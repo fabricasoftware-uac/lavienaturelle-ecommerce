@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Plus, Star, Eye } from "lucide-react"
+import { Plus, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore, type Product } from "@/lib/store-context"
 import { getCategoryById } from "@/lib/products"
@@ -45,7 +45,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Image Container */}
       <Link href={`/producto/${product.id}`} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden bg-secondary/30">
+        <div className="relative aspect-4/5 overflow-hidden bg-secondary/30">
           <Image
             src={product.image}
             alt={product.name}
@@ -97,28 +97,6 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
           {product.description}
         </p>
-
-        {/* Rating */}
-        {product.rating && (
-          <div className="flex items-center gap-1.5 mb-3">
-            <div className="flex items-center gap-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={cn(
-                    "h-3.5 w-3.5",
-                    i < Math.floor(product.rating!) 
-                      ? "fill-yellow-400 text-yellow-400" 
-                      : "fill-muted text-muted"
-                  )}
-                />
-              ))}
-            </div>
-            <span className="text-xs text-muted-foreground">
-              ({product.reviews})
-            </span>
-          </div>
-        )}
         
         {/* Price & Quick Add */}
         <div className="flex items-center justify-between pt-2 border-t border-border/50">

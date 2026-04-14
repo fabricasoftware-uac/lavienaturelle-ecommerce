@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 
 const PRODUCTS_PER_PAGE = 12
 
-type SortOption = "featured" | "price-asc" | "price-desc" | "name" | "rating"
+type SortOption = "featured" | "price-asc" | "price-desc" | "name"
 
 function CategoryPageContent() {
   const params = useParams()
@@ -43,8 +43,6 @@ function CategoryPageContent() {
         return [...filtered].sort((a, b) => b.price - a.price)
       case "name":
         return [...filtered].sort((a, b) => a.name.localeCompare(b.name))
-      case "rating":
-        return [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0))
       default:
         return filtered
     }
@@ -82,7 +80,7 @@ function CategoryPageContent() {
       <Header />
       <main className="flex-1">
         {/* Hero Banner */}
-        <section className="bg-gradient-to-br from-primary/10 via-secondary/50 to-accent/10 py-16">
+        <section className="bg-linear-to-br from-primary/10 via-secondary/50 to-accent/10 py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
@@ -146,7 +144,6 @@ function CategoryPageContent() {
                     <option value="price-asc">Precio: Menor a Mayor</option>
                     <option value="price-desc">Precio: Mayor a Menor</option>
                     <option value="name">Nombre A-Z</option>
-                    <option value="rating">Mejor Valorados</option>
                   </select>
                 </div>
 

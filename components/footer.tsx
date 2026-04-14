@@ -1,6 +1,7 @@
 import Link from "next/link"
-import { Leaf, Mail, Phone, MapPin, Instagram, Facebook, Twitter } from "lucide-react"
+import { Mail, Phone, MapPin, Instagram, Facebook, Twitter } from "lucide-react"
 import { categories } from "@/lib/products"
+import Image from "next/image"
 
 const footerLinks = {
   empresa: [
@@ -23,10 +24,15 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand */}
-          <div className="lg:col-span-2">
+          <div className="flex flex-col items-center lg:flex-none lg:col-span-2">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <Leaf className="h-8 w-8 text-primary" />
-              <span className="font-serif text-xl font-semibold">La Vie Naturelle</span>
+              <Image 
+                src="/logo-script.png" 
+                alt="La Vie Logo" 
+                className="h-50 w-auto object-contain"
+                width={20}
+                height={20}
+              />
             </Link>
             <p className="text-background/70 text-sm leading-relaxed max-w-sm">
               Dedicados a traerte los mejores productos naturales para un estilo de vida 

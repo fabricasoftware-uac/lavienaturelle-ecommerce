@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import {
-  Leaf,
   ArrowLeft,
   CreditCard,
   Truck,
@@ -72,8 +71,7 @@ function CheckoutForm() {
       clearCart()
     }
   }
-
-  if (cart.length === 0 && step !== "confirmacion") {
+  if (step == "confirmacion") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
@@ -93,7 +91,7 @@ function CheckoutForm() {
     )
   }
 
-  if (step === "confirmacion") {
+  if (false) {
     return (
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
@@ -134,8 +132,13 @@ function CheckoutForm() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2">
-              <Leaf className="h-7 w-7 text-primary" />
-              <span className="font-serif text-lg font-semibold text-foreground">La Vie Naturelle</span>
+              <Image 
+                src="/logo-full.png" 
+                alt="La Vie Naturelle Logo" 
+                className="h-10 w-auto object-contain"
+                height={10}
+                width={10}
+              />
             </Link>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="hidden sm:flex items-center gap-2">
@@ -535,7 +538,7 @@ function CheckoutForm() {
               <div className="space-y-4 mb-6">
                 {cart.map((item) => (
                   <div key={item.id} className="flex gap-4">
-                    <div className="relative h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                    <div className="relative h-16 w-16 shrink-0 rounded-lg overflow-hidden bg-muted">
                       <Image
                         src={item.image}
                         alt={item.name}

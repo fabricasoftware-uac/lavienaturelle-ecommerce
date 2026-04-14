@@ -59,7 +59,7 @@ export function CartDrawer() {
                   key={item.id}
                   className="flex gap-4 p-4 bg-secondary/30 rounded-xl"
                 >
-                  <div className="relative h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                  <div className="relative h-20 w-20 shrink-0 rounded-lg overflow-hidden bg-muted">
                     <Image
                       src={item.image}
                       alt={item.name}
@@ -114,9 +114,9 @@ export function CartDrawer() {
               <span className="font-serif font-semibold text-foreground">${cartTotal.toFixed(2)}</span>
             </div>
             <p className="text-xs text-muted-foreground">Envio e impuestos calculados al finalizar</p>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Link href="/checkout" onClick={() => setIsCartOpen(false)}>
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-14">
                   Finalizar Compra
                 </Button>
               </Link>

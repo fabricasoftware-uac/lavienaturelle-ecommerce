@@ -20,8 +20,6 @@ export interface Product {
     benefits?: string[]
   }
   inStock?: boolean
-  rating?: number
-  reviews?: number
 }
 
 export interface CartItem extends Product {

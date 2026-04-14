@@ -79,9 +79,7 @@ export const products: Product[] = [
       usage: "Anadir 3-5 gotas al difusor, o diluir con aceite portador para uso topico",
       benefits: ["Promueve el sueno reparador", "Reduce el estres y la ansiedad", "Alivia la tension muscular", "Propiedades antibacterianas naturales"]
     },
-    inStock: true,
-    rating: 4.9,
-    reviews: 124
+    inStock: true
   },
   {
     id: "aceite-2",
@@ -103,9 +101,7 @@ export const products: Product[] = [
       usage: "Aplicar unas gotas en piel humeda o puntas del cabello",
       benefits: ["Hidratacion intensa", "Reduce arrugas finas", "Fortalece el cabello", "Protege contra danos ambientales"]
     },
-    inStock: true,
-    rating: 4.8,
-    reviews: 89
+    inStock: true
   },
   {
     id: "aceite-3",
@@ -127,9 +123,7 @@ export const products: Product[] = [
       usage: "Difundir o inhalar para beneficios respiratorios. Diluir para uso topico",
       benefits: ["Despeja las vias respiratorias", "Refresca y energiza", "Apoyo inmunologico natural", "Repele insectos naturalmente"]
     },
-    inStock: true,
-    rating: 4.7,
-    reviews: 67
+    inStock: true
   },
   {
     id: "aceite-4",
@@ -152,9 +146,7 @@ export const products: Product[] = [
       usage: "Aplicar diluido en areas afectadas o anadir a productos de cuidado de la piel",
       benefits: ["Antiseptico potente", "Combate imperfecciones", "Calma la irritacion de la piel", "Promueve una piel clara"]
     },
-    inStock: true,
-    rating: 4.6,
-    reviews: 45
+    inStock: true
   },
   // Suplementos
   {
@@ -178,9 +170,7 @@ export const products: Product[] = [
       usage: "Tomar 6-10 tabletas diarias con agua o en batidos",
       benefits: ["Alto en proteinas", "Rico en hierro y B12", "Desintoxicante natural", "Potencia la energia"]
     },
-    inStock: true,
-    rating: 4.8,
-    reviews: 156
+    inStock: true
   },
   {
     id: "suplemento-2",
@@ -202,9 +192,7 @@ export const products: Product[] = [
       usage: "Tomar 1-2 capsulas diarias con alimentos",
       benefits: ["Reduce cortisol", "Mejora el enfoque", "Apoya el sueno", "Aumenta la resistencia"]
     },
-    inStock: true,
-    rating: 4.9,
-    reviews: 203
+    inStock: true
   },
   {
     id: "suplemento-3",
@@ -226,9 +214,7 @@ export const products: Product[] = [
       usage: "1-2 gotas diarias bajo la lengua o en bebidas",
       benefits: ["Apoyo inmunologico", "Fortalece huesos", "Mejora el animo", "Absorcion rapida"]
     },
-    inStock: true,
-    rating: 4.7,
-    reviews: 98
+    inStock: true
   },
   {
     id: "suplemento-4",
@@ -251,9 +237,7 @@ export const products: Product[] = [
       usage: "Tomar 1 capsula dos veces al dia con alimentos",
       benefits: ["Antiinflamatorio natural", "Salud articular", "Apoyo digestivo", "Potente antioxidante"]
     },
-    inStock: true,
-    rating: 4.8,
-    reviews: 134
+    inStock: true
   },
   // Tes
   {
@@ -277,9 +261,7 @@ export const products: Product[] = [
       usage: "Infusionar 1 bolsita en agua caliente (90C) por 5-7 minutos",
       benefits: ["Promueve el sueno", "Calma la ansiedad", "Sin cafeina", "Digestion suave"]
     },
-    inStock: true,
-    rating: 4.9,
-    reviews: 178
+    inStock: true
   },
   {
     id: "te-2",
@@ -301,9 +283,7 @@ export const products: Product[] = [
       usage: "Batir 1-2g con agua caliente (70-80C) usando chasen",
       benefits: ["Energia sostenida", "Alto en antioxidantes", "Mejora el enfoque", "Metabolismo activo"]
     },
-    inStock: true,
-    rating: 4.9,
-    reviews: 89
+    inStock: true
   },
   {
     id: "te-3",
@@ -325,9 +305,7 @@ export const products: Product[] = [
       usage: "Infusionar en agua recien hervida por 3-5 minutos",
       benefits: ["Alivia la digestion", "Refresca el aliento", "Reduce nauseas", "Sin cafeina"]
     },
-    inStock: true,
-    rating: 4.6,
-    reviews: 112
+    inStock: true
   },
   {
     id: "te-4",
@@ -350,8 +328,6 @@ export const products: Product[] = [
       usage: "Infusionar en agua caliente 5-7 minutos. Excelente frio con hielo",
       benefits: ["Rico en vitamina C", "Apoya el corazon", "Belleza para la piel", "Refrescante natural"]
     },
-    inStock: true,
-    rating: 4.7,
-    reviews: 67
+    inStock: true
   },
 ]

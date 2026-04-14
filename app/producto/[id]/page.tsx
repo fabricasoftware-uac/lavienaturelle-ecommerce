@@ -7,7 +7,6 @@ import { notFound } from "next/navigation"
 import { 
   ChevronLeft, 
   ShoppingCart, 
-  Star, 
   Check, 
   Minus, 
   Plus,
@@ -138,28 +137,6 @@ function ProductDetailContent({ productId }: { productId: string }) {
               <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-foreground text-balance">
                 {product.name}
               </h1>
-
-              {/* Rating */}
-              {product.rating && (
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={cn(
-                          "h-5 w-5",
-                          i < Math.floor(product.rating!) 
-                            ? "fill-yellow-400 text-yellow-400" 
-                            : "fill-muted text-muted"
-                        )}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {product.rating} ({product.reviews} resenas)
-                  </span>
-                </div>
-              )}
 
               {/* Price */}
               <div className="flex items-baseline gap-3">
