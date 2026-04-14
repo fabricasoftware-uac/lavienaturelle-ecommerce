@@ -23,8 +23,8 @@ export function HeroSection() {
               100% Natural y Organico
             </div>
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground leading-tight tracking-tight text-balance">
-              Abraza el poder de la{" "}
-              <span className="text-primary">naturaleza</span>
+              Creamos soluciones de origen{" "}
+              <span className="text-primary">Natural</span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
               En La Vie Naturelle creamos soluciones capilares de origen vegetal
