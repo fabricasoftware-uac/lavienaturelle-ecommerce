@@ -80,7 +80,7 @@ function CategoryPageContent() {
       <Header />
       <main className="flex-1">
         {/* Hero Banner */}
-        <section className="bg-linear-to-br from-primary/10 via-secondary/50 to-accent/10 py-16">
+        <section className="bg-linear-to-br from-primary/10 via-secondary/50 to-accent/10 py-8">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">

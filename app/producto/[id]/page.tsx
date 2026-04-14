@@ -59,7 +59,7 @@ function ProductDetailContent({ productId }: { productId: string }) {
               Inicio
             </Link>
             <span>/</span>
-            <Link href="/#catalogo" className="hover:text-primary transition-colors">
+            <Link href={`/categoria/${category?.id}`} className="hover:text-primary transition-colors">
               {category?.namePlural || "Productos"}
             </Link>
             <span>/</span>
