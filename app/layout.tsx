@@ -17,25 +17,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: 'La Vie Naturelle | Tienda de Productos Naturales',
-  description: 'Descubre productos naturales premium - aceites organicos, suplementos y tes herbales para un estilo de vida mas saludable.',
-  generator: 'v0.app',
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
-  },
+  description: 'Descubre productos naturales premium - Shampoo, Acondicionador, Tónicos, Aceites y mas.',
 }
 
 export default function RootLayout({
