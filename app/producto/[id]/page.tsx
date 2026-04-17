@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Header } from "@/components/header"
 import { CartDrawer } from "@/components/cart-drawer"
 import { Footer } from "@/components/footer"
-import { StoreProvider, useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/store-context"
 import { getProductById, getCategoryById } from "@/lib/products"
 import { cn } from "@/lib/utils"
 
@@ -303,10 +303,6 @@ function ProductDetailContent({ productId }: { productId: string }) {
 
 export default function ProductPage({ params }: ProductPageProps) {
   const resolvedParams = use(params)
-  
-  return (
-    <StoreProvider>
-      <ProductDetailContent productId={resolvedParams.id} />
-    </StoreProvider>
-  )
+
+  return <ProductDetailContent productId={resolvedParams.id} />
 }

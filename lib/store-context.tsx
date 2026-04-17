@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 
 export interface Product {
   id: string
@@ -48,6 +48,7 @@ interface StoreContextType {
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined)
+const CART_STORAGE_KEY = "lavienaturelle_cart"
 
 // Fake credentials
 const USERS = {
@@ -106,6 +107,32 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     setUser(null)
   }, [])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    try {
+      const storedCart = window.localStorage.getItem(CART_STORAGE_KEY)
+      if (!storedCart) return
+
+      const parsed = JSON.parse(storedCart)
+      if (Array.isArray(parsed)) {
+        setCart(parsed)
+      }
+    } catch (error) {
+      console.error("Error loading cart from storage", error)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    try {
+      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart))
+    } catch (error) {
+      console.error("Error saving cart to storage", error)
+    }
+  }, [cart])
 
   return (
     <StoreContext.Provider

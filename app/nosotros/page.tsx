@@ -5,7 +5,6 @@ import Link from "next/link"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { CartDrawer } from "@/components/cart-drawer"
-import { StoreProvider } from "@/lib/store-context"
 import { 
   Leaf, 
   Heart, 
@@ -84,7 +83,7 @@ function AboutPageContent() {
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative py-20 bg-gradient-to-br from-primary/10 via-background to-accent/10 overflow-hidden">
+        <section className="relative py-20 bg-linear-to-br from-primary/10 via-background to-accent/10 overflow-hidden">
           <div className="absolute inset-0 opacity-5">
             <div className="absolute top-20 left-10 w-72 h-72 bg-primary rounded-full blur-3xl" />
             <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent rounded-full blur-3xl" />
@@ -204,7 +203,7 @@ function AboutPageContent() {
               <div className="order-2 lg:order-1">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-4">
-                    <div className="aspect-[4/5] rounded-2xl overflow-hidden">
+                    <div className="aspect-4/5 rounded-2xl overflow-hidden">
                       <Image
                         src="https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=400&h=500&fit=crop"
                         alt="Aceites esenciales"
@@ -233,7 +232,7 @@ function AboutPageContent() {
                         className="object-cover w-full h-full"
                       />
                     </div>
-                    <div className="aspect-[4/5] rounded-2xl overflow-hidden">
+                    <div className="aspect-4/5 rounded-2xl overflow-hidden">
                       <Image
                         src="https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&h=500&fit=crop"
                         alt="Productos organicos"
@@ -397,9 +396,5 @@ function AboutPageContent() {
 }
 
 export default function AboutPage() {
-  return (
-    <StoreProvider>
-      <AboutPageContent />
-    </StoreProvider>
-  )
+  return <AboutPageContent />
 }

@@ -8,7 +8,6 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { CartDrawer } from "@/components/cart-drawer"
 import { ProductCard } from "@/components/product-card"
-import { StoreProvider } from "@/lib/store-context"
 import { products, categories, getCategoryById, getCategoryIcon } from "@/lib/products"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -298,9 +297,5 @@ function CategoryPageContent() {
 }
 
 export default function CategoryPage() {
-  return (
-    <StoreProvider>
-      <CategoryPageContent />
-    </StoreProvider>
-  )
+  return <CategoryPageContent />
 }

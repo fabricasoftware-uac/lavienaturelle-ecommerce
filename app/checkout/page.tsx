@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import {
@@ -18,7 +17,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useStore, StoreProvider } from "@/lib/store-context"
+import { useStore } from "@/lib/store-context"
 import { cn } from "@/lib/utils"
 
 type CheckoutStep = "informacion" | "envio" | "pago" | "confirmacion"
@@ -31,7 +30,6 @@ const stepLabels: Record<CheckoutStep, string> = {
 }
 
 function CheckoutForm() {
-  const router = useRouter()
   const { cart, cartTotal, clearCart, user } = useStore()
   const [step, setStep] = useState<CheckoutStep>("informacion")
   const [formData, setFormData] = useState({
@@ -43,17 +41,19 @@ function CheckoutForm() {
     apartment: "",
     city: "",
     state: "",
-    zipCode: "",
-    country: "Mexico",
+    country: "Colombia",
     cardNumber: "",
     cardName: "",
     expiry: "",
     cvv: "",
   })
 
-  const shippingCost = cartTotal > 500 ? 0 : 99
-  const tax = cartTotal * 0.16
-  const total = cartTotal + shippingCost + tax
+  const shippingCost = cartTotal
+  const total = cartTotal
+  console.log(total)
+  console.log(cart)
+  console.log(cartTotal)
+  console.log(shippingCost)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -71,7 +71,7 @@ function CheckoutForm() {
       clearCart()
     }
   }
-  if (step == "confirmacion") {
+  if (cart.length === 0 && step == "confirmacion") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
@@ -91,7 +91,7 @@ function CheckoutForm() {
     )
   }
 
-  if (false) {
+  if (step == "confirmacion") {
     return (
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
@@ -339,38 +339,25 @@ function CheckoutForm() {
                           name="city"
                           value={formData.city}
                           onChange={handleInputChange}
-                          placeholder="Ciudad de Mexico"
+                          placeholder="Ingresa la ciudad"
                           required
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-foreground mb-2">
-                          Estado
+                          Departamento
                         </label>
                         <Input
                           type="text"
                           name="state"
                           value={formData.state}
                           onChange={handleInputChange}
-                          placeholder="CDMX"
+                          placeholder="Ingresa el departamento"
                           required
                         />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          Codigo Postal
-                        </label>
-                        <Input
-                          type="text"
-                          name="zipCode"
-                          value={formData.zipCode}
-                          onChange={handleInputChange}
-                          placeholder="06600"
-                          required
-                        />
-                      </div>
                       <div>
                         <label className="block text-sm font-medium text-foreground mb-2">
                           Pais
@@ -388,25 +375,9 @@ function CheckoutForm() {
 
                   {/* Shipping Method */}
                   <div className="mt-8">
-                    <h3 className="font-medium text-foreground mb-4">Metodo de Envio</h3>
+                    <h3 className="font-medium text-foreground mb-4">Informacion del envio</h3>
                     <div className="space-y-3">
-                      <label className="flex items-center justify-between p-4 rounded-lg border-2 border-primary bg-primary/5 cursor-pointer">
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="radio"
-                            name="shipping"
-                            defaultChecked
-                            className="text-primary focus:ring-primary"
-                          />
-                          <div>
-                            <p className="font-medium text-foreground">Envio Estandar</p>
-                            <p className="text-sm text-muted-foreground">5-7 dias habiles</p>
-                          </div>
-                        </div>
-                        <span className="font-medium text-foreground">
-                          {cartTotal > 500 ? "Gratis" : "$99.00"}
-                        </span>
-                      </label>
+                      
                       <label className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-colors">
                         <div className="flex items-center gap-3">
                           <input
@@ -419,7 +390,7 @@ function CheckoutForm() {
                             <p className="text-sm text-muted-foreground">2-3 dias habiles</p>
                           </div>
                         </div>
-                        <span className="font-medium text-foreground">$199.00</span>
+                        <span className="font-medium text-foreground">$15.000</span>
                       </label>
                     </div>
                   </div>
@@ -569,16 +540,6 @@ function CheckoutForm() {
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="text-foreground">${cartTotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Envio</span>
-                  <span className="text-foreground">
-                    {shippingCost === 0 ? "Gratis" : `$${shippingCost.toFixed(2)}`}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">IVA (16%)</span>
-                  <span className="text-foreground">${tax.toFixed(2)}</span>
-                </div>
                 <div className="border-t border-border pt-3 flex justify-between">
                   <span className="font-medium text-foreground">Total</span>
                   <span className="font-serif text-xl font-semibold text-primary">
@@ -589,10 +550,6 @@ function CheckoutForm() {
 
               {/* Trust Badges */}
               <div className="mt-6 pt-6 border-t border-border space-y-3">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Truck className="h-4 w-4 text-primary" />
-                  <span>Envio gratis en pedidos mayores a $500</span>
-                </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Shield className="h-4 w-4 text-primary" />
                   <span>Transaccion 100% segura</span>
@@ -607,9 +564,5 @@ function CheckoutForm() {
 }
 
 export default function CheckoutPage() {
-  return (
-    <StoreProvider>
-      <CheckoutForm />
-    </StoreProvider>
-  )
+  return <CheckoutForm />
 }

@@ -26,7 +26,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useStore, StoreProvider } from "@/lib/store-context"
+import { useStore } from "@/lib/store-context"
 import { products } from "@/lib/products"
 import { cn } from "@/lib/utils"
 
@@ -407,9 +407,5 @@ function AdminDashboard() {
 }
 
 export default function AdminPage() {
-  return (
-    <StoreProvider>
-      <AdminDashboard />
-    </StoreProvider>
-  )
+  return <AdminDashboard />
 }

@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Leaf, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useStore, StoreProvider } from "@/lib/store-context"
+import { useStore } from "@/lib/store-context"
 
 function LoginForm() {
   const router = useRouter()
@@ -187,9 +187,5 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
-  return (
-    <StoreProvider>
-      <LoginForm />
-    </StoreProvider>
-  )
+  return <LoginForm />
 }
