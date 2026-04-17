@@ -207,12 +207,6 @@ function ProductDetailContent({ productId }: { productId: string }) {
               <div className="grid grid-cols-2 gap-4 pt-4">
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <div className="p-2 rounded-lg bg-secondary/50">
-                    <Truck className="h-5 w-5 text-primary" />
-                  </div>
-                  <span>Envio gratis +$50</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <div className="p-2 rounded-lg bg-secondary/50">
                     <Shield className="h-5 w-5 text-primary" />
                   </div>
                   <span>Garantia de calidad</span>
@@ -222,12 +216,6 @@ function ProductDetailContent({ productId }: { productId: string }) {
                     <Leaf className="h-5 w-5 text-primary" />
                   </div>
                   <span>100% Natural</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <div className="p-2 rounded-lg bg-secondary/50">
-                    <Package className="h-5 w-5 text-primary" />
-                  </div>
-                  <span>Empaque ecologico</span>
                 </div>
               </div>
             </div>

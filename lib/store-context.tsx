@@ -44,6 +44,7 @@ interface StoreContextType {
   setIsCartOpen: (open: boolean) => void
   user: User | null
   login: (email: string, password: string) => boolean
+  register: (name: string, email: string, password: string) => boolean
   logout: () => void
 }
 
@@ -104,6 +105,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return false
   }, [])
 
+  const register = useCallback((name: string, email: string, password: string): boolean => {
+    // Check if email already exists
+    if (USERS[email as keyof typeof USERS]) {
+      return false
+    }
+    // Add to mock users
+    ;(USERS as any)[email] = { password, role: "user", name }
+    setUser({ email, role: "user", name })
+    return true
+  }, [])
+
   const logout = useCallback(() => {
     setUser(null)
   }, [])
@@ -148,6 +160,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setIsCartOpen,
         user,
         login,
+        register,
         logout,
       }}
     >

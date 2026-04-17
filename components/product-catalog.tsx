@@ -81,7 +81,7 @@ export function ProductCatalog() {
             <button
               onClick={() => handleCategoryChange("all")}
               className={cn(
-                "px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200",
+                "px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
                 activeCategory === "all"
                   ? "bg-primary text-primary-foreground shadow-md"
                   : "bg-card text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border"
@@ -96,7 +96,7 @@ export function ProductCatalog() {
                   key={cat.id}
                   onClick={() => handleCategoryChange(cat.id)}
                   className={cn(
-                    "inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200",
+                    "inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
                     activeCategory === cat.id
                       ? "bg-primary text-primary-foreground shadow-md"
                       : "bg-card text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border"
