@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/store-context"
 import { products } from "@/lib/products"
 import { cn } from "@/lib/utils"
+import { OrdersPanel } from "@/components/admin/orders-panel"
 
 const navigation = [
   { name: "Panel", icon: LayoutDashboard, href: "#" },
@@ -319,10 +320,12 @@ function AdminDashboard() {
                     Administra tu catalogo de productos
                   </p>
                 </div>
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Agregar Producto
-                </Button>
+                <Link href="/admin/productos/nuevo">
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Agregar Producto
+                  </Button>
+                </Link>
               </div>
 
               {/* Products Table */}
@@ -395,7 +398,11 @@ function AdminDashboard() {
             </>
           )}
 
-          {(activeTab === "Pedidos" || activeTab === "Clientes" || activeTab === "Configuracion") && (
+          {activeTab === "Pedidos" && (
+            <OrdersPanel />
+          )}
+
+          {(activeTab === "Clientes" || activeTab === "Configuracion") && (
             <div className="flex items-center justify-center h-64 bg-card rounded-xl border border-border">
               <p className="text-muted-foreground">Pagina de {activeTab} proximamente...</p>
             </div>
