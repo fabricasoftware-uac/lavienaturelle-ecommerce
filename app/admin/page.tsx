@@ -30,6 +30,7 @@ import { useStore } from "@/lib/store-context"
 import { products } from "@/lib/products"
 import { cn } from "@/lib/utils"
 import { OrdersPanel } from "@/components/admin/orders-panel"
+import { ProductsPanel } from "@/components/admin/products-panel"
 
 const navigation = [
   { name: "Panel", icon: LayoutDashboard, href: "#" },
@@ -311,91 +312,7 @@ function AdminDashboard() {
           )}
 
           {activeTab === "Productos" && (
-            <>
-              {/* Page Header */}
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h1 className="font-serif text-2xl font-semibold text-foreground">Productos</h1>
-                  <p className="text-muted-foreground mt-1">
-                    Administra tu catalogo de productos
-                  </p>
-                </div>
-                <Link href="/admin/productos/nuevo">
-                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Agregar Producto
-                  </Button>
-                </Link>
-              </div>
-
-              {/* Products Table */}
-              <div className="bg-card rounded-xl border border-border">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Producto
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Categoria
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Precio
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Estado
-                        </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Acciones
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {products.map((product) => (
-                        <tr key={product.id} className="hover:bg-secondary/30">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center gap-3">
-                              <img
-                                src={product.image}
-                                alt={product.name}
-                                className="h-10 w-10 rounded-lg object-cover"
-                              />
-                              <span className="text-sm font-medium text-foreground">
-                                {product.name}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm text-muted-foreground capitalize">
-                              {product.category}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                            ${product.price.toFixed(2)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                              Activo
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <Edit className="h-4 w-4 text-muted-foreground" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <Trash2 className="h-4 w-4 text-muted-foreground" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </>
+            <ProductsPanel />
           )}
 
           {activeTab === "Pedidos" && (

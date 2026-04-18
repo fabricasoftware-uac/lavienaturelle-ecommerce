@@ -291,6 +291,7 @@ export function OrdersPanel() {
             <tr className="bg-muted/10 border-b border-border">
               <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">ID</th>
               <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Cliente</th>
+              <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Dirección</th>
               <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Fecha</th>
               <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Estado</th>
               <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Acciones</th>
@@ -308,10 +309,34 @@ export function OrdersPanel() {
                   <div className="text-sm font-semibold">{order.customer.name}</div>
                   <div className="text-[11px] text-muted-foreground">{order.customer.email}</div>
                 </td>
+                <td className="px-6 py-4">
+                  <div className="text-xs text-muted-foreground max-w-45 truncate font-medium" title={order.customer.address}>
+                    {order.customer.address}
+                  </div>
+                </td>
                 <td className="px-6 py-4 text-xs text-muted-foreground">{new Date(order.date).toLocaleDateString()}</td>
                 <td className="px-6 py-4">{getShippingBadge(order.shippingStatus)}</td>
-                <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
-                  <Button variant="outline" size="sm" onClick={() => handleOpenDetail(order)} className="h-8 text-xs font-medium rounded-lg">Ver Detalles</Button>
+                <td className="px-6 py-4 text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    {order.shippingStatus !== "Shipped" && order.shippingStatus !== "Delivered" && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleMarkAsShipped(order.id)}
+                        className="bg-primary text-white hover:bg-primary/90 h-8 text-xs font-semibold px-3 rounded-lg cursor-pointer"
+                      >
+                        Enviar
+                      </Button>
+                    )}
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleOpenDetail(order)} 
+                      className="h-8 text-xs font-semibold px-3 rounded-lg border-border hover:bg-secondary cursor-pointer"
+                    >
+                      Ver Detalles
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
