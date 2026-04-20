@@ -212,13 +212,14 @@ export function ProductsPanel() {
           className="bg-primary hover:bg-primary/90 text-white h-11 rounded-xl px-6 font-bold text-xs uppercase tracking-widest cursor-pointer shadow-lg shadow-primary/10 transition-all active:scale-95"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Añadir Producto
+          <span className="hidden sm:inline">Añadir Producto</span>
+          <span className="sm:hidden">Añadir Producto</span>
         </Button>
       </div>
 
       {/* Filters Bar */}
       <div className="bg-card rounded-xl border border-border p-3 shadow-sm">
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col lg:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -228,13 +229,13 @@ export function ProductsPanel() {
               className="pl-10 bg-secondary/30 border-none h-11 rounded-xl text-sm font-medium"
             />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="grid grid-cols-2 lg:flex items-center gap-3">
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary/40 border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50 min-w-[150px]"
+              className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary/40 border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50 lg:min-w-37.5"
             >
-              <option value="All">Categorías</option>
+              <option value="All">Todas las Categorías</option>
               {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </select>
             <select
@@ -242,7 +243,7 @@ export function ProductsPanel() {
               onChange={(e) => setStockFilter(e.target.value)}
               className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary/40 border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50"
             >
-              <option value="All">Stock</option>
+              <option value="All">Estado Stock</option>
               <option value="In Stock">En Stock</option>
               <option value="Low Stock">Bajo</option>
               <option value="Out of Stock">Agotado</option>
@@ -251,8 +252,8 @@ export function ProductsPanel() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -273,7 +274,7 @@ export function ProductsPanel() {
                 <tr><td colSpan={5} className="px-6 py-24 text-center text-muted-foreground font-medium italic opacity-60">No se encontraron productos coincidentes.</td></tr>
               ) : (
                 filteredProducts.map((p) => (
-                  <tr key={p.id} className="hover:bg-primary/[0.02] transition-colors group">
+                  <tr key={p.id} className="hover:bg-primary/2 transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
                         <div className="h-12 w-12 rounded-xl border border-border bg-muted overflow-hidden shrink-0 shadow-sm transition-transform group-hover:scale-105">
@@ -314,6 +315,61 @@ export function ProductsPanel() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-card rounded-2xl border border-border p-4 space-y-4 shadow-sm">
+              <div className="flex gap-4">
+                <Skeleton className="h-16 w-16 rounded-xl shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+              <Skeleton className="h-10 w-full rounded-xl" />
+            </div>
+          ))
+        ) : filteredProducts.length === 0 ? (
+          <div className="bg-card rounded-2xl border border-border p-12 text-center text-muted-foreground font-medium italic opacity-60">
+            No se encontraron productos.
+          </div>
+        ) : (
+          filteredProducts.map((p) => (
+            <div key={p.id} className="bg-card rounded-2xl border border-border p-4 shadow-sm active:scale-[0.98] transition-all" onClick={() => handleOpenDetail(p)}>
+              <div className="flex gap-4 mb-4">
+                <div className="h-20 w-20 rounded-xl border border-border bg-muted overflow-hidden shrink-0 shadow-sm">
+                  <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <span className="text-sm font-bold text-foreground leading-tight truncate">{p.name}</span>
+                    {getProductBadge(p.badge)}
+                  </div>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase mb-2 tracking-tighter">ID: {p.id}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-muted-foreground/80">{p.category}</span>
+                    <span className="h-1 w-1 rounded-full bg-border" />
+                    <span className="text-sm font-black text-foreground">${Number(p.price || 0).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between border-t border-border/50 pt-4">
+                {getStockBadge(p.stockStatus)}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 text-[11px] font-bold text-primary"
+                >
+                  Ver Detalles
+                  <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <ProductFormSheet 
@@ -372,23 +428,23 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
       <SheetContent className="sm:max-w-2xl p-0 flex flex-col h-full border-l border-border bg-background shadow-2xl">
         <div className="flex flex-col h-full overflow-hidden">
           {/* Header */}
-          <div className="px-8 pt-10 pb-6 border-b border-border bg-card/50 backdrop-blur-md z-30 shrink-0">
-            <div className="flex items-center justify-between mb-4">
+          <div className="px-5 sm:px-8 pt-8 sm:pt-10 pb-6 border-b border-border bg-card/50 backdrop-blur-md z-30 shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <div>
-                <SheetTitle className="text-xl font-bold tracking-tight text-foreground">{title}</SheetTitle>
-                <SheetDescription className="text-xs font-semibold text-muted-foreground mt-1">
+                <SheetTitle className="text-lg sm:text-xl font-bold tracking-tight text-foreground">{title}</SheetTitle>
+                <SheetDescription className="text-[10px] sm:text-xs font-semibold text-muted-foreground mt-1">
                   {isCreation ? "Añade un nuevo producto a tu catálogo botánico." : `Gestión de información para ID: ${data.id}`}
                 </SheetDescription>
               </div>
-              <div className="flex items-center gap-2 mr-6">
+              <div className="flex items-center gap-2">
                  {!isCreation && !isEditing ? (
-                  <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="rounded-xl h-9 px-5 text-[11px] font-bold uppercase tracking-wider cursor-pointer">
+                  <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="flex-1 sm:flex-initial rounded-xl h-9 px-5 text-[11px] font-bold uppercase tracking-wider cursor-pointer">
                     <Edit className="h-3.5 w-3.5 mr-2" /> Editar
                   </Button>
                  ) : (
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)} className="rounded-xl h-9 px-4 text-[11px] font-bold text-muted-foreground">Cancelar</Button>
-                    <Button onClick={onSave} className="bg-primary text-white rounded-xl h-9 px-6 text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10 transition-all hover:bg-primary/90">
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)} className="flex-1 sm:flex-initial rounded-xl h-9 px-4 text-[11px] font-bold text-muted-foreground">Cancelar</Button>
+                    <Button onClick={onSave} className="flex-1 sm:flex-initial bg-primary text-white rounded-xl h-9 px-6 text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10 transition-all hover:bg-primary/90">
                       <Save className="h-3.5 w-3.5 mr-2" /> {isCreation ? "Crear" : "Guardar"}
                     </Button>
                   </div>
@@ -396,15 +452,15 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
               </div>
             </div>
             {!isEditing && (
-              <div className="flex gap-3">
-                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">{data.category}</Badge>
-                {data.badge && <Badge className="bg-orange-500 text-white border-none">{data.badge}</Badge>}
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[10px]">{data.category}</Badge>
+                {data.badge && <Badge className="bg-orange-500 text-white border-none text-[10px]">{data.badge}</Badge>}
               </div>
             )}
           </div>
 
           {/* Scrollable Form Content */}
-          <div className="flex-1 overflow-y-auto px-8 py-8 space-y-12">
+          <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-6 sm:py-8 space-y-10 sm:space-y-12">
             
             {/* Image Upload Pattern */}
             <section className="space-y-4">
@@ -412,7 +468,7 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                 <ImageIcon className="h-4 w-4 text-primary" /> Imágenes del Producto <span className="text-[9px] lowercase font-medium opacity-50">(opcional)</span>
               </h3>
               {isEditing ? (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="h-40 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 hover:bg-muted/30 transition-all cursor-pointer group">
                     <UploadCloud className="h-8 w-8 text-muted-foreground/50 group-hover:text-primary transition-colors" />
                     <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Subir</p>
@@ -432,7 +488,7 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                   )}
                 </div>
               ) : (
-                <div className="h-64 w-full rounded-2xl overflow-hidden border border-border shadow-inner">
+                <div className="h-48 sm:h-64 w-full rounded-2xl overflow-hidden border border-border shadow-inner">
                    <img src={data.image || "https://via.placeholder.com/300?text=No+Image"} alt={data.name} className="h-full w-full object-cover" />
                 </div>
               )}
@@ -444,13 +500,13 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                  <Info className="h-4 w-4 text-primary" /> Información General
                </h3>
                {isEditing ? (
-                 <div className="grid grid-cols-1 gap-5 p-7 rounded-[32px] bg-white border border-border shadow-inner animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="grid grid-cols-1 gap-5 p-5 sm:p-7 rounded-3xl sm:rounded-4xl bg-white border border-border shadow-inner animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="space-y-5">
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Nombre Comercial</label>
                         <Input placeholder="Ej: Jabón de Romero" value={data.name} onChange={(e) => setForm({...data, name: e.target.value})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Precio ($)</label>
                           <Input type="number" value={data.price} onChange={(e) => setForm({...data, price: e.target.value})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
@@ -504,26 +560,26 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                         <textarea 
                           value={data.description} 
                           onChange={(e) => setForm({...data, description: e.target.value})} 
-                          className="w-full min-h-[100px] bg-secondary/20 rounded-2xl border-none p-4 font-bold text-sm outline-none resize-none" 
+                          className="w-full min-h-25 bg-secondary/20 rounded-2xl border-none p-4 font-bold text-sm outline-none resize-none" 
                         />
                       </div>
                     </div>
                  </div>
                ) : (
-                 <div className="grid grid-cols-2 gap-4">
-                    <div className="p-5 rounded-3xl bg-secondary/10 border border-border/40">
-                      <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Precio</p>
-                      <p className="text-sm font-black text-foreground">${Number(data.price || 0).toFixed(2)}</p>
-                    </div>
-                    <div className="p-5 rounded-3xl bg-secondary/10 border border-border/40">
-                      <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Stock</p>
-                      <p className="text-sm font-black text-foreground">{data.stock} unidades</p>
-                    </div>
-                    <div className="p-6 rounded-3xl bg-secondary/10 border border-border/40 col-span-2">
-                      <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Descripción</p>
-                      <p className="text-sm font-medium leading-relaxed italic text-foreground/80">{data.description}</p>
-                    </div>
-                 </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     <div className="p-5 rounded-3xl bg-secondary/10 border border-border/40">
+                       <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Precio</p>
+                       <p className="text-sm font-black text-foreground">${Number(data.price || 0).toFixed(2)}</p>
+                     </div>
+                     <div className="p-5 rounded-3xl bg-secondary/10 border border-border/40">
+                       <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Stock</p>
+                       <p className="text-sm font-black text-foreground">{data.stock} unidades</p>
+                     </div>
+                     <div className="p-6 rounded-3xl bg-secondary/10 border border-border/40 sm:col-span-2">
+                       <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Descripción</p>
+                       <p className="text-sm font-medium leading-relaxed italic text-foreground/80">{data.description}</p>
+                     </div>
+                  </div>
                )}
             </section>
 
@@ -535,8 +591,8 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                
                <div className="space-y-8">
                  {/* Content, Origin, Ingredients */}
-                 <div className={cn("grid grid-cols-1 gap-5", isEditing ? "p-7 rounded-[32px] bg-muted/20 border border-border" : "")}>
-                    <div className="grid grid-cols-2 gap-4">
+                 <div className={cn("grid grid-cols-1 gap-5", isEditing ? "p-5 sm:p-7 rounded-3xl sm:rounded-4xl bg-muted/20 border border-border" : "")}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Contenido <span className="opacity-40">(opcional)</span></label>
                         {isEditing ? <Input placeholder="Ej: 30ml" value={data.content} onChange={(e) => setForm({...data, content: e.target.value})} className="h-11 bg-card rounded-xl border-border font-bold text-xs" /> : <p className="text-sm font-bold text-foreground/80">{data.content || "N/A"}</p>}
@@ -548,7 +604,7 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Ingredientes <span className="opacity-40">(opcional)</span></label>
-                      {isEditing ? <textarea placeholder="Lista de ingredientes..." value={data.ingredients} onChange={(e) => setForm({...data, ingredients: e.target.value})} className="w-full min-h-[80px] bg-card rounded-xl border-border p-3 text-xs font-bold outline-none resize-none" /> : <p className="text-sm font-bold text-foreground/80 leading-relaxed">{data.ingredients || "No especificado."}</p>}
+                      {isEditing ? <textarea placeholder="Lista de ingredientes..." value={data.ingredients} onChange={(e) => setForm({...data, ingredients: e.target.value})} className="w-full min-h-20 bg-card rounded-xl border-border p-3 text-xs font-bold outline-none resize-none" /> : <p className="text-sm font-bold text-foreground/80 leading-relaxed">{data.ingredients || "No especificado."}</p>}
                     </div>
                  </div>
 
@@ -579,14 +635,14 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                  {/* Usage */}
                  <div className="space-y-4">
                     <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Modo de Uso <span className="text-[9px] lowercase font-medium opacity-50 ml-2">(opcional)</span></label>
-                    {isEditing ? <textarea placeholder="Instrucciones de uso..." value={data.usage} onChange={(e) => setForm({...data, usage: e.target.value})} className="w-full min-h-[80px] bg-muted/20 rounded-xl border-border p-3 text-xs font-bold outline-none resize-none" /> : <div className="p-5 rounded-3xl bg-primary/5 border border-primary/10 italic text-xs font-bold text-primary/80 leading-relaxed"><Beaker className="h-4 w-4 mb-2 opacity-50" />{data.usage || "No especificado."}</div>}
+                    {isEditing ? <textarea placeholder="Instrucciones de uso..." value={data.usage} onChange={(e) => setForm({...data, usage: e.target.value})} className="w-full min-h-20 bg-muted/20 rounded-xl border-border p-3 text-xs font-bold outline-none resize-none" /> : <div className="p-5 rounded-3xl bg-primary/5 border border-primary/10 italic text-xs font-bold text-primary/80 leading-relaxed"><Beaker className="h-4 w-4 mb-2 opacity-50" />{data.usage || "No especificado."}</div>}
                  </div>
                </div>
             </section>
           </div>
 
           {!isEditing && (
-             <div className="p-8 border-t border-border bg-card/80 backdrop-blur-md shrink-0">
+             <div className="p-5 sm:p-8 border-t border-border bg-card/80 backdrop-blur-md shrink-0">
                <Button variant="outline" className="w-full h-12 rounded-2xl border-destructive/20 text-destructive hover:bg-destructive/10 font-black text-[10px] uppercase tracking-widest cursor-pointer shadow-sm">
                  <Trash2 className="h-4 w-4 mr-2" /> Eliminar Producto
                </Button>

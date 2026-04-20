@@ -31,6 +31,7 @@ import { products } from "@/lib/products"
 import { cn } from "@/lib/utils"
 import { OrdersPanel } from "@/components/admin/orders-panel"
 import { ProductsPanel } from "@/components/admin/products-panel"
+import { ClientsPanel } from "@/components/admin/clients-panel"
 
 const navigation = [
   { name: "Panel", icon: LayoutDashboard, href: "#" },
@@ -319,7 +320,11 @@ function AdminDashboard() {
             <OrdersPanel />
           )}
 
-          {(activeTab === "Clientes" || activeTab === "Configuracion") && (
+          {activeTab === "Clientes" && (
+            <ClientsPanel />
+          )}
+
+          {activeTab === "Configuracion" && (
             <div className="flex items-center justify-center h-64 bg-card rounded-xl border border-border">
               <p className="text-muted-foreground">Pagina de {activeTab} proximamente...</p>
             </div>

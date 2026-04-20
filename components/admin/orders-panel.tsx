@@ -450,7 +450,7 @@ export function OrdersPanel() {
                       <textarea
                         value={editForm.customerAddress}
                         onChange={(e) => setEditForm({ ...editForm, customerAddress: e.target.value })}
-                        className="w-full min-h-[80px] rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all resize-none"
+                        className="w-full min-h-20 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all resize-none"
                       />
                     </div>
                   ) : (
@@ -484,7 +484,7 @@ export function OrdersPanel() {
                 {/* Historial */}
                 <section className="space-y-6 pb-6">
                   <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Historial de Eventos</h3>
-                  <div className="relative space-y-6 pl-3 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-border">
+                  <div className="relative space-y-6 pl-3 before:absolute before:left-2.75 before:top-2 before:bottom-2 before:w-px before:bg-border">
                     {selectedOrder.history.map((entry, idx) => (
                       <div key={idx} className="relative pl-8">
                         <div className={cn("absolute left-0 top-1.5 h-6 w-6 rounded-full flex items-center justify-center z-10", idx === 0 ? "bg-primary text-white scale-110" : "bg-muted border border-border scale-90")}>
