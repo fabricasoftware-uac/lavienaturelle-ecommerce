@@ -38,7 +38,6 @@ const navigation = [
   { name: "Productos", icon: Package, href: "#" },
   { name: "Pedidos", icon: ShoppingCart, href: "#" },
   { name: "Clientes", icon: Users, href: "#" },
-  { name: "Configuracion", icon: Settings, href: "#" },
 ]
 
 const stats = [
@@ -127,7 +126,7 @@ function AdminDashboard() {
                 key={item.name}
                 onClick={() => setActiveTab(item.name)}
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-colors",
                   activeTab === item.name
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -141,15 +140,6 @@ function AdminDashboard() {
 
           {/* User */}
           <div className="p-4 border-t border-border">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-sm font-medium text-primary">AD</span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">Admin</p>
-                <p className="text-xs text-muted-foreground">admin@gmail.com</p>
-              </div>
-            </div>
             <Button
               variant="ghost"
               className="w-full justify-start text-muted-foreground hover:text-foreground"
@@ -322,12 +312,6 @@ function AdminDashboard() {
 
           {activeTab === "Clientes" && (
             <ClientsPanel />
-          )}
-
-          {activeTab === "Configuracion" && (
-            <div className="flex items-center justify-center h-64 bg-card rounded-xl border border-border">
-              <p className="text-muted-foreground">Pagina de {activeTab} proximamente...</p>
-            </div>
           )}
         </main>
       </div>
