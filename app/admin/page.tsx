@@ -32,9 +32,12 @@ import { cn } from "@/lib/utils"
 import { OrdersPanel } from "@/components/admin/orders-panel"
 import { ProductsPanel } from "@/components/admin/products-panel"
 import { ClientsPanel } from "@/components/admin/clients-panel"
+import { AnalyticsPanel } from "@/components/admin/analytics-panel"
+import { NotificationCenter } from "@/components/admin/notification-center"
 
 const navigation = [
   { name: "Panel", icon: LayoutDashboard, href: "#" },
+  { name: "Analíticas", icon: TrendingUp, href: "#" },
   { name: "Productos", icon: Package, href: "#" },
   { name: "Pedidos", icon: ShoppingCart, href: "#" },
   { name: "Clientes", icon: Users, href: "#" },
@@ -42,32 +45,32 @@ const navigation = [
 
 const stats = [
   {
-    name: "Ingresos Totales",
-    value: "$45,231.89",
-    change: "+20.1%",
-    trend: "up",
-    icon: DollarSign,
+    name: "Pedidos Pendientes",
+    value: "14",
+    change: "3 urgentes",
+    trend: "down", // purely for color/icon check
+    icon: ShoppingCart,
   },
   {
-    name: "Pedidos",
-    value: "2,350",
-    change: "+15.3%",
-    trend: "up",
-    icon: ShoppingBag,
+    name: "Stock Crítico",
+    value: "8",
+    change: "Requiere acción",
+    trend: "down",
+    icon: Package,
   },
   {
-    name: "Clientes",
-    value: "1,247",
-    change: "+8.2%",
+    name: "Clientes Nuevos",
+    value: "24",
+    change: "+12% hoy",
     trend: "up",
     icon: Users,
   },
   {
-    name: "Tasa de Conversion",
-    value: "3.24%",
-    change: "-2.1%",
-    trend: "down",
-    icon: TrendingUp,
+    name: "Envíos hoy",
+    value: "12",
+    change: "8 en camino",
+    trend: "up",
+    icon: ShoppingBag,
   },
 ]
 
@@ -176,10 +179,7 @@ function AdminDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5 text-muted-foreground" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full" />
-              </Button>
+              <NotificationCenter onNavigateToOrders={() => setActiveTab("Pedidos")} />
               <Link href="/">
                 <Button variant="outline" size="sm">
                   Ver Tienda
@@ -214,16 +214,11 @@ function AdminDashboard() {
                       </div>
                       <span
                         className={cn(
-                          "inline-flex items-center text-sm font-medium",
-                          stat.trend === "up" ? "text-green-600" : "text-red-500"
+                          "inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md",
+                          stat.trend === "up" ? "text-green-600 bg-green-50" : "text-amber-600 bg-amber-50"
                         )}
                       >
                         {stat.change}
-                        {stat.trend === "up" ? (
-                          <ArrowUpRight className="h-4 w-4 ml-1" />
-                        ) : (
-                          <ArrowDownRight className="h-4 w-4 ml-1" />
-                        )}
                       </span>
                     </div>
                     <p className="text-2xl font-semibold text-foreground">{stat.value}</p>
@@ -308,6 +303,10 @@ function AdminDashboard() {
 
           {activeTab === "Pedidos" && (
             <OrdersPanel />
+          )}
+
+          {activeTab === "Analíticas" && (
+            <AnalyticsPanel />
           )}
 
           {activeTab === "Clientes" && (
