@@ -83,7 +83,5 @@ export const USER_DATA = {
     name: "Salomon V.",
     email: "salomon.v@example.com",
     phone: "+52 55 1234 5678",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Salomon",
     memberSince: "Enero 2024",
-    tier: "Cliente Platinum"
 }
