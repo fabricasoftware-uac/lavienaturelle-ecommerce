@@ -94,6 +94,31 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* Support Links */}
+          <div>
+            <h3 className="font-medium text-sm uppercase tracking-wider mb-4">Soporte</h3>
+            <ul className="space-y-3">
+              {footerLinks.soporte.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-background/70 hover:text-primary transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href="/consulta-pedido"
+                  className="text-sm text-primary font-semibold hover:underline transition-colors"
+                >
+                  Rastrear mi Pedido
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Contact */}
           <div>
             <h3 className="font-medium text-sm uppercase tracking-wider mb-4">Contacto</h3>

@@ -7,6 +7,7 @@ import { OrdersSection } from "./components/OrdersSection"
 import { AddressesSection } from "./components/AddressesSection"
 import { ProfileSection } from "./components/ProfileSection"
 import { OrderDetailsSheet } from "./components/OrderDetailsSheet"
+import { TrackingModal } from "./components/TrackingModal"
 import { AddressDialog } from "./components/AddressDialog"
 import { NAVIGATION } from "./constants"
 import { Clock } from "lucide-react"
@@ -16,6 +17,7 @@ export default function ClientDashboard() {
   const [activeSegment, setActiveSegment] = useState("orders")
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<any>(null)
+  const [trackingOrder, setTrackingOrder] = useState<any>(null)
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false)
 
   return (
@@ -35,7 +37,10 @@ export default function ClientDashboard() {
 
         <div className="p-6 sm:p-10 max-w-6xl mx-auto space-y-10">
           {activeSegment === "orders" && (
-            <OrdersSection onViewDetails={setSelectedOrder} />
+            <OrdersSection 
+              onViewDetails={setSelectedOrder} 
+              onTrack={setTrackingOrder}
+            />
           )}
 
           {activeSegment === "addresses" && (
@@ -64,6 +69,12 @@ export default function ClientDashboard() {
             order={selectedOrder} 
             open={!!selectedOrder} 
             onOpenChange={(open) => !open && setSelectedOrder(null)} 
+        />
+
+        <TrackingModal 
+            order={trackingOrder} 
+            open={!!trackingOrder} 
+            onOpenChange={(open) => !open && setTrackingOrder(null)} 
         />
 
         <AddressDialog 

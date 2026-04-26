@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils"
 interface OrderCardProps {
   order: any
   onViewDetails: () => void
+  onTrack: () => void
 }
 
-export function OrderCard({ order, onViewDetails }: OrderCardProps) {
+export function OrderCard({ order, onViewDetails, onTrack }: OrderCardProps) {
   return (
     <div className="bg-white border border-stone-100 rounded-4xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300 group">
        <div className="flex flex-col sm:flex-row gap-6">
@@ -64,7 +65,11 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
                        Detalles del pedido
                     </Button>  
                  </div>
-                <Button size="sm" className="h-10 rounded-2xl px-6 bg-stone-900 text-white font-bold text-xs transition-all hover:bg-stone-800 shadow-lg shadow-stone-200">
+                <Button 
+                  size="sm" 
+                  className="h-10 rounded-2xl px-6 bg-stone-900 text-white font-bold text-xs transition-all hover:bg-stone-800 shadow-lg shadow-stone-200"
+                  onClick={onTrack}
+                >
                    Rastrear Envío
                 </Button>
              </div>

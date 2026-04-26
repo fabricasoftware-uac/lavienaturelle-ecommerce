@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ShoppingBag, User } from "lucide-react"
+import { ShoppingBag, User, Truck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/lib/store-context"
 import Image from "next/image"
@@ -33,6 +33,12 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Quick Track Link */}
+            <Link href="/consulta-pedido" className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-stone-500 hover:text-primary hover:bg-primary/5 transition-all">
+              <Truck className="h-3.5 w-3.5" />
+              Rastrear Pedido
+            </Link>
+
             {/* User Account */}
             {user ? (
               <div className="hidden sm:flex items-center gap-2">

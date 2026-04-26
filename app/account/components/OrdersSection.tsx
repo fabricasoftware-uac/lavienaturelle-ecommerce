@@ -6,9 +6,10 @@ import { MOCK_ORDERS } from "../constants"
 
 interface OrdersSectionProps {
   onViewDetails: (order: any) => void
+  onTrack: (order: any) => void
 }
 
-export function OrdersSection({ onViewDetails }: OrdersSectionProps) {
+export function OrdersSection({ onViewDetails, onTrack }: OrdersSectionProps) {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -22,7 +23,12 @@ export function OrdersSection({ onViewDetails }: OrdersSectionProps) {
 
       <div className="grid grid-cols-1 gap-6">
         {MOCK_ORDERS.map((order) => (
-          <OrderCard key={order.id} order={order} onViewDetails={() => onViewDetails(order)} />
+          <OrderCard 
+            key={order.id} 
+            order={order} 
+            onViewDetails={() => onViewDetails(order)} 
+            onTrack={() => onTrack(order)}
+          />
         ))}
       </div>
     </div>

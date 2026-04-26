@@ -1,5 +1,6 @@
 import { Header } from "@/components/header"
 import { HeroSection } from "@/components/hero-section"
+import { TrackingWidget } from "@/components/tracking-widget"
 import { ProductCatalog } from "@/components/product-catalog"
 import { Footer } from "@/components/footer"
 import { CartDrawer } from "@/components/cart-drawer"
@@ -10,7 +11,9 @@ export default function HomePage() {
       <Header />
       <main className="flex-1">
         <HeroSection />
-        <ProductCatalog />
+        <div className="pt-20">
+          <ProductCatalog />
+        </div>
       </main>
       <Footer />
       <CartDrawer />
