@@ -20,8 +20,10 @@ import { Header } from "@/components/header"
 import { CartDrawer } from "@/components/cart-drawer"
 import { Footer } from "@/components/footer"
 import { useStore } from "@/lib/store-context"
-import { getProductById, getCategoryById } from "@/lib/products"
+import { getProductById, getCategoryById, products } from "@/lib/products"
 import { cn } from "@/lib/utils"
+import { ProductCard } from "@/components/product-card"
+import { Sparkles } from "lucide-react"
 
 interface ProductPageProps {
   params: Promise<{ id: string }>
@@ -175,19 +177,19 @@ function ProductDetailContent({ productId }: { productId: string }) {
               )}
 
               {/* Quantity & Add to Cart */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex items-center border border-border rounded-xl overflow-hidden">
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <div className="flex items-center border border-border rounded-xl overflow-hidden bg-white sm:w-auto w-full justify-between sm:justify-start">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-3 hover:bg-secondary/50 transition-colors"
+                    className="p-3.5 hover:bg-secondary/50 transition-colors"
                     aria-label="Reducir cantidad"
                   >
                     <Minus className="h-5 w-5" />
                   </button>
-                  <span className="w-14 text-center font-medium">{quantity}</span>
+                  <span className="w-14 text-center font-bold text-lg">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-3 hover:bg-secondary/50 transition-colors"
+                    className="p-3.5 hover:bg-secondary/50 transition-colors"
                     aria-label="Aumentar cantidad"
                   >
                     <Plus className="h-5 w-5" />
@@ -195,7 +197,7 @@ function ProductDetailContent({ productId }: { productId: string }) {
                 </div>
                 <Button 
                   size="lg" 
-                  className="flex-1 gap-2 rounded-xl text-base"
+                  className="flex-1 p-5 gap-3 rounded-xl text-base font-bold shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all active:scale-[0.98]"
                   onClick={handleAddToCart}
                 >
                   <ShoppingCart className="h-5 w-5" />
@@ -204,18 +206,18 @@ function ProductDetailContent({ productId }: { productId: string }) {
               </div>
 
               {/* Trust Badges */}
-              <div className="grid grid-cols-2 gap-4 pt-4">
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <div className="p-2 rounded-lg bg-secondary/50">
-                    <Shield className="h-5 w-5 text-primary" />
+              <div className="grid grid-cols-2 gap-4 pt-6">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground bg-stone-50/50 p-3 rounded-2xl border border-stone-100">
+                  <div className="p-2 rounded-lg bg-white shadow-sm">
+                    <Shield className="h-4 w-4 text-primary" />
                   </div>
-                  <span>Garantia de calidad</span>
+                  <span className="font-medium">Garantia</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <div className="p-2 rounded-lg bg-secondary/50">
-                    <Leaf className="h-5 w-5 text-primary" />
+                <div className="flex items-center gap-3 text-sm text-muted-foreground bg-stone-50/50 p-3 rounded-2xl border border-stone-100">
+                  <div className="p-2 rounded-lg bg-white shadow-sm">
+                    <Leaf className="h-4 w-4 text-primary" />
                   </div>
-                  <span>100% Natural</span>
+                  <span className="font-medium">100% Natural</span>
                 </div>
               </div>
             </div>
@@ -229,21 +231,21 @@ function ProductDetailContent({ productId }: { productId: string }) {
               {/* Ingredients & Usage */}
               <div className="space-y-6">
                 {product.details.ingredients && (
-                  <div className="bg-card rounded-2xl p-6 border border-border/50">
-                    <h3 className="font-serif text-xl font-semibold text-foreground mb-3">
+                  <div className="bg-card rounded-[2rem] p-8 border border-border/50 shadow-sm">
+                    <h3 className="font-serif text-xl font-semibold text-foreground mb-4">
                       Ingredientes
                     </h3>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-muted-foreground leading-relaxed text-sm">
                       {product.details.ingredients}
                     </p>
                   </div>
                 )}
                 {product.details.usage && (
-                  <div className="bg-card rounded-2xl p-6 border border-border/50">
-                    <h3 className="font-serif text-xl font-semibold text-foreground mb-3">
+                  <div className="bg-card rounded-[2rem] p-8 border border-border/50 shadow-sm">
+                    <h3 className="font-serif text-xl font-semibold text-foreground mb-4">
                       Modo de Uso
                     </h3>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-muted-foreground leading-relaxed text-sm">
                       {product.details.usage}
                     </p>
                   </div>
@@ -252,17 +254,18 @@ function ProductDetailContent({ productId }: { productId: string }) {
 
               {/* Benefits */}
               {product.details.benefits && product.details.benefits.length > 0 && (
-                <div className="bg-secondary/30 rounded-2xl p-6 border border-border/50">
-                  <h3 className="font-serif text-xl font-semibold text-foreground mb-4">
+                <div className="bg-primary/5 rounded-[2.5rem] p-8 border border-primary/10">
+                  <h3 className="font-serif text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
                     Beneficios
                   </h3>
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {product.details.benefits.map((benefit, idx) => (
-                      <li key={idx} className="flex items-start gap-3">
-                        <div className="mt-0.5 p-1 rounded-full bg-primary/20">
-                          <Check className="h-4 w-4 text-primary" />
+                      <li key={idx} className="flex items-start gap-4">
+                        <div className="mt-1 p-1 rounded-full bg-white shadow-sm border border-primary/10">
+                          <Check className="h-3 w-3 text-primary" />
                         </div>
-                        <span className="text-muted-foreground">{benefit}</span>
+                        <span className="text-stone-600 font-medium text-sm">{benefit}</span>
                       </li>
                     ))}
                   </ul>
@@ -272,14 +275,34 @@ function ProductDetailContent({ productId }: { productId: string }) {
           </section>
         )}
 
+        {/* Related Products */}
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 border-t border-stone-100">
+           <div className="flex items-center justify-between mb-10">
+              <div>
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900">También te puede gustar</h2>
+                <p className="text-stone-500 text-sm mt-1">Productos seleccionados para complementar tu rutina.</p>
+              </div>
+           </div>
+           
+           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {products
+                .filter(p => p.category === product.category && p.id !== product.id)
+                .slice(0, 4)
+                .map(p => (
+                  <ProductCard key={p.id} product={p} />
+                ))
+              }
+           </div>
+        </section>
+
         {/* Back to Catalog */}
-        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20 flex justify-center">
           <Link
             href="/#catalogo"
-            className="inline-flex items-center gap-2 text-primary hover:underline"
+            className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-stone-50 text-stone-500 hover:text-stone-900 hover:bg-stone-100 transition-all font-bold text-xs uppercase tracking-widest group"
           >
-            <ChevronLeft className="h-4 w-4" />
-            Volver al catalogo
+            <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            Volver al catalogo completo
           </Link>
         </section>
       </main>

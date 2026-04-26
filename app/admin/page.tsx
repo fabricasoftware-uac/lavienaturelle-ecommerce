@@ -183,7 +183,7 @@ function AdminDashboard() {
               <Link href="/">
                 <Button variant="outline" size="sm">
                   Ver Tienda
-                </Button>
+                </Button> 
               </Link>
             </div>
           </div>
