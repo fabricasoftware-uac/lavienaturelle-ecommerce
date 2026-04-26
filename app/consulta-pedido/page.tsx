@@ -73,6 +73,19 @@ function TrackingContent() {
       </div>
 
       <div className="w-full max-w-xl">
+        {/* Back Button */}
+        <div className="mb-8">
+           <Link 
+             href="/" 
+             className="inline-flex items-center gap-2 text-stone-400 hover:text-stone-900 transition-colors text-xs font-bold uppercase tracking-widest group"
+           >
+              <div className="w-8 h-8 rounded-full border border-stone-100 flex items-center justify-center group-hover:border-stone-200 group-hover:bg-white transition-all">
+                <ChevronLeft className="w-4 h-4" />
+              </div>
+              Volver al Inicio
+           </Link>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-10 space-y-3">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white shadow-sm border border-stone-100 mb-2">

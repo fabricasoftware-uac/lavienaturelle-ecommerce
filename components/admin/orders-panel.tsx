@@ -41,6 +41,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import { ShipmentModal } from "./shipment-modal"
 
 // Mock Data
 const INITIAL_ORDERS = [
@@ -162,17 +163,40 @@ export function OrdersPanel() {
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState<any>(null)
 
+  // Shipment Modal State
+  const [shipmentModalOrder, setShipmentModalOrder] = useState<any>(null)
+  const [isShipmentModalOpen, setIsShipmentModalOpen] = useState(false)
+
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1200)
     return () => clearTimeout(timer)
   }, [])
 
-  const handleMarkAsShipped = (orderId: string) => {
+  const handleOpenShipmentModal = (order: any) => {
+    setShipmentModalOrder(order)
+    setIsShipmentModalOpen(true)
+  }
+
+  const handleConfirmShipment = (carrier: string, trackingId: string) => {
+    if (!shipmentModalOrder) return
+    
     setOrders(prev => prev.map(order => 
-      order.id === orderId 
-        ? { ...order, shippingStatus: "Shipped" as const } 
+      order.id === shipmentModalOrder.id 
+        ? { 
+            ...order, 
+            shippingStatus: "Shipped" as const,
+            carrier,
+            trackingId,
+            history: [
+              { status: "Shipped", date: new Date().toISOString() },
+              ...order.history
+            ]
+          } 
         : order
     ))
+    
+    setIsShipmentModalOpen(false)
+    setShipmentModalOrder(null)
   }
 
   const handleOpenDetail = (order: typeof INITIAL_ORDERS[0]) => {
@@ -322,7 +346,7 @@ export function OrdersPanel() {
                       <Button
                         variant="default"
                         size="sm"
-                        onClick={() => handleMarkAsShipped(order.id)}
+                        onClick={() => handleOpenShipmentModal(order)}
                         className="bg-primary text-white hover:bg-primary/90 h-8 text-xs font-semibold px-3 rounded-lg cursor-pointer"
                       >
                         Enviar
@@ -515,6 +539,12 @@ export function OrdersPanel() {
           )}
         </SheetContent>
       </Sheet>
+      <ShipmentModal 
+        order={shipmentModalOrder}
+        open={isShipmentModalOpen}
+        onOpenChange={setIsShipmentModalOpen}
+        onConfirm={handleConfirmShipment}
+      />
     </div>
   )
 }
