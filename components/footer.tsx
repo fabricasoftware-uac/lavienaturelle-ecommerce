@@ -3,145 +3,94 @@ import { Mail, Phone, MapPin, Instagram, Facebook, Twitter } from "lucide-react"
 import { categories } from "@/lib/products"
 import Image from "next/image"
 
-const footerLinks = {
-  empresa: [
-    { name: "Sobre Nosotros", href: "#nosotros" },
-    { name: "Nuestra Historia", href: "#" },
-    { name: "Sostenibilidad", href: "#" },
-    { name: "Trabaja con Nosotros", href: "#" },
-  ],
-  soporte: [
-    { name: "Contacto", href: "#" },
-    { name: "Informacion de Envio", href: "#" },
-    { name: "Devoluciones", href: "#" },
-    { name: "Preguntas Frecuentes", href: "#" },
-  ],
-}
+
 
 export function Footer() {
   return (
-    <footer id="nosotros" className="bg-foreground text-background">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
-          {/* Brand */}
-          <div className="flex flex-col items-center lg:flex-none lg:col-span-2">
-            <Link href="/" className="inline-flex items-center gap-2 mb-4">
+    <footer id="nosotros" className="bg-[#1a1a1a] text-stone-200 border-t border-stone-800">
+      <div className="mx-auto max-w-7xl px-6 py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 items-start">
+          
+          {/* Brand & Mission */}
+          <div className="lg:col-span-5 space-y-8">
+            <Link href="/" className="inline-block transition-opacity hover:opacity-80">
               <Image 
                 src="/logo-script.png" 
-                alt="La Vie Logo" 
-                className="h-50 w-auto object-contain"
-                width={20}
-                height={20}
+                alt="La Vie Naturelle" 
+                className="h-50 w-auto object-contain brightness-0 invert"
+                width={180}
+                height={60}
               />
             </Link>
-            <p className="text-background/70 text-sm leading-relaxed max-w-sm">
+            <p className="text-stone-400 text-base leading-relaxed max-w-md font-light">
               Dedicados a traerte los mejores productos naturales para un estilo de vida 
-              mas saludable y equilibrado. Cada producto es cuidadosamente seleccionado y 
-              probado para garantizar su pureza.
+              más saludable y equilibrado. Cada producto es cuidadosamente seleccionado y 
+              probado para garantizar su pureza botánica.
             </p>
-            <div className="flex items-center gap-4 mt-6">
-              <a href="#" className="text-background/70 hover:text-primary transition-colors">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-background/70 hover:text-primary transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-background/70 hover:text-primary transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
+            <div className="flex items-center gap-6">
+              {[
+                { Icon: Instagram, href: "#" },
+                { Icon: Facebook, href: "#" },
+                { Icon: Twitter, href: "#" }
+              ].map(({ Icon, href }, i) => (
+                <a 
+                  key={i}
+                  href={href} 
+                  className="w-10 h-10 rounded-full bg-stone-800/50 flex items-center justify-center text-stone-400 hover:bg-primary hover:text-white transition-all duration-300"
+                >
+                  <Icon className="h-5 w-5" />
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Shop Links - Dynamic from categories */}
-          <div>
-            <h3 className="font-medium text-sm uppercase tracking-wider mb-4">Tienda</h3>
-            <ul className="space-y-3">
-              {categories.map((category) => (
-                <li key={category.id}>
-                  <Link
-                    href={category.href}
-                    className="text-sm text-background/70 hover:text-primary transition-colors"
-                  >
-                    {category.namePlural}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link
-                  href="/#catalogo"
-                  className="text-sm text-background/70 hover:text-primary transition-colors"
-                >
-                  Nuevos Productos
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Spacer for better distribution */}
+          <div className="hidden lg:block lg:col-span-2" />
 
-          {/* Company Links */}
-          <div>
-            <h3 className="font-medium text-sm uppercase tracking-wider mb-4">Empresa</h3>
-            <ul className="space-y-3">
-              {footerLinks.empresa.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-background/70 hover:text-primary transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Support Links */}
-          <div>
-            <h3 className="font-medium text-sm uppercase tracking-wider mb-4">Soporte</h3>
-            <ul className="space-y-3">
-              {footerLinks.soporte.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-background/70 hover:text-primary transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link
-                  href="/consulta-pedido"
-                  className="text-sm text-primary font-semibold hover:underline transition-colors"
-                >
-                  Rastrear mi Pedido
-                </Link>
+          {/* Contact Information */}
+          <div className="lg:col-span-5 space-y-8">
+            <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-stone-500">
+              Contacto y Ubicación
+            </h3>
+            <ul className="space-y-6">
+              <li className="flex items-center gap-4 group cursor-pointer">
+                <div className="w-10 h-10 rounded-xl bg-stone-800/30 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <Mail className="h-5 w-5 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-stone-300 group-hover:text-primary transition-colors">
+                  hola@lavienaturelle.com
+                </span>
               </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="font-medium text-sm uppercase tracking-wider mb-4">Contacto</h3>
-            <ul className="space-y-3 text-sm text-background/70">
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-primary" />
-                hola@lavienaturelle.com
+              <li className="flex items-center gap-4 group cursor-pointer">
+                <div className="w-10 h-10 rounded-xl bg-stone-800/30 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <Phone className="h-5 w-5 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-stone-300 group-hover:text-primary transition-colors">
+                  +52 (55) 1234-5678
+                </span>
               </li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-primary" />
-                +52 (55) 1234-5678
-              </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 text-primary mt-0.5" />
-                <span>Calle Natural 123<br />Ciudad Verde, CDMX 06600</span>
+              <li className="flex items-start gap-4 group cursor-pointer">
+                <div className="w-10 h-10 rounded-xl bg-stone-800/30 flex items-center justify-center group-hover:bg-primary/10 transition-colors shrink-0">
+                  <MapPin className="h-5 w-5 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-stone-300 group-hover:text-primary transition-colors leading-relaxed pt-2">
+                  Calle Natural 123, Ciudad Verde<br />
+                  <span className="text-stone-500 font-light">COL 06600, Colombia</span>
+                </span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="mt-12 pt-8 border-t border-background/10 text-center text-sm text-background/50">
-          <p>&copy; {new Date().getFullYear()} La Vie Naturelle. Todos los derechos reservados.</p>
+        {/* Footer Bottom */}
+        <div className="mt-20 pt-8 border-t border-stone-800/50 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-600">
+            &copy; {new Date().getFullYear()} La Vie Naturelle. Esencia de la tierra.
+          </p>
+          <div className="flex gap-8 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-600">
+            <a href="#" className="hover:text-stone-400 transition-colors">Privacidad</a>
+            <a href="#" className="hover:text-stone-400 transition-colors">Términos</a>
+          </div>
         </div>
       </div>
     </footer>

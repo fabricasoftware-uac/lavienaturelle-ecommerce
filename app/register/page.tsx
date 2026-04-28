@@ -7,6 +7,7 @@ import { Leaf, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2 } from "lu
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/store-context"
+import Image from "next/image"
 
 function RegisterForm() {
   const router = useRouter()
@@ -85,8 +86,13 @@ function RegisterForm() {
         </div>
         <div className="relative z-10 flex flex-col items-center justify-center w-full p-12">
           <Link href="/" className="flex items-center gap-3 mb-8">
-            <Leaf className="h-12 w-12 text-primary" />
-            <span className="font-serif text-3xl font-semibold text-foreground">La Vie Naturelle</span>
+            <Image
+                src="/logo_header.png"
+                alt="La Vie Naturelle Logo"
+                className="h-20 w-auto object-contain"
+                height={50}
+                width={50}
+            />
           </Link>
           <div className="max-w-md text-center">
             <h2 className="font-serif text-2xl font-semibold text-foreground mb-4">
@@ -94,7 +100,7 @@ function RegisterForm() {
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               Unate a nuestra comunidad y descubre como los ingredientes naturales 
-              pueden transformar tu rutina de cuidado personal. Wellness real, directo de la tierra.
+              pueden transformar tu rutina de cuidado personal.
             </p>
           </div>
           <div className="mt-12 relative">
@@ -131,8 +137,13 @@ function RegisterForm() {
           </Link>
 
           <div className="lg:hidden flex items-center gap-2 mb-8 text-primary">
-            <Leaf className="h-8 w-8" />
-            <span className="font-serif text-xl font-semibold text-foreground">La Vie Naturelle</span>
+            <Image
+                src="/logo_header.png"
+                alt="La Vie Naturelle Logo"
+                className="h-12 w-auto object-contain"
+                height={50}
+                width={50}
+            />
           </div>
 
           <div className="mb-8">

@@ -362,7 +362,7 @@ function CheckoutForm() {
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2">
               <Image
-                src="/logo-full.png"
+                src="/logo_header.png"
                 alt="La Vie Naturelle Logo"
                 className="h-10 w-auto object-contain"
                 height={10}
@@ -392,7 +392,7 @@ function CheckoutForm() {
           {/* Left Column - Form */}
           <div>
             {/* Progress Steps */}
-            <div className="flex items-center gap-2 mb-8">
+            <div className="flex items-center gap-2 mb-8 justify-center">
               {(["informacion", "envio", "pago"] as CheckoutStep[]).map((s, i) => (
                 <div key={s} className="flex items-center">
                   <div
@@ -428,24 +428,24 @@ function CheckoutForm() {
 
             {/* Guest Checkout Option */}
             {step === "informacion" && !user && (
-              <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-8">
+              <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-8 max-w-sm md:max-w-full">
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-medium text-foreground">Continuar como Invitado</p>
                     <p className="text-sm text-muted-foreground">
                       No necesitas una cuenta. O{" "}
-                      <Link href="/login" className="text-primary hover:underline">
-                        inicia sesion
+                      <Link href="/register" className="text-green-600 hover:underline">
+                        crea una nueva
                       </Link>{" "}
-                      para una compra mas rapida.
+                      para compras mas rapidas.
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="max-w-sm md:max-w-full">
               {/* Information Step */}
               {step === "informacion" && (
                 <div className="space-y-6">
@@ -694,7 +694,7 @@ function CheckoutForm() {
           </div>
 
           {/* Right Column - Order Summary */}
-          <div className="lg:pl-8">
+          <div className="lg:pl-8 max-w-sm md:max-w-full">
             <div className="sticky top-24 bg-card rounded-xl border border-border p-6">
               <h2 className="font-serif text-lg font-semibold text-foreground mb-6">
                 Resumen del Pedido
