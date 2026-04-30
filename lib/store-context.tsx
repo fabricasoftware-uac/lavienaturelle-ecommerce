@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
+import { createClient } from "@/lib/supabase/client"
 
 export interface Product {
   id: string
@@ -43,9 +44,9 @@ interface StoreContextType {
   isCartOpen: boolean
   setIsCartOpen: (open: boolean) => void
   user: User | null
-  login: (email: string, password: string) => boolean
-  register: (name: string, email: string, password: string) => boolean
-  logout: () => void
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  logout: () => Promise<void>
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined)
@@ -58,9 +59,36 @@ const USERS = {
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
+  const supabase = createClient()
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session) {
+          // Get additional user data from profiles
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single()
+
+          setUser({
+            email: session.user.email!,
+            role: (profile?.role as "user" | "admin") || "user",
+            name: profile?.full_name || session.user.user_metadata?.full_name || "Usuario",
+          })
+        } else {
+          setUser(null)
+        }
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [supabase])
 
   const addToCart = useCallback((product: Product) => {
     setCart((prev) => {
@@ -96,29 +124,41 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
 
-  const login = useCallback((email: string, password: string): boolean => {
-    const userRecord = USERS[email as keyof typeof USERS]
-    if (userRecord && userRecord.password === password) {
-      setUser({ email, role: userRecord.role, name: userRecord.name })
-      return true
+  const login = useCallback(async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    
+    if (error) {
+      return { success: false, error: error.message }
     }
-    return false
-  }, [])
+    
+    return { success: true }
+  }, [supabase])
 
-  const register = useCallback((name: string, email: string, password: string): boolean => {
-    // Check if email already exists
-    if (USERS[email as keyof typeof USERS]) {
-      return false
+  const register = useCallback(async (name: string, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+        },
+      },
+    })
+    
+    if (error) {
+      return { success: false, error: error.message }
     }
-    // Add to mock users
-    ;(USERS as any)[email] = { password, role: "user", name }
-    setUser({ email, role: "user", name })
-    return true
-  }, [])
+    
+    return { success: true }
+  }, [supabase])
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut()
     setUser(null)
-  }, [])
+  }, [supabase])
 
   useEffect(() => {
     if (typeof window === "undefined") return

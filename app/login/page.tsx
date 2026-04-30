@@ -21,22 +21,17 @@ function LoginForm() {
     e.preventDefault()
     setError("")
     setIsLoading(true)
-
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    const success = login(email, password)
-    if (success) {
-      // Check if admin or user
-      if (email === "admin@gmail.com") {
-        router.push("/admin")
-      } else {
-        router.push("/")
-      }
+    
+    const result = await login(email, password)
+    
+    if (result.success) {
+      // The role-based redirection is usually handled by the layout or middleware,
+      // but we'll redirect to home or admin based on common patterns.
+      router.push("/")
     } else {
-      setError("Correo o contrasena invalidos")
+      setError(result.error || "Correo o contrasena invalidos")
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
   return (
@@ -161,14 +156,6 @@ function LoginForm() {
               {isLoading ? "Iniciando sesion..." : "Iniciar Sesion"}
             </Button>
           </form>
-
-          <div className="mt-8 p-4 rounded-xl bg-secondary/50 border border-border">
-            <p className="text-xs text-muted-foreground mb-2 font-medium">Credenciales de Prueba:</p>
-            <div className="space-y-1 text-xs text-muted-foreground">
-              <p><span className="font-medium">Usuario:</span> usuario@gmail.com / testuser</p>
-              <p><span className="font-medium">Admin:</span> admin@gmail.com / testuser</p>
-            </div>
-          </div>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             No tienes una cuenta?{" "}

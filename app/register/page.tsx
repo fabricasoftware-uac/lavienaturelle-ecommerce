@@ -38,19 +38,16 @@ function RegisterForm() {
     }
 
     setIsLoading(true)
-
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 800))
-
-    const success = register(name, email, password)
     
-    if (success) {
+    const result = await register(name, email, password)
+    
+    if (result.success) {
       setIsSuccess(true)
       setTimeout(() => {
         router.push("/")
-      }, 2000)
+      }, 1000)
     } else {
-      setError("El correo electronico ya esta registrado")
+      setError(result.error || "Error al crear la cuenta. Intentalo de nuevo.")
       setIsLoading(false)
     }
   }
