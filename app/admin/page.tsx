@@ -34,6 +34,7 @@ import { ProductsPanel } from "@/components/admin/products-panel"
 import { ClientsPanel } from "@/components/admin/clients-panel"
 import { AnalyticsPanel } from "@/components/admin/analytics-panel"
 import { NotificationCenter } from "@/components/admin/notification-center"
+import { LogoutDialog } from "@/components/logout-dialog"
 
 const navigation = [
   { name: "Panel", icon: LayoutDashboard, href: "#" },
@@ -84,9 +85,10 @@ const recentOrders = [
 
 function AdminDashboard() {
   const router = useRouter()
-  const { user, logout } = useStore()
+  const { user } = useStore()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("Panel")
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
   return (
     <div className="min-h-screen bg-secondary/30">
@@ -146,7 +148,7 @@ function AdminDashboard() {
             <Button
               variant="ghost"
               className="w-full justify-start text-muted-foreground hover:text-foreground"
-              onClick={() => router.push("/login")}
+              onClick={() => setShowLogoutDialog(true)}
             >
               <LogOut className="h-4 w-4 mr-2" />
               Cerrar Sesion
@@ -314,6 +316,10 @@ function AdminDashboard() {
           )}
         </main>
       </div>
+      <LogoutDialog 
+        open={showLogoutDialog} 
+        onOpenChange={setShowLogoutDialog} 
+      />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect   } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {
@@ -40,9 +40,9 @@ function CheckoutForm() {
   const [step, setStep] = useState<CheckoutStep>("informacion")
   const [formData, setFormData] = useState({
     email: user?.email || "",
-    firstName: "",
-    lastName: "",
-    phone: "",
+    firstName: user?.name || "",
+    documentNumber: user?.document_number || "",
+    phone: user?.phone || "",
     address: "",
     apartment: "",
     city: "",
@@ -53,6 +53,19 @@ function CheckoutForm() {
     expiry: "",
     cvv: "",
   })
+
+  // Update form data when user profile loads
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        email: prev.email || user.email,
+        firstName: prev.firstName || user.name,
+        documentNumber: prev.documentNumber || user.document_number || "",
+        phone: prev.phone || user.phone || "",
+      }))
+    }
+  }, [user])
 
   const [orderSummary, setOrderSummary] = useState<any>(null)
   const [orderId, setOrderId] = useState("")
@@ -80,17 +93,15 @@ function CheckoutForm() {
     }
 
     setIsRegistering(true)
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
     
-    const success = register(orderSummary.name, orderSummary.email, regPassword)
+    const success = await register(orderSummary.name, orderSummary.email, regPassword, orderSummary.documentNumber, orderSummary.phone)
     
     if (success) {
       setRegistrationSuccess(true)
       setTimeout(() => {
         setShowRegisterModal(false)
         router.push("/account")
-      }, 2000)
+      }, 1000)
     } else {
       setRegisterError("Error al crear la cuenta. Inténtalo de nuevo.")
       setIsRegistering(false)
@@ -117,7 +128,9 @@ function CheckoutForm() {
         items: [...cart],
         total: total,
         email: formData.email,
-        name: formData.firstName
+        name: formData.firstName,
+        documentNumber: formData.documentNumber,
+        phone: formData.phone
       })
       setOrderId(`LVN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`)
       setStep("confirmacion")
@@ -301,6 +314,14 @@ function CheckoutForm() {
                         <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Email</label>
                         <Input disabled value={orderSummary.email} className="h-11 bg-stone-50 border-stone-100" />
                       </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Documento</label>
+                        <Input disabled value={orderSummary.documentNumber} className="h-11 bg-stone-50 border-stone-100" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Teléfono</label>
+                        <Input disabled value={orderSummary.phone} className="h-11 bg-stone-50 border-stone-100" />
+                      </div>
                     </div>
 
                     <div className="space-y-4 pt-2">
@@ -470,17 +491,31 @@ function CheckoutForm() {
                         />
                       </div>
                     </div>
-                    <div className="relative">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-foreground mb-2">
-                          Nombre Completeo
+                          Nombre Completo
                         </label>
                         <Input
                           type="text"
                           name="firstName"
                           value={formData.firstName}
                           onChange={handleInputChange}
-                          placeholder="Ingresa tu nomnbre y apellido"
+                          placeholder="Ingresa tu nombre y apellido"
+                          className="w-full"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-foreground mb-2">
+                          Numero de Documento
+                        </label>
+                        <Input
+                          type="text"
+                          name="documentNumber"
+                          value={formData.documentNumber}
+                          onChange={handleInputChange}
+                          placeholder="1234567890"
                           className="w-full"
                           required
                         />

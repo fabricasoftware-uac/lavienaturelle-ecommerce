@@ -5,6 +5,9 @@ import { LogOut, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { NAVIGATION } from "../constants"
+import { useStore } from "@/lib/store-context"
+import { LogoutDialog } from "@/components/logout-dialog"
+import { useState } from "react"
 
 interface SidebarProps {
   activeSegment: string
@@ -20,6 +23,8 @@ export function Sidebar({
   sidebarOpen, 
   setSidebarOpen 
 }: SidebarProps) {
+  const { logout } = useStore()
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
   return (
     <>
       {/* Mobile Backdrop */}
@@ -67,13 +72,22 @@ export function Sidebar({
           </nav>
 
           <div className="pt-6 border-t border-stone-100">
-            <Button variant="ghost" className="w-full justify-start gap-3 px-4 py-3 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-colors">
+            <Button 
+              variant="ghost" 
+              onClick={() => setShowLogoutDialog(true)}
+              className="w-full justify-start gap-3 px-4 py-3 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-colors"
+            >
               <LogOut className="h-5 w-5" />
               Cerrar Sesión
             </Button>
           </div>
         </div>
       </aside>
+
+      <LogoutDialog 
+        open={showLogoutDialog} 
+        onOpenChange={setShowLogoutDialog} 
+      />
     </>
   )
 }

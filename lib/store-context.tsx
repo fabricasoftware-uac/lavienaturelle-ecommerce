@@ -31,6 +31,8 @@ export interface User {
   email: string
   role: "user" | "admin"
   name: string
+  document_number?: string
+  phone?: string
 }
 
 interface StoreContextType {
@@ -45,7 +47,7 @@ interface StoreContextType {
   setIsCartOpen: (open: boolean) => void
   user: User | null
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
-  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  register: (name: string, email: string, password: string, documentNumber?: string, phone?: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
 }
 
@@ -80,6 +82,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             email: session.user.email!,
             role: (profile?.role as "user" | "admin") || "user",
             name: profile?.full_name || session.user.user_metadata?.full_name || "Usuario",
+            document_number: profile?.document_number || session.user.user_metadata?.document_number,
+            phone: profile?.phone || session.user.user_metadata?.phone,
           })
         } else {
           setUser(null)
@@ -137,13 +141,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return { success: true }
   }, [supabase])
 
-  const register = useCallback(async (name: string, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const register = useCallback(async (name: string, email: string, password: string, documentNumber?: string, phone?: string): Promise<{ success: boolean; error?: string }> => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: name,
+          document_number: documentNumber,
+          phone: phone,
         },
       },
     })

@@ -1,6 +1,5 @@
 import { Header } from "@/components/header"
 import { HeroSection } from "@/components/hero-section"
-import { TrackingWidget } from "@/components/tracking-widget"
 import { ProductCatalog } from "@/components/product-catalog"
 import { Footer } from "@/components/footer"
 import { CartDrawer } from "@/components/cart-drawer"
