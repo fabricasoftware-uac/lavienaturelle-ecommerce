@@ -56,7 +56,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors duration-300" />
           
           {/* Quick Actions - Visible on Hover */}
-          <div className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+          <div className="absolute bottom-4 left-4 right-4 hidden sm:flex gap-2 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
             <Button
               onClick={(e) => {
                 e.preventDefault()
