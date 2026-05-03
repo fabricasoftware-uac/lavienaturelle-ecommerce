@@ -17,13 +17,15 @@ import {
   ShoppingCart,
   Lock,
   X,
-  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/store-context"
 import { cn, formatPrice } from "@/lib/utils"
 import { useRouter } from "next/navigation"
+import { createOrder, saveUserAddress } from "@/lib/supabase/orders"
+import { Loader2 } from "lucide-react"
+import { Order, OrderStatus, PaymentStatus } from "@/types/database"
 
 type CheckoutStep = "informacion" | "envio" | "pago" | "confirmacion"
 
@@ -38,6 +40,7 @@ function CheckoutForm() {
   const router = useRouter()
   const { cart, cartTotal, clearCart, user, register } = useStore()
   const [step, setStep] = useState<CheckoutStep>("informacion")
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     email: user?.email || "",
     firstName: user?.name || "",
@@ -116,25 +119,71 @@ function CheckoutForm() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (step === "informacion") {
       setStep("envio")
     } else if (step === "envio") {
       setStep("pago")
     } else if (step === "pago") {
-      // Store summary and order ID before clearing
-      setOrderSummary({
-        items: [...cart],
-        total: total,
+      setIsSubmitting(true)
+      
+      const orderNumber = `LVN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+      
+      const orderData: Partial<Order> = {
+        order_number: orderNumber,
+        user_id: user?.id || null,
         email: formData.email,
-        name: formData.firstName,
-        documentNumber: formData.documentNumber,
-        phone: formData.phone
-      })
-      setOrderId(`LVN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`)
-      setStep("confirmacion")
-      clearCart()
+        full_name: formData.firstName,
+        phone: formData.phone,
+        document_number: formData.documentNumber,
+        total_amount: total,
+        shipping_address_line1: formData.address,
+        shipping_address_line2: formData.apartment,
+        shipping_city: formData.city,
+        shipping_state: formData.state,
+        shipping_country: formData.country,
+        payment_method: "Tarjeta de Crédito",
+        status: 'paid' as OrderStatus,
+        payment_status: 'completed' as PaymentStatus
+      }
+
+      try {
+        const result = await createOrder(orderData, cart)
+        
+        if (result.success) {
+          // Store summary and order ID before clearing
+          setOrderSummary({
+            items: [...cart],
+            total: total,
+            email: formData.email,
+            name: formData.firstName,
+            documentNumber: formData.documentNumber,
+            phone: formData.phone
+          })
+          setOrderId(orderNumber)
+          setStep("confirmacion")
+          clearCart()
+
+          // Save address if user is logged in
+          if (user?.id) {
+            await saveUserAddress(user.id, {
+              address_line1: formData.address,
+              address_line2: formData.apartment,
+              city: formData.city,
+              state: formData.state,
+              country: formData.country
+            })
+          }
+        } else {
+          alert("Hubo un error al procesar tu pedido: " + result.error)
+        }
+      } catch (err) {
+        console.error("Checkout error:", err)
+        alert("Ocurrió un error inesperado.")
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -721,8 +770,16 @@ function CheckoutForm() {
                 <Button
                   type="submit"
                   className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                  disabled={isSubmitting}
                 >
-                  {step === "pago" ? "Completar Pedido" : "Continuar"}
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Procesando...
+                    </div>
+                  ) : (
+                    step === "pago" ? "Completar Pedido" : "Continuar"
+                  )}
                 </Button>
               </div>
             </form>

@@ -39,7 +39,7 @@ export function LogoutDialog({ open, onOpenChange }: LogoutDialogProps) {
             ¿Estás seguro de que deseas cerrar tu sesión actual? Tendrás que volver a ingresar tus credenciales para acceder a tu cuenta.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="gap-3 sm:gap-0">
+        <AlertDialogFooter className="gap-3 ">
           <AlertDialogCancel className="rounded-xl border-stone-200 text-stone-600 hover:bg-stone-50">
             Cancelar
           </AlertDialogCancel>

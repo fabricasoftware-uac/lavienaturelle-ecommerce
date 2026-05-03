@@ -42,123 +42,18 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { cn, formatPrice } from "@/lib/utils"
 import { ShipmentModal } from "./shipment-modal"
+import { getOrders, updateOrder } from "@/lib/supabase/orders"
+import { Order, OrderStatus, PaymentStatus } from "@/types/database"
 
-// Mock Data
-const INITIAL_ORDERS = [
-  /* ... previous orders remain same for brevity in theory, but I'll keep them to avoid errors ... */
-  {
-    id: "ORD-7241",
-    customer: {
-      name: "Maria Garcia",
-      email: "maria.g@gmail.com",
-      phone: "+57 301 234 5678",
-      address: "Calle 100 #15-32, Bogota, Colombia",
-    },
-    date: "2026-04-16T14:30:00Z",
-    shippingStatus: "Processing",
-    paymentStatus: "Paid",
-    total: 124.99,
-    items: [
-      { id: "p1", name: "Aceite de Lavanda", price: 24.99, quantity: 2 },
-      { id: "p2", name: "Jabon de Romero", price: 15.00, quantity: 5 },
-    ],
-    history: [
-      { status: "Order Placed", date: "2026-04-16T14:30:00Z" },
-      { status: "Payment Confirmed", date: "2026-04-16T14:35:00Z" },
-    ],
-  },
-  {
-    id: "ORD-7242",
-    customer: {
-      name: "Juan Perez",
-      email: "juan.p@gmail.com",
-      phone: "+57 312 987 6543",
-      address: "Carrera 7 #72-10, Bogota, Colombia",
-    },
-    date: "2026-04-16T16:45:00Z",
-    shippingStatus: "Pending",
-    paymentStatus: "Pending",
-    total: 89.50,
-    items: [
-      { id: "p3", name: "Tónico Capilar", price: 45.00, quantity: 1 },
-      { id: "p4", name: "Shampoo Natural", price: 44.50, quantity: 1 },
-    ],
-    history: [
-      { status: "Order Placed", date: "2026-04-16T16:45:00Z" },
-    ],
-  },
-  {
-    id: "ORD-7243",
-    customer: {
-      name: "Ana Rodriguez",
-      email: "ana.rod@gmail.com",
-      phone: "+57 320 456 7890",
-      address: "Transversal 23 #94-50, Medellin, Colombia",
-    },
-    date: "2026-04-15T09:15:00Z",
-    shippingStatus: "Shipped",
-    paymentStatus: "Paid",
-    total: 256.00,
-    items: [
-      { id: "p5", name: "Kit Completo Wellness", price: 256.00, quantity: 1 },
-    ],
-    history: [
-      { status: "Order Placed", date: "2026-04-15T09:15:00Z" },
-      { status: "Payment Confirmed", date: "2026-04-15T09:20:00Z" },
-      { status: "Shipped", date: "2026-04-16T10:00:00Z" },
-    ],
-  },
-  {
-    id: "ORD-7244",
-    customer: {
-      name: "Carlos Lopez",
-      email: "c.lopez@gmail.com",
-      phone: "+57 300 111 2233",
-      address: "Avenida 80 #33-12, Cali, Colombia",
-    },
-    date: "2026-04-15T11:20:00Z",
-    shippingStatus: "Delivered",
-    paymentStatus: "Paid",
-    total: 45.99,
-    items: [
-      { id: "p6", name: "Vela Aromática", price: 45.99, quantity: 1 },
-    ],
-    history: [
-      { status: "Order Placed", date: "2026-04-15T11:20:00Z" },
-      { status: "Payment Confirmed", date: "2026-04-15T11:25:00Z" },
-      { status: "Shipped", date: "2026-04-15T15:00:00Z" },
-      { status: "Delivered", date: "2026-04-16T12:00:00Z" },
-    ],
-  },
-  {
-    id: "ORD-7245",
-    customer: {
-      name: "Sofia Martinez",
-      email: "sofia.m@gmail.com",
-      phone: "+57 315 555 4433",
-      address: "Calle 50 #12-45, Barranquilla, Colombia",
-    },
-    date: "2026-04-14T18:00:00Z",
-    shippingStatus: "Pending",
-    paymentStatus: "Failed",
-    total: 178.00,
-    items: [
-      { id: "p7", name: "Aceite de Argan x3", price: 178.00, quantity: 1 },
-    ],
-    history: [
-      { status: "Order Placed", date: "2026-04-14T18:00:00Z" },
-      { status: "Payment Attempt Failed", date: "2026-04-14T18:05:00Z" },
-    ],
-  },
-]
+// INITIAL_ORDERS removed - using Supabase data
 
 export function OrdersPanel() {
-  const [orders, setOrders] = useState(INITIAL_ORDERS)
+  const [orders, setOrders] = useState<any[]>([]) // Keeping any[] for the mapped UI structure but could define a UIOther interface
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [shippingFilter, setShippingFilter] = useState("All")
   const [paymentFilter, setPaymentFilter] = useState("All")
-  const [selectedOrder, setSelectedOrder] = useState<typeof INITIAL_ORDERS[0] | null>(null)
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState<any>(null)
@@ -168,8 +63,40 @@ export function OrdersPanel() {
   const [isShipmentModalOpen, setIsShipmentModalOpen] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200)
-    return () => clearTimeout(timer)
+    async function loadOrders() {
+      setLoading(true)
+      const data = await getOrders()
+      
+      // Map Supabase data to UI structure
+      const mappedOrders = data.map((o: any) => ({
+        id: o.order_number || o.id,
+        realId: o.id,
+        customer: {
+          name: o.full_name,
+          email: o.email,
+          phone: o.phone || "No especificado",
+          address: `${o.shipping_address_line1}${o.shipping_address_line2 ? ', ' + o.shipping_address_line2 : ''}, ${o.shipping_city}, ${o.shipping_state}`,
+        },
+        date: o.created_at,
+        shippingStatus: o.status.charAt(0).toUpperCase() + o.status.slice(1),
+        paymentStatus: o.payment_status.charAt(0).toUpperCase() + o.payment_status.slice(1),
+        total: Number(o.total_amount),
+        items: o.order_items.map((item: any) => ({
+          id: item.product_id,
+          name: item.product_name_snapshot,
+          price: Number(item.unit_price),
+          quantity: item.quantity
+        })),
+        history: [
+          { status: "Pedido Realizado", date: o.created_at }
+        ]
+      }))
+      
+      setOrders(mappedOrders)
+      setLoading(false)
+    }
+    
+    loadOrders()
   }, [])
 
   const handleOpenShipmentModal = (order: any) => {
@@ -177,29 +104,37 @@ export function OrdersPanel() {
     setIsShipmentModalOpen(true)
   }
 
-  const handleConfirmShipment = (carrier: string, trackingId: string) => {
+  const handleConfirmShipment = async (carrier: string, trackingId: string) => {
     if (!shipmentModalOrder) return
     
-    setOrders(prev => prev.map(order => 
-      order.id === shipmentModalOrder.id 
-        ? { 
-            ...order, 
-            shippingStatus: "Shipped" as const,
-            carrier,
-            trackingId,
-            history: [
-              { status: "Shipped", date: new Date().toISOString() },
-              ...order.history
-            ]
-          } 
-        : order
-    ))
+    const res = await updateOrder(shipmentModalOrder.realId, {
+      status: "shipped",
+      courier_name: carrier,
+      tracking_number: trackingId
+    })
+
+    if (res.success) {
+      setOrders(prev => prev.map(order => 
+        order.realId === shipmentModalOrder.realId 
+          ? { 
+              ...order, 
+              shippingStatus: "Shipped" as const,
+              carrier,
+              trackingId,
+              history: [
+                { status: "Shipped", date: new Date().toISOString() },
+                ...order.history
+              ]
+            } 
+          : order
+      ))
+    }
     
     setIsShipmentModalOpen(false)
     setShipmentModalOrder(null)
   }
 
-  const handleOpenDetail = (order: typeof INITIAL_ORDERS[0]) => {
+  const handleOpenDetail = (order: any) => {
     setSelectedOrder(order)
     setEditForm({
       customerName: order.customer.name,
@@ -213,21 +148,35 @@ export function OrdersPanel() {
     setIsEditing(false)
   }
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!selectedOrder) return
-    setOrders(prev => prev.map(order => 
-      order.id === selectedOrder.id 
-        ? { 
-            ...order, 
-            customer: { ...order.customer, name: editForm.customerName, email: editForm.customerEmail, phone: editForm.customerPhone, address: editForm.customerAddress },
-            shippingStatus: editForm.shippingStatus,
-            paymentStatus: editForm.paymentStatus,
-          } 
-        : order
-    ))
-    setSelectedOrder(null)
-    setIsDetailOpen(false)
-    setIsEditing(false)
+    
+    const res = await updateOrder(selectedOrder.realId, {
+      full_name: editForm.customerName,
+      email: editForm.customerEmail,
+      phone: editForm.customerPhone,
+      shipping_address_line1: editForm.customerAddress,
+      status: editForm.shippingStatus.toLowerCase() as OrderStatus,
+      payment_status: editForm.paymentStatus.toLowerCase() as PaymentStatus
+    })
+
+    if (res.success) {
+      setOrders(prev => prev.map(order => 
+        order.realId === selectedOrder.realId 
+          ? { 
+              ...order, 
+              customer: { ...order.customer, name: editForm.customerName, email: editForm.customerEmail, phone: editForm.customerPhone, address: editForm.customerAddress },
+              shippingStatus: editForm.shippingStatus,
+              paymentStatus: editForm.paymentStatus,
+            } 
+          : order
+      ))
+      setSelectedOrder(null)
+      setIsDetailOpen(false)
+      setIsEditing(false)
+    } else {
+      alert("Error al actualizar: " + res.error)
+    }
   }
 
   const filteredOrders = orders.filter(order => {
@@ -489,7 +438,7 @@ export function OrdersPanel() {
                 <section className="space-y-4">
                   <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Resumen de Compra</h3>
                   <div className="rounded-xl border border-border bg-card divide-y divide-border">
-                    {selectedOrder.items.map((item, id) => (
+                    {selectedOrder.items.map((item: any, id: number) => (
                       <div key={id} className="p-4 flex justify-between items-center text-sm">
                         <div className="flex gap-3 items-center">
                           <div className="h-8 w-8 rounded flex items-center justify-center bg-secondary font-bold text-xs">{item.quantity}</div>
@@ -509,7 +458,7 @@ export function OrdersPanel() {
                 <section className="space-y-6 pb-6">
                   <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Historial de Eventos</h3>
                   <div className="relative space-y-6 pl-3 before:absolute before:left-2.75 before:top-2 before:bottom-2 before:w-px before:bg-border">
-                    {selectedOrder.history.map((entry, idx) => (
+                    {selectedOrder.history.map((entry: any, idx: number) => (
                       <div key={idx} className="relative pl-8">
                         <div className={cn("absolute left-0 top-1.5 h-6 w-6 rounded-full flex items-center justify-center z-10", idx === 0 ? "bg-primary text-white scale-110" : "bg-muted border border-border scale-90")}>
                           {idx === 0 ? <CheckCircle className="h-3 w-3" /> : <div className="h-1 w-1 rounded-full bg-muted-foreground/50" />}

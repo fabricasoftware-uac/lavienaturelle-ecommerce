@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { Search, Package, Truck, ExternalLink, MessageCircle, AlertCircle, ArrowRight, User, ChevronLeft } from "lucide-react"
+import { Search, Package, Truck, ExternalLink, MessageCircle, AlertCircle, ArrowRight, User, ChevronLeft, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { MOCK_ORDERS } from "@/app/account/constants"
-import { getWhatsAppTrackingLink } from "@/lib/whatsapp"
+import { getWhatsAppTrackingLink, getWhatsAppHelpLink } from "@/lib/whatsapp"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { getOrderByTracking } from "@/lib/supabase/orders"
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 
@@ -36,25 +36,37 @@ function TrackingContent() {
     }
   }, [searchParams])
 
-  const performSearch = (oId: string, dNum: string) => {
+  const performSearch = async (oId: string, dNum: string) => {
     setLoading(true)
     setOrder(null)
     setSearched(true)
-
-    // Simulate API call
-    setTimeout(() => {
-      const foundOrder = MOCK_ORDERS.find(
-        (o) => o.id.toLowerCase() === oId.toLowerCase() && o.documentNumber === dNum
-      )
+ 
+    try {
+      const data = await getOrderByTracking(oId, dNum)
       
-      if (foundOrder) {
-        setOrder(foundOrder)
+      if (data) {
+        const mappedOrder = {
+          id: data.order_number || data.id,
+          realId: data.id,
+          status: data.status.charAt(0).toUpperCase() + data.status.slice(1),
+          statusColor: data.status === 'delivered' ? 'green' : data.status === 'shipped' ? 'blue' : 'amber',
+          trackingId: data.tracking_number || "No generado",
+          carrier: data.courier_name || "N/A",
+          date: new Date(data.created_at).toLocaleDateString(),
+          total: Number(data.total_amount),
+          documentNumber: data.document_number
+        }
+        setOrder(mappedOrder)
         toast.success("Pedido encontrado")
       } else {
         toast.error("No se encontró ningún pedido con esos datos")
       }
+    } catch (error) {
+      console.error("Tracking error:", error)
+      toast.error("Error al buscar el pedido")
+    } finally {
       setLoading(false)
-    }, 800)
+    }
   }
 
   const handleSearch = (e: React.FormEvent) => {
@@ -62,7 +74,7 @@ function TrackingContent() {
     performSearch(orderId, documentNumber)
   }
 
-  const whatsappLink = order ? getWhatsAppTrackingLink("Cliente", order.trackingId, order.carrier) : "#"
+  const whatsappLink = order ? getWhatsAppHelpLink(order.id) : "#"
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex flex-col items-center justify-center p-6 sm:p-12">
@@ -176,34 +188,46 @@ function TrackingContent() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-5 rounded-3xl bg-stone-50 border border-stone-100 space-y-1">
-                      <div className="flex items-center gap-2 text-stone-400 mb-1">
-                        <Truck className="w-3.5 h-3.5" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider">Transportadora</span>
+                  {!(order.status === "Pending" || order.status === "Paid") && (
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="p-5 rounded-3xl bg-stone-50 border border-stone-100 space-y-1">
+                          <div className="flex items-center gap-2 text-stone-400 mb-1">
+                            <Truck className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider">Transportadora</span>
+                          </div>
+                          <p className="text-sm font-bold text-stone-900">{order.carrier}</p>
+                        </div>
+                        <div className="p-5 rounded-3xl bg-stone-50 border border-stone-100 space-y-1">
+                          <div className="flex items-center gap-2 text-stone-400 mb-1">
+                            <Package className="w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider">Número de Guía</span>
+                          </div>
+                          <p className="text-sm font-bold text-stone-900 tracking-tight">{order.trackingId}</p>
+                        </div>
                       </div>
-                      <p className="text-sm font-bold text-stone-900">{order.carrier}</p>
-                    </div>
-                    <div className="p-5 rounded-3xl bg-stone-50 border border-stone-100 space-y-1">
-                      <div className="flex items-center gap-2 text-stone-400 mb-1">
-                        <Package className="w-3.5 h-3.5" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider">Número de Guía</span>
-                      </div>
-                      <p className="text-sm font-bold text-stone-900 tracking-tight">{order.trackingId}</p>
-                    </div>
-                  </div>
 
-                  <div className="p-6 rounded-3xl bg-primary/5 border border-primary/10 flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-sm border border-primary/10">
-                      <AlertCircle className="w-5 h-5 text-primary" />
+                      <div className="p-6 rounded-3xl bg-primary/5 border border-primary/10 flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-sm border border-primary/10">
+                          <AlertCircle className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs font-bold text-stone-900">Nota importante</p>
+                          <p className="text-[11px] leading-relaxed text-stone-600 font-medium">
+                            Para ver detalles granulares del recorrido de tu paquete, te recomendamos ingresar el número de guía directamente en el portal oficial de <strong>{order.carrier}</strong>.
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {(order.status === "Pending" || order.status === "Paid") && (
+                    <div className="p-8 rounded-3xl bg-stone-50 border border-stone-100 text-center space-y-2">
+                       <Clock className="w-8 h-8 text-stone-300 mx-auto" />
+                       <p className="text-sm font-bold text-stone-900">Preparando tu envío</p>
+                       <p className="text-xs text-stone-500 font-medium">Estamos alistando tus productos. Una vez sea despachado, podrás ver aquí el número de guía.</p>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold text-stone-900">Nota importante</p>
-                      <p className="text-[11px] leading-relaxed text-stone-600 font-medium">
-                        Para ver detalles granulares del recorrido de tu paquete, te recomendamos ingresar el número de guía directamente en el portal oficial de <strong>{order.carrier}</strong>.
-                      </p>
-                    </div>
-                  </div>
+                  )}
 
                   <div className="flex flex-col sm:flex-row gap-3">
                     <a 
@@ -217,10 +241,7 @@ function TrackingContent() {
                         Solicitar ayuda por WhatsApp
                       </Button>
                     </a>
-                    <Button variant="ghost" className="h-12 rounded-2xl text-stone-400 hover:text-stone-900 hover:bg-stone-50 text-xs font-bold gap-2">
-                      <ExternalLink className="w-4 h-4" />
-                      Portal de {order.carrier}
-                    </Button>
+                    
                   </div>
                 </div>
               ) : (

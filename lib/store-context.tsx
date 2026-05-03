@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { AppProduct, Profile } from "@/types/database"
+import type { Session, AuthChangeEvent } from "@supabase/supabase-js"
 
 export type Product = AppProduct;
 
@@ -11,6 +12,7 @@ export interface CartItem extends Product {
 }
 
 export interface User {
+  id: string
   email: string
   role: "customer" | "admin"
   name: string
@@ -37,12 +39,6 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined)
 const CART_STORAGE_KEY = "lavienaturelle_cart"
 
-// Fake credentials
-const USERS = {
-  "usuario@gmail.com": { password: "testuser", role: "user" as const, name: "Usuario" },
-  "admin@gmail.com": { password: "testuser", role: "admin" as const, name: "Administrador" },
-}
-
 export function StoreProvider({ children }: { children: ReactNode }) {
   const supabase = createClient()
   const [cart, setCart] = useState<CartItem[]>([])
@@ -52,7 +48,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Listen for auth state changes
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: AuthChangeEvent, session: Session | null) => {
         if (session) {
           // Get additional user data from profiles
           const { data: profile } = await supabase
@@ -62,6 +58,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             .single()
 
           setUser({
+            id: session.user.id,
             email: session.user.email!,
             role: (profile?.role as "customer" | "admin") || "customer",
             name: profile?.full_name || session.user.user_metadata?.full_name || "Usuario",
