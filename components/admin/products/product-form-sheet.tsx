@@ -13,6 +13,7 @@ import {
   Beaker,
   Trash2,
   Loader2,
+  Upload,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -25,6 +26,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet"
 import { cn, formatPrice } from "@/lib/utils"
+import { uploadImage, deleteImage } from "@/lib/supabase/storage"
 
 interface ProductFormSheetProps {
   isOpen: boolean
@@ -59,6 +61,10 @@ export function ProductFormSheet({
   const [newCategoryName, setNewCategoryName] = useState("")
   const [showCategoryInput, setShowCategoryInput] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
+  const [uploading, setUploading] = useState(false)
+
+  const MAX_IMAGES = 2
+  const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
 
   const addBenefit = () => setForm({ ...data, benefits: [...(data.benefits || []), ""] })
   const updateBenefit = (val: string, idx: number) => {
@@ -74,6 +80,47 @@ export function ProductFormSheet({
       setNewCategoryName("")
       setShowCategoryInput(false)
     }
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    const currentImages = data.images || []
+    if (currentImages.length >= MAX_IMAGES) {
+      alert(`Máximo ${MAX_IMAGES} imágenes permitidas.`)
+      return
+    }
+
+    const file = files[0]
+    if (file.size > MAX_FILE_SIZE) {
+      alert("La imagen es muy pesada. Máximo 2MB.")
+      return
+    }
+
+    setUploading(true)
+    try {
+      const folder = data.id || "temp"
+      const publicUrl = await uploadImage(file, folder)
+      setForm({ ...data, images: [...currentImages, publicUrl] })
+    } catch (error) {
+      console.error("Error uploading image:", error)
+      alert("Error al cargar la imagen.")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleRemoveImage = async (idx: number) => {
+    const currentImages = [...(data.images || [])]
+    const removedUrl = currentImages[idx]
+    
+    // We don't necessarily want to delete from storage immediately if it's an existing product
+    // but for simplicity and following the user request, we'll just update the form state
+    // If it's a newly uploaded image (temp folder or recently added), we might want to delete it.
+    // For now, let's just remove it from the array.
+    currentImages.splice(idx, 1)
+    setForm({ ...data, images: currentImages })
   }
 
   return (
@@ -117,38 +164,64 @@ export function ProductFormSheet({
             {/* Image Section */}
             <section className="space-y-4">
               <h3 className="text-[11px] font-black text-foreground uppercase tracking-widest flex items-center gap-2">
-                <ImageIcon className="h-4 w-4 text-primary" /> Imágenes del Producto <span className="text-[9px] lowercase font-medium opacity-50">(opcional)</span>
+                <ImageIcon className="h-4 w-4 text-primary" /> Imágenes del Producto <span className="text-[9px] lowercase font-medium opacity-50">({data.images?.length || 0}/{MAX_IMAGES})</span>
               </h3>
+              <p className="text-[9px] text-muted-foreground ml-6 -mt-3 italic">
+                Carga hasta 2 imágenes. Máximo 2MB por archivo. Formatos sugeridos: JPG, PNG, WEBP.
+              </p>
+              
               {isEditing ? (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">URL de la Imagen</label>
-                    <Input 
-                      placeholder="https://images.unsplash.com/..." 
-                      value={data.image} 
-                      onChange={(e) => setForm({...data, image: e.target.value})} 
-                      className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" 
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {data.image ? (
-                      <div className="h-40 rounded-2xl bg-muted overflow-hidden border border-border group relative">
-                        <img src={data.image} alt="" className="w-full h-full object-cover" />
-                        <Button variant="destructive" size="icon" onClick={() => setForm({...data, image: ""})} className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="h-40 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 hover:bg-muted/30 transition-all opacity-40 uppercase font-bold tracking-tighter">
-                        <ImageIcon className="h-8 w-8 text-muted-foreground/50" />
-                        <p className="text-[10px]">Sin imagen</p>
-                      </div>
-                    )}
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {data.images?.map((img: string, idx: number) => (
+                    <div key={idx} className="h-40 rounded-2xl bg-muted overflow-hidden border border-border group relative">
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                      <Button 
+                        variant="destructive" 
+                        size="icon" 
+                        onClick={() => handleRemoveImage(idx)} 
+                        className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  
+                  {(!data.images || data.images.length < MAX_IMAGES) && (
+                    <label className={cn(
+                      "h-40 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/50 transition-all cursor-pointer",
+                      uploading && "opacity-50 pointer-events-none"
+                    )}>
+                      {uploading ? (
+                        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                      ) : (
+                        <>
+                          <Upload className="h-8 w-8 text-muted-foreground/50" />
+                          <p className="text-[10px] font-bold uppercase tracking-tighter">Subir Imagen</p>
+                        </>
+                      )}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={handleImageUpload}
+                        disabled={uploading}
+                      />
+                    </label>
+                  )}
                 </div>
               ) : (
-                <div className="h-48 sm:h-64 w-full rounded-2xl overflow-hidden border border-border shadow-inner">
-                  <img src={data.image || "https://via.placeholder.com/300?text=No+Image"} alt={data.name} className="h-full w-full object-cover" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {data.images && data.images.length > 0 ? (
+                    data.images.map((img: string, idx: number) => (
+                      <div key={idx} className="h-48 sm:h-64 w-full rounded-2xl overflow-hidden border border-border shadow-inner">
+                        <img src={img} alt={`${data.name} ${idx + 1}`} className="h-full w-full object-cover" />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="h-48 sm:h-64 w-full rounded-2xl overflow-hidden border border-border shadow-inner">
+                      <img src={data.image || "https://via.placeholder.com/300?text=No+Image"} alt={data.name} className="h-full w-full object-cover" />
+                    </div>
+                  )}
                 </div>
               )}
             </section>

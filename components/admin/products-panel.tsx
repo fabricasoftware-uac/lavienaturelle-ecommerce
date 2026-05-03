@@ -44,7 +44,7 @@ export function ProductsPanel() {
     usage: "",
     category: "",
     badge: "",
-    image: "",
+    images: [],
   })
 
   const handleOpenDetail = (product: any) => {
@@ -72,7 +72,7 @@ export function ProductsPanel() {
       usage: "",
       category: "",
       badge: "",
-      image: "",
+      images: [],
     })
   }
 

@@ -94,28 +94,27 @@ export function useProducts() {
 
       if (error) throw error
 
-      if (form.image && form.image !== originalProduct.image) {
-        const { data: existingImg } = await supabase
+      // Sync images
+      if (form.images && Array.isArray(form.images)) {
+        // Simple approach: delete existing and insert new ones
+        await supabase
           .from('product_multimedia')
-          .select('id')
+          .delete()
           .eq('product_id', id)
-          .eq('display_order', 0)
-          .single()
 
-        if (existingImg) {
-          await supabase
+        if (form.images.length > 0) {
+          const multimediaToInsert = form.images.map((url: string, index: number) => ({
+            product_id: id,
+            url: url,
+            type: 'image',
+            display_order: index
+          }))
+
+          const { error: multimediaError } = await supabase
             .from('product_multimedia')
-            .update({ url: form.image })
-            .eq('id', existingImg.id)
-        } else {
-          await supabase
-            .from('product_multimedia')
-            .insert({
-              product_id: id,
-              url: form.image,
-              type: 'image',
-              display_order: 0
-            })
+            .insert(multimediaToInsert)
+
+          if (multimediaError) throw multimediaError
         }
       }
       
@@ -158,15 +157,17 @@ export function useProducts() {
 
       if (error) throw error
 
-      if (form.image && form.image.startsWith('http')) {
+      if (form.images && Array.isArray(form.images) && form.images.length > 0) {
+        const multimediaToInsert = form.images.map((url: string, index: number) => ({
+          product_id: newProd.id,
+          url: url,
+          type: 'image',
+          display_order: index
+        }))
+
         await supabase
           .from('product_multimedia')
-          .insert({
-            product_id: newProd.id,
-            url: form.image,
-            type: 'image',
-            display_order: 0
-          })
+          .insert(multimediaToInsert)
       }
 
       await fetchData()
