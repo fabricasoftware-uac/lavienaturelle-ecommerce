@@ -10,16 +10,24 @@ import Link from "next/link"
 
 const PRODUCTS_PER_PAGE = 8
 
-export function ProductCatalog() {
-  const [activeCategory, setActiveCategory] = useState<Category | "all">("all")
+interface ProductCatalogProps {
+  initialProducts?: any[]
+  initialCategories?: any[]
+}
+
+export function ProductCatalog({ initialProducts, initialCategories }: ProductCatalogProps) {
+  const displayProducts = initialProducts || products
+  const displayCategories = initialCategories || categories
+  
+  const [activeCategory, setActiveCategory] = useState<string | "all">("all")
   const [gridSize, setGridSize] = useState<"compact" | "comfortable">("comfortable")
   const [currentPage, setCurrentPage] = useState(1)
 
   const filteredProducts = useMemo(() => {
     return activeCategory === "all"
-      ? products
-      : products.filter((p) => p.category === activeCategory)
-  }, [activeCategory])
+      ? displayProducts
+      : displayProducts.filter((p) => p.category === activeCategory)
+  }, [activeCategory, displayProducts])
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
@@ -28,7 +36,7 @@ export function ProductCatalog() {
   const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
 
   // Reset to page 1 when category changes
-  const handleCategoryChange = (category: Category | "all") => {
+  const handleCategoryChange = (category: string | "all") => {
     setActiveCategory(category)
     setCurrentPage(1)
   }
@@ -89,21 +97,21 @@ export function ProductCatalog() {
             >
               Todos
             </button>
-            {categories.map((cat) => {
-              const Icon = getCategoryIcon(cat.id)
+            {displayCategories.map((cat) => {
+              const Icon = getCategoryIcon(cat.id || cat.slug)
               return (
                 <button
-                  key={cat.id}
-                  onClick={() => handleCategoryChange(cat.id)}
+                  key={cat.id || cat.slug}
+                  onClick={() => handleCategoryChange(cat.slug || cat.id)}
                   className={cn(
                     "inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
-                    activeCategory === cat.id
+                    activeCategory === (cat.slug || cat.id)
                       ? "bg-primary text-primary-foreground shadow-md"
                       : "bg-card text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border"
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  {cat.namePlural}
+                  {cat.namePlural || cat.name}
                 </button>
               )
             })}
@@ -141,7 +149,7 @@ export function ProductCatalog() {
           <p className="text-sm text-muted-foreground">
             Mostrando {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} de {filteredProducts.length} producto{filteredProducts.length !== 1 ? "s" : ""}
             {activeCategory !== "all" && (
-              <span> en {categories.find(c => c.id === activeCategory)?.namePlural}</span>
+              <span> en {displayCategories.find(c => (c.slug || c.id) === activeCategory)?.namePlural || displayCategories.find(c => (c.slug || c.id) === activeCategory)?.name}</span>
             )}
           </p>
           {activeCategory !== "all" && (
