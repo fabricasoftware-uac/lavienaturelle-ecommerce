@@ -20,6 +20,7 @@ export function ProductsPanel() {
     saveProduct,
     createProduct,
     addCategory,
+    deleteProduct,
   } = useProducts()
 
   const [searchQuery, setSearchQuery] = useState("")
@@ -96,6 +97,13 @@ export function ProductsPanel() {
     const res = await addCategory(name)
     if (res.success) {
       setForm((prev: any) => ({ ...prev, category: res.data.name }))
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    const res = await deleteProduct(id)
+    if (res.success) {
+      setIsDetailOpen(false)
     }
   }
 
@@ -201,6 +209,7 @@ export function ProductsPanel() {
         title="Detalle del Producto"
         categories={categories}
         onAddCategory={handleAddCategory}
+        onDelete={handleDelete}
         saving={saving}
       />
 
@@ -216,6 +225,7 @@ export function ProductsPanel() {
         title="Nuevo Producto"
         categories={categories}
         onAddCategory={handleAddCategory}
+        onDelete={() => {}} 
         saving={saving}
       />
     </div>

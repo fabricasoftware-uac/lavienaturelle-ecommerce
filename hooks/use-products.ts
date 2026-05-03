@@ -200,6 +200,26 @@ export function useProducts() {
     }
   }
 
+  const deleteProduct = async (id: string) => {
+    setSaving(true)
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id)
+
+      if (error) throw error
+      
+      await fetchData()
+      return { success: true }
+    } catch (error) {
+      console.error("Error deleting product:", error)
+      return { success: false, error }
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return {
     products,
     categories,
@@ -208,6 +228,7 @@ export function useProducts() {
     saveProduct,
     createProduct,
     addCategory,
+    deleteProduct,
     refresh: fetchData
   }
 }

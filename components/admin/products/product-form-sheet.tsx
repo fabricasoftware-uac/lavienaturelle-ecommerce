@@ -37,6 +37,7 @@ interface ProductFormSheetProps {
   title: string
   categories: any[]
   onAddCategory: (name: string) => void
+  onDelete: (id: string) => void
   saving: boolean
 }
 
@@ -51,11 +52,13 @@ export function ProductFormSheet({
   title,
   categories,
   onAddCategory,
+  onDelete,
   saving,
 }: ProductFormSheetProps) {
   const isCreation = title === "Nuevo Producto"
   const [newCategoryName, setNewCategoryName] = useState("")
   const [showCategoryInput, setShowCategoryInput] = useState(false)
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
 
   const addBenefit = () => setForm({ ...data, benefits: [...(data.benefits || []), ""] })
   const updateBenefit = (val: string, idx: number) => {
@@ -288,9 +291,37 @@ export function ProductFormSheet({
 
           {!isEditing && (
             <div className="p-5 sm:p-8 border-t border-border bg-card/80 backdrop-blur-md shrink-0">
-              <Button variant="outline" className="w-full h-12 rounded-2xl border-destructive/20 text-destructive hover:bg-destructive/10 font-black text-[10px] uppercase tracking-widest shadow-sm">
-                <Trash2 className="h-4 w-4 mr-2" /> Eliminar Producto
-              </Button>
+              {showConfirmDelete ? (
+                <div className="flex flex-col gap-3 animate-in fade-in zoom-in-95 duration-200">
+                  <p className="text-[10px] font-bold text-center text-destructive uppercase tracking-widest">¿Estás seguro de eliminar este producto?</p>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="destructive" 
+                      className="flex-1 h-11 rounded-xl font-black text-[10px] uppercase tracking-widest"
+                      onClick={() => onDelete(data.id)}
+                      disabled={saving}
+                    >
+                      {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sí, Eliminar"}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 h-11 rounded-xl font-black text-[10px] uppercase tracking-widest"
+                      onClick={() => setShowConfirmDelete(false)}
+                      disabled={saving}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  className="w-full h-12 rounded-2xl border-destructive/20 text-destructive hover:bg-destructive/10 font-black text-[10px] uppercase tracking-widest shadow-sm"
+                  onClick={() => setShowConfirmDelete(true)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" /> Eliminar Producto
+                </Button>
+              )}
             </div>
           )}
         </div>
