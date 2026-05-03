@@ -7,7 +7,7 @@ import { Plus, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore, type Product } from "@/lib/store-context"
 import { getCategoryById } from "@/lib/products"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 
 interface ProductCardProps {
   product: Product
@@ -101,7 +101,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Price & Quick Add */}
         <div className="flex items-center justify-between pt-2 border-t border-border/50">
           <span className="font-serif text-xl font-semibold text-primary">
-            ${product.price.toFixed(2)}
+            {formatPrice(product.price)}
           </span>
           <Button
             size="sm"

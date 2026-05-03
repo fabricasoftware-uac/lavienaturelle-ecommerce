@@ -29,6 +29,7 @@ import {
   Beaker,
   Sparkles,
   UploadCloud,
+  Loader2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,7 +45,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { cn } from "@/lib/utils"
+import { cn, slugify, formatPrice } from "@/lib/utils"
+import { createClient } from "@/lib/supabase/client"
 
 // Mock Data for Products
 const INITIAL_PRODUCTS = [
@@ -89,9 +91,11 @@ const INITIAL_PRODUCTS = [
 const INITIAL_CATEGORIES = ["Aceites Esenciales", "Higiene Personal", "Cuidado Capilar", "Hogar"]
 
 export function ProductsPanel() {
-  const [products, setProducts] = useState(INITIAL_PRODUCTS)
-  const [categories, setCategories] = useState(INITIAL_CATEGORIES)
+  const supabase = createClient()
+  const [products, setProducts] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("All")
   const [stockFilter, setStockFilter] = useState("All")
@@ -116,10 +120,65 @@ export function ProductsPanel() {
     images: [],
   })
 
+  const fetchData = useCallback(async () => {
+    setLoading(true)
+    try {
+      // Fetch categories
+      const { data: catsData, error: catsError } = await supabase
+        .from('categories')
+        .select('*')
+        .is('deleted_at', null)
+        .order('name')
+      
+      if (catsError) throw catsError
+      setCategories(catsData || [])
+
+      // Fetch products
+      const { data: prodsData, error: prodsError } = await supabase
+        .from('products')
+        .select(`
+          *,
+          categories (name),
+          product_multimedia (url, display_order)
+        `)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false })
+      
+      if (prodsError) throw prodsError
+      
+      const mappedProducts = (prodsData || []).map(p => ({
+        id: p.id,
+        name: p.name,
+        sku: p.sku,
+        category: p.categories?.name || "Sin categoría",
+        categoryId: p.category_id,
+        price: p.price,
+        stock: p.stock_quantity,
+        stockStatus: p.stock_quantity > 10 ? "In Stock" : p.stock_quantity > 0 ? "Low Stock" : "Out of Stock",
+        status: p.status === 'published' ? 'Active' : 'Draft',
+        image: p.product_multimedia?.[0]?.url || "https://via.placeholder.com/300?text=No+Image",
+        images: p.product_multimedia?.map((m: any) => m.url) || [],
+        description: p.description,
+        fullDescription: p.full_description,
+        content: p.weight,
+        origin: p.origin,
+        ingredients: p.ingredients,
+        benefits: p.benefits || [],
+        usage: p.usage_instructions,
+        badge: p.badge,
+      }))
+      
+      setProducts(mappedProducts)
+    } catch (error) {
+      console.error("Error fetching data:", error)
+    } finally {
+      setLoading(false)
+    }
+  }, [supabase])
+
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200)
-    return () => clearTimeout(timer)
-  }, [])
+    fetchData()
+  }, [fetchData])
 
   const handleOpenDetail = (product: any) => {
     setActiveProduct(product)
@@ -128,29 +187,116 @@ export function ProductsPanel() {
     setIsDetailOpen(true)
   }
 
-  const handleSaveProduct = () => {
-    setProducts(prev => prev.map(p => 
-      p.id === activeProduct.id 
-        ? { ...form, stockStatus: Number(form.stock) > 10 ? "In Stock" : Number(form.stock) > 0 ? "Low Stock" : "Out of Stock" } 
-        : p
-    ))
-    setIsDetailOpen(false)
-    setIsEditing(false)
+  const handleSaveProduct = async () => {
+    setSaving(true)
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({
+          name: form.name,
+          slug: slugify(form.name),
+          price: Number(form.price),
+          stock_quantity: Number(form.stock),
+          description: form.description,
+          weight: form.content,
+          origin: form.origin,
+          ingredients: form.ingredients,
+          benefits: form.benefits,
+          usage_instructions: form.usage,
+          badge: form.badge,
+          category_id: categories.find(c => c.name === form.category)?.id
+        })
+        .eq('id', activeProduct.id)
+
+      if (error) throw error
+
+      // Update multimedia (simplified: delete existing and insert new if changed)
+      if (form.image && form.image !== activeProduct.image) {
+        // Find existing main image (display_order 0)
+        const { data: existingImg } = await supabase
+          .from('product_multimedia')
+          .select('id')
+          .eq('product_id', activeProduct.id)
+          .eq('display_order', 0)
+          .single()
+
+        if (existingImg) {
+          await supabase
+            .from('product_multimedia')
+            .update({ url: form.image })
+            .eq('id', existingImg.id)
+        } else {
+          await supabase
+            .from('product_multimedia')
+            .insert({
+              product_id: activeProduct.id,
+              url: form.image,
+              type: 'image',
+              display_order: 0
+            })
+        }
+      }
+      
+      await fetchData()
+      setIsDetailOpen(false)
+      setIsEditing(false)
+    } catch (error) {
+      console.error("Error saving product:", error)
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const handleCreateProduct = (e: React.FormEvent) => {
+  const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault()
-    const newProd = {
-      ...form,
-      id: `PROD-${Math.floor(100 + Math.random() * 900)}`,
-      sku: `SKU-${Math.random().toString(36).substr(2, 5).toUpperCase()}`,
-      stockStatus: Number(form.stock) > 0 ? "In Stock" : "Out of Stock",
-      status: "Active",
-      image: form.images[0] || "https://via.placeholder.com/300?text=No+Image",
+    setSaving(true)
+    try {
+      const productSlug = slugify(form.name)
+      const productSku = `LVN-${Math.random().toString(36).substr(2, 4).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
+      
+      const { data: newProd, error } = await supabase
+        .from('products')
+        .insert({
+          name: form.name,
+          slug: productSlug,
+          sku: productSku,
+          price: Number(form.price),
+          stock_quantity: Number(form.stock),
+          description: form.description,
+          weight: form.content,
+          origin: form.origin,
+          ingredients: form.ingredients,
+          benefits: form.benefits,
+          usage_instructions: form.usage,
+          badge: form.badge,
+          category_id: categories.find(c => c.name === form.category)?.id,
+          status: 'published'
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // If we have an image URL in the form, add it to multimedia
+      if (form.image && form.image.startsWith('http')) {
+        await supabase
+          .from('product_multimedia')
+          .insert({
+            product_id: newProd.id,
+            url: form.image,
+            type: 'image',
+            display_order: 0
+          })
+      }
+
+      await fetchData()
+      setIsCreateOpen(false)
+      resetForm()
+    } catch (error) {
+      console.error("Error creating product:", error)
+    } finally {
+      setSaving(false)
     }
-    setProducts([newProd, ...products])
-    setIsCreateOpen(false)
-    resetForm()
   }
 
   const resetForm = () => {
@@ -193,9 +339,23 @@ export function ProductsPanel() {
     return <Badge variant="secondary" className="text-[10px] font-bold">{badge}</Badge>
   }
 
-  const addNewCategory = (newCat: string) => {
-    if (newCat && !categories.includes(newCat)) {
-      setCategories([...categories, newCat])
+  const addNewCategory = async (newCatName: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert({
+          name: newCatName,
+          slug: slugify(newCatName)
+        })
+        .select()
+        .single()
+      
+      if (error) throw error
+      
+      setCategories(prev => [...prev, data])
+      setForm((prev: any) => ({ ...prev, category: data.name }))
+    } catch (error) {
+      console.error("Error adding category:", error)
     }
   }
 
@@ -236,7 +396,7 @@ export function ProductsPanel() {
               className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary/40 border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50 lg:min-w-37.5"
             >
               <option value="All">Todas las Categorías</option>
-              {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
             </select>
             <select
               value={stockFilter}
@@ -293,7 +453,7 @@ export function ProductsPanel() {
                       <span className="text-xs font-semibold text-muted-foreground/80">{p.category}</span>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="text-sm font-bold text-foreground tabular-nums">${Number(p.price || 0).toFixed(2)}</span>
+                      <span className="text-sm font-bold text-foreground tabular-nums">{formatPrice(p.price || 0)}</span>
                     </td>
                     <td className="px-6 py-5">
                       {getStockBadge(p.stockStatus)}
@@ -352,7 +512,7 @@ export function ProductsPanel() {
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-muted-foreground/80">{p.category}</span>
                     <span className="h-1 w-1 rounded-full bg-border" />
-                    <span className="text-sm font-black text-foreground">${Number(p.price || 0).toFixed(2)}</span>
+                    <span className="text-sm font-black text-foreground">{formatPrice(p.price || 0)}</span>
                   </div>
                 </div>
               </div>
@@ -383,6 +543,7 @@ export function ProductsPanel() {
         title="Detalle del Producto"
         categories={categories}
         onAddCategory={addNewCategory}
+        saving={saving}
       />
 
       <ProductFormSheet 
@@ -396,12 +557,13 @@ export function ProductsPanel() {
         title="Nuevo Producto"
         categories={categories}
         onAddCategory={addNewCategory}
+        saving={saving}
       />
     </div>
   )
 }
 
-function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEditing, onSave, title, categories, onAddCategory }: any) {
+function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEditing, onSave, title, categories, onAddCategory, saving }: any) {
   const isCreation = title === "Nuevo Producto"
   const [newCategoryName, setNewCategoryName] = useState("")
   const [showCategoryInput, setShowCategoryInput] = useState(false)
@@ -444,8 +606,8 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                  ) : (
                   <div className="flex gap-2 w-full sm:w-auto">
                     <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)} className="flex-1 sm:flex-initial rounded-xl h-9 px-4 text-[11px] font-bold text-muted-foreground">Cancelar</Button>
-                    <Button onClick={onSave} className="flex-1 sm:flex-initial bg-primary text-white rounded-xl h-9 px-6 text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10 transition-all hover:bg-primary/90">
-                      <Save className="h-3.5 w-3.5 mr-2" /> {isCreation ? "Crear" : "Guardar"}
+                    <Button onClick={onSave} disabled={saving} className="flex-1 sm:flex-initial bg-primary text-white rounded-xl h-9 px-6 text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10 transition-all hover:bg-primary/90">
+                      {saving ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> : <Save className="h-3.5 w-3.5 mr-2" />} {isCreation ? "Crear" : "Guardar"}
                     </Button>
                   </div>
                  )}
@@ -468,24 +630,33 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                 <ImageIcon className="h-4 w-4 text-primary" /> Imágenes del Producto <span className="text-[9px] lowercase font-medium opacity-50">(opcional)</span>
               </h3>
               {isEditing ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="h-40 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 hover:bg-muted/30 transition-all cursor-pointer group">
-                    <UploadCloud className="h-8 w-8 text-muted-foreground/50 group-hover:text-primary transition-colors" />
-                    <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Subir</p>
-                    <p className="text-[9px] text-muted-foreground italic">(Máx 2)</p>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">URL de la Imagen</label>
+                    <div className="flex gap-2">
+                      <Input 
+                        placeholder="https://images.unsplash.com/..." 
+                        value={data.image} 
+                        onChange={(e) => setForm({...data, image: e.target.value})} 
+                        className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" 
+                      />
+                    </div>
                   </div>
-                  {data.image ? (
-                    <div className="h-40 rounded-2xl bg-muted overflow-hidden border border-border group relative">
-                       <img src={data.image} alt="" className="w-full h-full object-cover" />
-                       <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <X className="h-4 w-4" />
-                       </Button>
-                    </div>
-                  ) : (
-                    <div className="h-40 rounded-2xl border border-border bg-muted/20 flex items-center justify-center italic text-muted-foreground text-[10px] opacity-40 uppercase font-bold tracking-tighter">
-                      Sin imagen
-                    </div>
-                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {data.image ? (
+                      <div className="h-40 rounded-2xl bg-muted overflow-hidden border border-border group relative">
+                         <img src={data.image} alt="" className="w-full h-full object-cover" />
+                         <Button variant="destructive" size="icon" onClick={() => setForm({...data, image: ""})} className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <X className="h-4 w-4" />
+                         </Button>
+                      </div>
+                    ) : (
+                      <div className="h-40 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 hover:bg-muted/30 transition-all opacity-40 uppercase font-bold tracking-tighter">
+                        <ImageIcon className="h-8 w-8 text-muted-foreground/50" />
+                        <p className="text-[10px]">Sin imagen</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="h-48 sm:h-64 w-full rounded-2xl overflow-hidden border border-border shadow-inner">
@@ -509,7 +680,16 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Precio ($)</label>
-                          <Input type="number" value={data.price} onChange={(e) => setForm({...data, price: e.target.value})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
+                          <Input 
+                            type="text" 
+                            placeholder="0"
+                            value={data.price ? Number(data.price).toLocaleString('es-CO') : ''} 
+                            onChange={(e) => {
+                              const rawValue = e.target.value.replace(/\D/g, '')
+                              setForm({...data, price: rawValue})
+                            }} 
+                            className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" 
+                          />
                         </div>
                         <div className="space-y-2">
                           <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Stock</label>
@@ -539,7 +719,7 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                                   className="flex-1 bg-secondary/20 h-12 rounded-2xl border-none outline-none font-bold text-sm px-4"
                                 >
                                   <option value="">Seleccionar...</option>
-                                  {categories.map((cat: string) => <option key={cat} value={cat}>{cat}</option>)}
+                                  {categories.map((cat: any) => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
                                 </select>
                                 <Button type="button" onClick={() => setShowCategoryInput(true)} variant="outline" className="h-12 w-12 rounded-2xl border-border hover:bg-secondary shrink-0"><PlusCircle className="h-5 w-5 text-primary" /></Button>
                               </div>
@@ -569,7 +749,7 @@ function ProductFormSheet({ isOpen, setIsOpen, data, setForm, isEditing, setIsEd
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                      <div className="p-5 rounded-3xl bg-secondary/10 border border-border/40">
                        <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Precio</p>
-                       <p className="text-sm font-black text-foreground">${Number(data.price || 0).toFixed(2)}</p>
+                       <p className="text-sm font-black text-foreground">{formatPrice(data.price || 0)}</p>
                      </div>
                      <div className="p-5 rounded-3xl bg-secondary/10 border border-border/40">
                        <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Stock</p>

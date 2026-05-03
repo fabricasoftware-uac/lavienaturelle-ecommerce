@@ -21,7 +21,7 @@ import { CartDrawer } from "@/components/cart-drawer"
 import { Footer } from "@/components/footer"
 import { useStore } from "@/lib/store-context"
 import { getProductById, getCategoryById, products } from "@/lib/products"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 import { ProductCard } from "@/components/product-card"
 import { Sparkles } from "lucide-react"
 
@@ -143,7 +143,7 @@ function ProductDetailContent({ productId }: { productId: string }) {
               {/* Price */}
               <div className="flex items-baseline gap-3">
                 <span className="font-serif text-3xl font-bold text-primary">
-                  ${product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </span>
                 {product.inStock !== false && (
                   <span className="inline-flex items-center gap-1 text-sm text-chart-1">
