@@ -31,7 +31,7 @@ export function useProducts() {
         .from('products')
         .select(`
           *,
-          categories (name),
+          categories (name, slug),
           product_multimedia (url, display_order)
         `)
         .is('deleted_at', null)
@@ -43,7 +43,8 @@ export function useProducts() {
         id: p.id,
         name: p.name,
         sku: p.sku || "",
-        category: p.categories?.name || "Sin categoría",
+        category: p.categories?.slug || "sin-categoria",
+        categoryName: p.categories?.name || "Sin categoría",
         categoryId: p.category_id || "",
         price: Number(p.price),
         stock: p.stock_quantity || 0,

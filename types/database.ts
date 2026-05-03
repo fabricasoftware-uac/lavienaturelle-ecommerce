@@ -144,7 +144,7 @@ export interface ProductReview {
 
 // Helper types for relations often fetched together
 export interface ProductWithDetails extends Product {
-  categories?: Pick<Category, 'name'> | null;
+  categories?: Pick<Category, 'slug' | 'name'> | null;
   product_multimedia?: Pick<ProductMultimedia, 'url' | 'display_order'>[];
 }
 
@@ -154,6 +154,7 @@ export interface AppProduct {
   name: string;
   sku: string;
   category: string;
+  categoryName: string;
   categoryId: string;
   price: number;
   stock: number;
