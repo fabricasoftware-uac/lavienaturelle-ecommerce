@@ -5,7 +5,7 @@ import Image from "next/image"
 import { X, Plus, Minus, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/lib/store-context"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 
 export function CartDrawer() {
   const { cart, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, cartTotal } = useStore()
@@ -71,7 +71,7 @@ export function CartDrawer() {
                     <h3 className="font-medium text-foreground text-sm leading-tight truncate">
                       {item.name}
                     </h3>
-                    <p className="text-primary font-semibold mt-1">${item.price.toFixed(2)}</p>
+                    <p className="text-primary font-semibold mt-1">{formatPrice(item.price)}</p>
                     <div className="flex items-center gap-2 mt-2">
                       <Button
                         variant="outline"
@@ -111,7 +111,7 @@ export function CartDrawer() {
           <div className="border-t border-border p-6 space-y-4">
             <div className="flex items-center justify-between text-lg">
               <span className="font-medium text-foreground">Subtotal</span>
-              <span className="font-serif font-semibold text-foreground">${cartTotal.toFixed(2)}</span>
+              <span className="font-serif font-semibold text-foreground">{formatPrice(cartTotal)}</span>
             </div>
             <p className="text-xs text-muted-foreground">Envio e impuestos calculados al finalizar</p>
             <div className="flex flex-col gap-2">

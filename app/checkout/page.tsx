@@ -22,7 +22,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/store-context"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 
 type CheckoutStep = "informacion" | "envio" | "pago" | "confirmacion"
@@ -232,7 +232,7 @@ function CheckoutForm() {
                         <p className="text-sm font-bold text-stone-900 truncate">{item.name}</p>
                         <p className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Cant: {item.quantity}</p>
                       </div>
-                      <p className="text-sm font-bold text-stone-900">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm font-bold text-stone-900">{formatPrice(item.price * item.quantity)}</p>
                     </div>
                   ))}
                   {orderSummary.items.length > 2 && (
@@ -242,7 +242,7 @@ function CheckoutForm() {
                   )}
                   <div className="p-6 bg-stone-50 flex justify-between items-center">
                     <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Total Pagado</span>
-                    <span className="font-serif text-2xl font-bold text-primary">${orderSummary.total.toFixed(2)}</span>
+                    <span className="font-serif text-2xl font-bold text-primary">{formatPrice(orderSummary.total)}</span>
                   </div>
                 </div>
               </div>
@@ -759,7 +759,7 @@ function CheckoutForm() {
                       </p>
                     </div>
                     <p className="text-sm font-medium text-foreground">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      {formatPrice(item.price * item.quantity)}
                     </p>
                   </div>
                 ))}
@@ -768,12 +768,12 @@ function CheckoutForm() {
               <div className="border-t border-border pt-4 space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-foreground">${cartTotal.toFixed(2)}</span>
+                  <span className="text-foreground">{formatPrice(cartTotal)}</span>
                 </div>
                 <div className="border-t border-border pt-3 flex justify-between">
                   <span className="font-medium text-foreground">Total</span>
                   <span className="font-serif text-xl font-semibold text-primary">
-                    ${total.toFixed(2)}
+                    {formatPrice(total)}
                   </span>
                 </div>
               </div>

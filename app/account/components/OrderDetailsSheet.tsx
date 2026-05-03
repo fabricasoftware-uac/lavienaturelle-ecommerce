@@ -3,7 +3,7 @@
 import { MapPin, CreditCard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 import {
   Sheet,
   SheetContent,
@@ -57,7 +57,7 @@ export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsShe
                       <p className="text-xs text-stone-400 mt-0.5">Cantidad: {item.quantity}</p>
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-stone-900">${(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="text-sm font-bold text-stone-900">{formatPrice(item.price * item.quantity)}</p>
                 </div>
               ))}
             </div>
@@ -87,7 +87,7 @@ export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsShe
           <div className="space-y-2 border-t border-stone-100 pt-6">
             <div className="flex justify-between text-sm">
               <span className="text-stone-500">Subtotal</span>
-              <span className="font-medium text-stone-900">${(order?.total - 10).toFixed(2)}</span>
+              <span className="font-medium text-stone-900">{formatPrice(order?.total - 10)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-stone-500">Envío</span>
@@ -95,11 +95,11 @@ export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsShe
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-stone-500">Impuestos</span>
-              <span className="font-medium text-stone-900">$10.00</span>
+              <span className="font-medium text-stone-900">{formatPrice(10)}</span>
             </div>
             <div className="flex justify-between items-center pt-4 border-t border-primary/10 mt-4">
               <span className="text-lg font-bold text-stone-900">Total</span>
-              <span className="text-2xl font-bold text-primary tracking-tight">${order?.total?.toFixed(2)}</span>
+              <span className="text-2xl font-bold text-primary tracking-tight">{formatPrice(order?.total)}</span>
             </div>
           </div>
 

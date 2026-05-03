@@ -40,7 +40,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 import { ShipmentModal } from "./shipment-modal"
 
 // Mock Data
@@ -495,12 +495,12 @@ export function OrdersPanel() {
                           <div className="h-8 w-8 rounded flex items-center justify-center bg-secondary font-bold text-xs">{item.quantity}</div>
                           <span className="font-semibold">{item.name}</span>
                         </div>
-                        <span className="font-medium text-muted-foreground">${(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="font-medium text-muted-foreground">{formatPrice(item.price * item.quantity)}</span>
                       </div>
                     ))}
                     <div className="p-5 flex justify-between items-center bg-muted/5 border-t border-border mt-auto">
                       <span className="text-[10px] font-bold text-primary uppercase">Total Pagado</span>
-                      <span className="text-xl font-serif font-bold text-primary">${selectedOrder.total.toFixed(2)}</span>
+                      <span className="text-xl font-serif font-bold text-primary">{formatPrice(selectedOrder.total)}</span>
                     </div>
                   </div>
                 </section>

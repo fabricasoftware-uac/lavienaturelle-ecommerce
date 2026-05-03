@@ -3,7 +3,7 @@
 import { ShoppingBag, Truck, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 
 interface OrderCardProps {
   order: any
@@ -50,7 +50,7 @@ export function OrderCard({ order, onViewDetails, onTrack }: OrderCardProps) {
                 </div>
                 <div className="text-right">
                    <p className="text-xs font-medium text-stone-400 mb-0.5">{order.items} Artículo{order.items > 1 ? 's' : ''}</p>
-                   <p className="text-xl font-bold text-stone-900 tracking-tight">${order.total.toFixed(2)}</p>
+                   <p className="text-xl font-bold text-stone-900 tracking-tight">{formatPrice(order.total)}</p>
                 </div>
              </div>
              

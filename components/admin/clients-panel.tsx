@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 
 // Mock Data for Clients
 const INITIAL_CLIENTS = [
@@ -486,7 +486,7 @@ export function ClientsPanel() {
                               {getPaymentBadge(order.paymentStatus)}
                             </td>
                             <td className="px-4 py-4 text-right">
-                              <span className="text-xs font-black text-foreground">${order.total.toFixed(2)}</span>
+                              <span className="text-xs font-black text-foreground">{formatPrice(order.total)}</span>
                             </td>
                           </tr>
                         ))}

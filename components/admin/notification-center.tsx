@@ -11,8 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { useProducts } from "@/hooks/use-products"
+import { cn, formatPrice } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
 
 const INITIAL_NOTIFICATIONS = [
   {
@@ -118,7 +119,7 @@ export function NotificationCenter({ onNavigateToOrders }: { onNavigateToOrders?
                     </div>
                     <div className="flex items-center justify-between">
                        <p className="text-xs font-bold text-muted-foreground tracking-tight">Pedido #{n.id}</p>
-                       <p className="text-xs font-bold text-foreground">${n.total.toFixed(2)}</p>
+                       <p className="text-xs font-bold text-foreground">{formatPrice(n.total)}</p>
                     </div>
                     <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60 flex items-center gap-1.5">
                        {n.time}
