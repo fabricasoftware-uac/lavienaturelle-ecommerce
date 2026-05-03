@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { slugify } from "@/lib/utils"
+import { deleteImage } from "@/lib/supabase/storage"
 
 export function useProducts() {
   const supabase = createClient()
@@ -37,7 +38,7 @@ export function useProducts() {
       
       if (prodsError) throw prodsError
       
-      const mappedProducts = (prodsData || []).map(p => ({
+      const mappedProducts = (prodsData || []).map((p:any)=> ({
         id: p.id,
         name: p.name,
         sku: p.sku,
@@ -47,7 +48,7 @@ export function useProducts() {
         stock: p.stock_quantity,
         stockStatus: p.stock_quantity > 10 ? "In Stock" : p.stock_quantity > 0 ? "Low Stock" : "Out of Stock",
         status: p.status === 'published' ? 'Active' : 'Draft',
-        image: p.product_multimedia?.[0]?.url || "https://via.placeholder.com/300?text=No+Image",
+        image: p.product_multimedia?.[0]?.url || "/logo-script.png",
         images: p.product_multimedia?.map((m: any) => m.url) || [],
         description: p.description,
         fullDescription: p.full_description,
@@ -94,7 +95,20 @@ export function useProducts() {
 
       if (error) throw error
 
-      // Sync images
+      // 1. Physical deletion from Storage for removed images
+      const originalImages = originalProduct.images || []
+      const currentImages = form.images || []
+      const removedImages = originalImages.filter((img: string) => !currentImages.includes(img))
+
+      for (const imageUrl of removedImages) {
+        try {
+          await deleteImage(imageUrl)
+        } catch (err) {
+          console.error("Error deleting physical file from storage:", err)
+        }
+      }
+
+      // 2. Sync images in Database
       if (form.images && Array.isArray(form.images)) {
         // Simple approach: delete existing and insert new ones
         await supabase

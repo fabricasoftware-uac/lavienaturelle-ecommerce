@@ -77,6 +77,7 @@ export function HeroSection() {
                   alt="Coleccion de aceites esenciales"
                   fill
                   className="object-cover"
+                  loading="eager"
                 />
               </div>
               <div className="relative aspect-square rounded-2xl overflow-hidden shadow-lg">
@@ -85,6 +86,7 @@ export function HeroSection() {
                   alt="Te herbal"
                   fill
                   className="object-cover"
+                  loading="eager"
                 />
               </div>
             </div>
@@ -95,6 +97,7 @@ export function HeroSection() {
                   alt="Suplementos naturales"
                   fill
                   className="object-cover"
+                  loading="eager"
                 />
               </div>
               <div className="relative aspect-3/4 rounded-2xl overflow-hidden shadow-lg">
@@ -103,6 +106,7 @@ export function HeroSection() {
                   alt="Ingredientes botanicos"
                   fill
                   className="object-cover"
+                  loading="eager"
                 />
               </div>
             </div>
