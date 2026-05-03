@@ -3,16 +3,17 @@
 import { useState, useMemo } from "react"
 import { Sparkles, Grid3X3, LayoutGrid, ChevronLeft, ChevronRight } from "lucide-react"
 import { ProductCard } from "@/components/product-card"
-import { products, categories, type Category, getCategoryIcon } from "@/lib/products"
+import { products, categories, getCategoryIcon } from "@/lib/products"
 import { cn } from "@/lib/utils"
+import { AppProduct, Category } from "@/types/database"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 const PRODUCTS_PER_PAGE = 8
 
 interface ProductCatalogProps {
-  initialProducts?: any[]
-  initialCategories?: any[]
+  initialProducts?: AppProduct[]
+  initialCategories?: Category[]
 }
 
 export function ProductCatalog({ initialProducts, initialCategories }: ProductCatalogProps) {

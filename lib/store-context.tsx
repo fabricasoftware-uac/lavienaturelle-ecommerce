@@ -2,26 +2,9 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { AppProduct, Profile } from "@/types/database"
 
-export interface Product {
-  id: string
-  name: string
-  price: number
-  category: string
-  image: string
-  images?: string[] // Up to 3 images for gallery
-  description: string
-  fullDescription?: string
-  badge?: string
-  details?: {
-    weight?: string
-    origin?: string
-    ingredients?: string
-    usage?: string
-    benefits?: string[]
-  }
-  inStock?: boolean
-}
+export type Product = AppProduct;
 
 export interface CartItem extends Product {
   quantity: number
@@ -29,7 +12,7 @@ export interface CartItem extends Product {
 
 export interface User {
   email: string
-  role: "user" | "admin"
+  role: "customer" | "admin"
   name: string
   document_number?: string
   phone?: string
@@ -80,7 +63,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
           setUser({
             email: session.user.email!,
-            role: (profile?.role as "user" | "admin") || "user",
+            role: (profile?.role as "customer" | "admin") || "customer",
             name: profile?.full_name || session.user.user_metadata?.full_name || "Usuario",
             document_number: profile?.document_number || session.user.user_metadata?.document_number,
             phone: profile?.phone || session.user.user_metadata?.phone,

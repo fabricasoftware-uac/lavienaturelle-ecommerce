@@ -10,6 +10,7 @@ import { useProducts } from "@/hooks/use-products"
 import { ProductsTable } from "./products/products-table"
 import { ProductMobileCard } from "./products/product-mobile-card"
 import { ProductFormSheet } from "./products/product-form-sheet"
+import { AppProduct, Category } from "@/types/database"
 
 export function ProductsPanel() {
   const {
@@ -30,12 +31,12 @@ export function ProductsPanel() {
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [activeProduct, setActiveProduct] = useState<any>(null)
+  const [activeProduct, setActiveProduct] = useState<AppProduct | null>(null)
   
-  const [form, setForm] = useState<any>({
+  const [form, setForm] = useState<Partial<AppProduct>>({
     name: "",
-    price: "",
-    stock: "",
+    price: 0,
+    stock: 0,
     description: "",
     content: "",
     origin: "",
@@ -47,7 +48,7 @@ export function ProductsPanel() {
     images: [],
   })
 
-  const handleOpenDetail = (product: any) => {
+  const handleOpenDetail = (product: AppProduct) => {
     setActiveProduct(product)
     setForm({ ...product })
     setIsEditing(false)
@@ -62,8 +63,8 @@ export function ProductsPanel() {
   const resetForm = () => {
     setForm({
       name: "",
-      price: "",
-      stock: "",
+      price: 0,
+      stock: 0,
       description: "",
       content: "",
       origin: "",
@@ -77,7 +78,7 @@ export function ProductsPanel() {
   }
 
   const handleSave = async () => {
-    const res = await saveProduct(activeProduct.id, form, activeProduct)
+    const res = await saveProduct(activeProduct!.id, form, activeProduct!)
     if (res.success) {
       setIsDetailOpen(false)
       setIsEditing(false)

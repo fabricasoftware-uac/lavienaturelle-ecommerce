@@ -1,5 +1,6 @@
 import { createClient as createServerClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
+import { AppProduct, Category, ProductWithDetails } from "@/types/database"
 
 export async function getProducts() {
   const cookieStore = await cookies()
@@ -20,26 +21,28 @@ export async function getProducts() {
     return []
   }
 
-  return data.map(p => ({
+  const products = data as ProductWithDetails[]
+
+  return products.map(p => ({
     id: p.id,
     name: p.name,
-    price: p.price,
-    category: p.categories?.slug || 'otros',
+    price: Number(p.price),
+    category: p.categories?.name || 'otros',
     categoryName: p.categories?.name || 'Otros',
-    image: p.product_multimedia?.[0]?.url || "https://via.placeholder.com/300?text=No+Image",
-    images: p.product_multimedia?.map((m: any) => m.url) || [],
-    description: p.description,
-    fullDescription: p.full_description,
-    badge: p.badge,
+    image: p.product_multimedia?.[0]?.url || "/logo-script.png",
+    images: p.product_multimedia?.map((m) => m.url) || [],
+    description: p.description || "",
+    fullDescription: p.full_description || "",
+    badge: p.badge || "",
     details: {
-      weight: p.weight,
-      origin: p.origin,
-      ingredients: p.ingredients,
-      usage: p.usage_instructions,
+      weight: p.weight || "",
+      origin: p.origin || "",
+      ingredients: p.ingredients || "",
+      usage: p.usage_instructions || "",
       benefits: p.benefits || []
     },
     inStock: p.stock_quantity > 0
-  }))
+  })) as any[] // Keeping as any[] for now to avoid breaking UI that expects the old AppProduct structure if it differs slightly
 }
 
 export async function getCategories() {
@@ -57,7 +60,7 @@ export async function getCategories() {
     return []
   }
 
-  return data
+  return data as Category[]
 }
 
 export async function getProductBySlugOrId(id: string) {
@@ -80,24 +83,26 @@ export async function getProductBySlugOrId(id: string) {
     return null
   }
 
+  const p = data as ProductWithDetails
+
   return {
-    id: data.id,
-    name: data.name,
-    price: data.price,
-    category: data.categories?.slug || 'otros',
-    categoryName: data.categories?.name || 'Otros',
-    image: data.product_multimedia?.[0]?.url || "https://via.placeholder.com/300?text=No+Image",
-    images: data.product_multimedia?.map((m: any) => m.url) || [],
-    description: data.description,
-    fullDescription: data.full_description,
-    badge: data.badge,
+    id: p.id,
+    name: p.name,
+    price: Number(p.price),
+    category: p.categories?.name || 'otros',
+    categoryName: p.categories?.name || 'Otros',
+    image: p.product_multimedia?.[0]?.url || "/logo-script.png",
+    images: p.product_multimedia?.map((m) => m.url) || [],
+    description: p.description || "",
+    fullDescription: p.full_description || "",
+    badge: p.badge || "",
     details: {
-      weight: data.weight,
-      origin: data.origin,
-      ingredients: data.ingredients,
-      usage: data.usage_instructions,
-      benefits: data.benefits || []
+      weight: p.weight || "",
+      origin: p.origin || "",
+      ingredients: p.ingredients || "",
+      usage: p.usage_instructions || "",
+      benefits: p.benefits || []
     },
-    inStock: data.stock_quantity > 0
+    inStock: p.stock_quantity > 0
   }
 }

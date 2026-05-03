@@ -4,11 +4,12 @@ import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { slugify } from "@/lib/utils"
 import { deleteImage } from "@/lib/supabase/storage"
+import { AppProduct, Category, ProductWithDetails } from "@/types/database"
 
 export function useProducts() {
   const supabase = createClient()
-  const [products, setProducts] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
+  const [products, setProducts] = useState<AppProduct[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
@@ -38,26 +39,26 @@ export function useProducts() {
       
       if (prodsError) throw prodsError
       
-      const mappedProducts = (prodsData || []).map((p:any)=> ({
+      const mappedProducts: AppProduct[] = (prodsData as ProductWithDetails[] || []).map((p) => ({
         id: p.id,
         name: p.name,
-        sku: p.sku,
+        sku: p.sku || "",
         category: p.categories?.name || "Sin categoría",
-        categoryId: p.category_id,
-        price: p.price,
-        stock: p.stock_quantity,
-        stockStatus: p.stock_quantity > 10 ? "In Stock" : p.stock_quantity > 0 ? "Low Stock" : "Out of Stock",
+        categoryId: p.category_id || "",
+        price: Number(p.price),
+        stock: p.stock_quantity || 0,
+        stockStatus: (p.stock_quantity || 0) > 10 ? "In Stock" : (p.stock_quantity || 0) > 0 ? "Low Stock" : "Out of Stock",
         status: p.status === 'published' ? 'Active' : 'Draft',
         image: p.product_multimedia?.[0]?.url || "/logo-script.png",
         images: p.product_multimedia?.map((m: any) => m.url) || [],
-        description: p.description,
-        fullDescription: p.full_description,
-        content: p.weight,
-        origin: p.origin,
-        ingredients: p.ingredients,
+        description: p.description || "",
+        fullDescription: p.full_description || "",
+        content: p.weight || "",
+        origin: p.origin || "",
+        ingredients: p.ingredients || "",
         benefits: p.benefits || [],
-        usage: p.usage_instructions,
-        badge: p.badge,
+        usage: p.usage_instructions || "",
+        badge: p.badge || "",
       }))
       
       setProducts(mappedProducts)

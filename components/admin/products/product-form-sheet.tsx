@@ -23,21 +23,22 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
+  SheetDescription, 
 } from "@/components/ui/sheet"
 import { cn, formatPrice } from "@/lib/utils"
 import { uploadImage, deleteImage } from "@/lib/supabase/storage"
+import { AppProduct, Category } from "@/types/database"
 
 interface ProductFormSheetProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
-  data: any
-  setForm: (data: any) => void
+  data: Partial<AppProduct>
+  setForm: (data: Partial<AppProduct>) => void
   isEditing: boolean
   setIsEditing: (editing: boolean) => void
   onSave: (e?: any) => void
   title: string
-  categories: any[]
+  categories: Category[]
   onAddCategory: (name: string) => void
   onDelete: (id: string) => void
   saving: boolean
@@ -68,11 +69,11 @@ export function ProductFormSheet({
 
   const addBenefit = () => setForm({ ...data, benefits: [...(data.benefits || []), ""] })
   const updateBenefit = (val: string, idx: number) => {
-    const next = [...data.benefits]
+    const next = [...(data.benefits || [])]
     next[idx] = val
     setForm({ ...data, benefits: next })
   }
-  const removeBenefit = (idx: number) => setForm({ ...data, benefits: data.benefits.filter((_: any, i: number) => i !== idx) })
+  const removeBenefit = (idx: number) => setForm({ ...data, benefits: (data.benefits || []).filter((_, i) => i !== idx) })
 
   const handleCreateCategory = () => {
     if (newCategoryName.trim()) {
@@ -247,14 +248,14 @@ export function ProductFormSheet({
                           value={data.price ? Number(data.price).toLocaleString('es-CO') : ''} 
                           onChange={(e) => {
                             const rawValue = e.target.value.replace(/\D/g, '')
-                            setForm({...data, price: rawValue})
+                            setForm({...data, price: Number(rawValue)})
                           }} 
                           className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" 
                         />
                       </div>
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Stock</label>
-                        <Input type="number" value={data.stock} onChange={(e) => setForm({...data, stock: e.target.value})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
+                        <Input type="number" value={data.stock} onChange={(e) => setForm({...data, stock: Number(e.target.value)})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -270,7 +271,7 @@ export function ProductFormSheet({
                           <div className="flex-1 flex gap-2">
                             <select value={data.category} onChange={(e) => setForm({...data, category: e.target.value})} className="flex-1 bg-secondary/20 h-12 rounded-2xl border-none outline-none font-bold text-sm px-4">
                               <option value="">Seleccionar...</option>
-                              {categories.map((cat: any) => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+                              {categories.map((cat) => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
                             </select>
                             <Button type="button" onClick={() => setShowCategoryInput(true)} variant="outline" className="h-12 w-12 rounded-2xl border-border hover:bg-secondary shrink-0"><PlusCircle className="h-5 w-5 text-primary" /></Button>
                           </div>
@@ -287,7 +288,7 @@ export function ProductFormSheet({
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Descripción</label>
-                      <textarea value={data.description} onChange={(e) => setForm({...data, description: e.target.value})} className="w-full min-h-25 bg-secondary/20 rounded-2xl border-none p-4 font-bold text-sm outline-none resize-none" />
+                      <textarea value={data.description} onChange={(e) => setForm({...data, description: e.target.value})} className="w-full min-h-25 bg-secondary/20 rounded-2xl border-none p-4 font-bold text-sm outline-1 resize-none" />
                     </div>
                   </div>
                 </div>
@@ -356,7 +357,7 @@ export function ProductFormSheet({
 
                 <div className="space-y-4">
                   <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Modo de Uso</label>
-                  {isEditing ? <textarea placeholder="Instrucciones..." value={data.usage} onChange={(e) => setForm({...data, usage: e.target.value})} className="w-full min-h-20 bg-muted/20 rounded-xl border-border p-3 text-xs font-bold outline-none resize-none" /> : <div className="p-5 rounded-3xl bg-primary/5 border border-primary/10 italic text-xs font-bold text-primary/80"><Beaker className="h-4 w-4 mb-2 opacity-50" />{data.usage || "No especificado."}</div>}
+                  {isEditing ? <textarea placeholder="Instrucciones..." value={data.usage} onChange={(e) => setForm({...data, usage: e.target.value})} className="w-full min-h-20 bg-muted/20 rounded-xl border-border p-3 text-xs font-bold outline-1 resize-none" /> : <div className="p-5 rounded-3xl bg-primary/5 border border-primary/10 italic text-xs font-bold text-primary/80"><Beaker className="h-4 w-4 mb-2 opacity-50" />{data.usage || "No especificado."}</div>}
                 </div>
               </div>
             </section>
@@ -371,7 +372,7 @@ export function ProductFormSheet({
                     <Button 
                       variant="destructive" 
                       className="flex-1 h-11 rounded-xl font-black text-[10px] uppercase tracking-widest"
-                      onClick={() => onDelete(data.id)}
+                      onClick={() => data.id && onDelete(data.id)}
                       disabled={saving}
                     >
                       {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sí, Eliminar"}
