@@ -25,7 +25,8 @@ export function LogoutDialog({ open, onOpenChange }: LogoutDialogProps) {
   const handleLogout = async () => {
     await logout()
     onOpenChange(false)
-    router.push("/")
+    // Use window.location.href for a full refresh to clear all session states and cookies
+    window.location.href = "/"
   }
 
   return (

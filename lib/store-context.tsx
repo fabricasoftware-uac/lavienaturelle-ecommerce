@@ -47,26 +47,37 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // Listen for auth state changes
   useEffect(() => {
+    let currentUserId: string | null = null;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
         if (session) {
+          const userId = session.user.id;
+          currentUserId = userId;
+
           // Get additional user data from profiles
           const { data: profile } = await supabase
             .from("profiles")
             .select("*")
-            .eq("id", session.user.id)
+            .eq("id", userId)
             .single()
 
-          setUser({
-            id: session.user.id,
-            email: session.user.email!,
-            role: (profile?.role as "customer" | "admin") || "customer",
-            name: profile?.full_name || session.user.user_metadata?.full_name || "Usuario",
-            document_number: profile?.document_number || session.user.user_metadata?.document_number,
-            phone: profile?.phone || session.user.user_metadata?.phone,
-          })
+          // Only update if this is still the current user session
+          if (currentUserId === userId) {
+            setUser({
+              id: userId,
+              email: session.user.email!,
+              role: (profile?.role as "customer" | "admin") || "customer",
+              name: profile?.full_name || session.user.user_metadata?.full_name || "Usuario",
+              document_number: profile?.document_number || session.user.user_metadata?.document_number,
+              phone: profile?.phone || session.user.user_metadata?.phone,
+            })
+          }
         } else {
-          setUser(null)
+          currentUserId = null;
+          setUser(null);
+          // Optional: Clear cart on logout if security/privacy is a concern
+          // clearCart(); 
         }
       }
     )
@@ -142,8 +153,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [supabase])
 
   const logout = useCallback(async () => {
-    await supabase.auth.signOut()
+    // Set user to null immediately to update UI faster
     setUser(null)
+    
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.error("Error signing out:", error)
+    }
   }, [supabase])
 
   useEffect(() => {
