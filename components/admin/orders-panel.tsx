@@ -41,9 +41,21 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { cn, formatPrice } from "@/lib/utils"
+import { toast } from "sonner"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { ShipmentModal } from "./shipment-modal"
-import { getOrders, updateOrder } from "@/lib/supabase/orders"
+import { getOrders, updateOrder, deleteOrder } from "@/lib/supabase/orders"
 import { Order, OrderStatus, PaymentStatus } from "@/types/database"
+import { getWhatsAppContactLink, getWhatsAppTrackingLink } from "@/lib/whatsapp"
 
 // INITIAL_ORDERS removed - using Supabase data
 
@@ -62,6 +74,10 @@ export function OrdersPanel() {
   const [shipmentModalOrder, setShipmentModalOrder] = useState<any>(null)
   const [isShipmentModalOpen, setIsShipmentModalOpen] = useState(false)
 
+  // Delete Confirmation State
+  const [orderToDelete, setOrderToDelete] = useState<{ id: string, realId: string } | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
   useEffect(() => {
     async function loadOrders() {
       setLoading(true)
@@ -75,7 +91,12 @@ export function OrdersPanel() {
           name: o.full_name,
           email: o.email,
           phone: o.phone || "No especificado",
+          documentNumber: o.document_number || "No especificado",
           address: `${o.shipping_address_line1}${o.shipping_address_line2 ? ', ' + o.shipping_address_line2 : ''}, ${o.shipping_city}, ${o.shipping_state}`,
+          addressLine1: o.shipping_address_line1,
+          addressLine2: o.shipping_address_line2 || "",
+          city: o.shipping_city,
+          state: o.shipping_state,
         },
         date: o.created_at,
         shippingStatus: o.status.charAt(0).toUpperCase() + o.status.slice(1),
@@ -128,6 +149,23 @@ export function OrdersPanel() {
             } 
           : order
       ))
+
+      toast.success("Pedido actualizado", {
+        description: `El pedido ${shipmentModalOrder.id} ha sido marcado como enviado.`
+      })
+
+      // Optional: Open WhatsApp with tracking info automatically
+      const whatsappLink = getWhatsAppTrackingLink(
+        shipmentModalOrder.customer.name,
+        trackingId,
+        carrier,
+        shipmentModalOrder.customer.phone
+      )
+      window.open(whatsappLink, '_blank')
+    } else {
+      toast.error("Error al actualizar", {
+        description: res.error
+      })
     }
     
     setIsShipmentModalOpen(false)
@@ -140,7 +178,11 @@ export function OrdersPanel() {
       customerName: order.customer.name,
       customerEmail: order.customer.email,
       customerPhone: order.customer.phone,
-      customerAddress: order.customer.address,
+      customerDocument: order.customer.documentNumber,
+      customerAddress: order.customer.addressLine1,
+      customerAddress2: order.customer.addressLine2,
+      customerCity: order.customer.city,
+      customerState: order.customer.state,
       shippingStatus: order.shippingStatus,
       paymentStatus: order.paymentStatus,
     })
@@ -155,28 +197,89 @@ export function OrdersPanel() {
       full_name: editForm.customerName,
       email: editForm.customerEmail,
       phone: editForm.customerPhone,
+      document_number: editForm.customerDocument,
       shipping_address_line1: editForm.customerAddress,
+      shipping_address_line2: editForm.customerAddress2,
+      shipping_city: editForm.customerCity,
+      shipping_state: editForm.customerState,
       status: editForm.shippingStatus.toLowerCase() as OrderStatus,
       payment_status: editForm.paymentStatus.toLowerCase() as PaymentStatus
     })
 
     if (res.success) {
+      const fullAddress = `${editForm.customerAddress}${editForm.customerAddress2 ? ', ' + editForm.customerAddress2 : ''}, ${editForm.customerCity}, ${editForm.customerState}`
+      
       setOrders(prev => prev.map(order => 
         order.realId === selectedOrder.realId 
           ? { 
               ...order, 
-              customer: { ...order.customer, name: editForm.customerName, email: editForm.customerEmail, phone: editForm.customerPhone, address: editForm.customerAddress },
+              customer: { 
+                ...order.customer, 
+                name: editForm.customerName, 
+                email: editForm.customerEmail, 
+                phone: editForm.customerPhone, 
+                documentNumber: editForm.customerDocument,
+                address: fullAddress,
+                addressLine1: editForm.customerAddress,
+                addressLine2: editForm.customerAddress2,
+                city: editForm.customerCity,
+                state: editForm.customerState
+              },
               shippingStatus: editForm.shippingStatus,
               paymentStatus: editForm.paymentStatus,
             } 
           : order
       ))
-      setSelectedOrder(null)
+      toast.success("Pedido guardado", {
+        description: "La información del pedido ha sido actualizada correctamente."
+      })
       setIsDetailOpen(false)
       setIsEditing(false)
     } else {
-      alert("Error al actualizar: " + res.error)
+      toast.error("Error al guardar", {
+        description: res.error
+      })
     }
+  }
+
+  const handleDeleteOrder = (orderId: string, realId: string) => {
+    setOrderToDelete({ id: orderId, realId })
+    setIsDeleteDialogOpen(true)
+  }
+
+  const confirmDeleteOrder = async () => {
+    if (!orderToDelete) return
+
+    const res = await deleteOrder(orderToDelete.realId)
+    if (res.success) {
+      setOrders(prev => prev.filter(order => order.realId !== orderToDelete.realId))
+      toast.success("Pedido eliminado", {
+        description: `El pedido ${orderToDelete.id} ha sido borrado.`
+      })
+      if (selectedOrder?.realId === orderToDelete.realId) {
+        setIsDetailOpen(false)
+      }
+    } else {
+      toast.error("Error al eliminar", {
+        description: res.error
+      })
+    }
+    setIsDeleteDialogOpen(false)
+    setOrderToDelete(null)
+  }
+
+  const handleWhatsAppMessage = () => {
+    if (!selectedOrder || !selectedOrder.customer.phone || selectedOrder.customer.phone === "No especificado") {
+      alert("No hay un número de teléfono válido para este cliente.")
+      return
+    }
+
+    const whatsappLink = getWhatsAppContactLink(
+      selectedOrder.customer.name,
+      selectedOrder.id,
+      selectedOrder.customer.phone
+    )
+    window.open(whatsappLink, '_blank')
   }
 
   const filteredOrders = orders.filter(order => {
@@ -187,20 +290,27 @@ export function OrdersPanel() {
   })
 
   const getShippingBadge = (status: string) => {
-    switch (status) {
-      case "Pending": return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 font-medium">Pendiente</Badge>
-      case "Processing": return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-medium">Procesando</Badge>
-      case "Shipped": return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 font-medium">Enviado</Badge>
-      case "Delivered": return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">Entregado</Badge>
+    const s = status.toLowerCase()
+    switch (s) {
+      case "pending": return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 font-medium">Pendiente</Badge>
+      case "paid": return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-medium">Pagado</Badge>
+      case "processing": return <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 font-medium">Procesando</Badge>
+      case "shipped": return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 font-medium">Enviado</Badge>
+      case "delivered": return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">Entregado</Badge>
+      case "cancelled": return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 font-medium">Cancelado</Badge>
+      case "refunded": return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 font-medium">Reembolsado</Badge>
       default: return <Badge variant="outline">{status}</Badge>
     }
   }
 
   const getPaymentBadge = (status: string) => {
-    switch (status) {
-      case "Paid": return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1.5 font-medium"><CheckCircle className="h-3 w-3" /> Pagado</Badge>
-      case "Pending": return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 flex items-center gap-1.5 font-medium"><Clock className="h-3 w-3" /> Pendiente</Badge>
-      case "Failed": return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1.5 font-medium"><AlertCircle className="h-3 w-3" /> Fallido</Badge>
+    const s = status.toLowerCase()
+    switch (s) {
+      case "paid":
+      case "completed": return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1.5 font-medium"><CheckCircle className="h-3 w-3" /> Pagado</Badge>
+      case "pending": return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 flex items-center gap-1.5 font-medium"><Clock className="h-3 w-3" /> Pendiente</Badge>
+      case "failed": return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1.5 font-medium"><AlertCircle className="h-3 w-3" /> Fallido</Badge>
+      case "refunded": return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 flex items-center gap-1.5 font-medium"><RotateCcw className="h-3 w-3" /> Reembolsado</Badge>
       default: return <Badge variant="outline">{status}</Badge>
     }
   }
@@ -239,9 +349,12 @@ export function OrdersPanel() {
             >
               <option value="All">Todos los envíos</option>
               <option value="Pending">Pendiente</option>
+              <option value="Paid">Pagado</option>
               <option value="Processing">Procesando</option>
               <option value="Shipped">Enviado</option>
               <option value="Delivered">Entregado</option>
+              <option value="Cancelled">Cancelado</option>
+              <option value="Refunded">Reembolsado</option>
             </select>
             <select
               value={paymentFilter}
@@ -252,6 +365,7 @@ export function OrdersPanel() {
               <option value="Paid">Pagado</option>
               <option value="Pending">Pendiente</option>
               <option value="Failed">Fallido</option>
+              <option value="Refunded">Reembolsado</option>
             </select>
           </div>
         </div>
@@ -309,6 +423,14 @@ export function OrdersPanel() {
                     >
                       Ver Detalles
                     </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleDeleteOrder(order.id, order.realId)} 
+                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -355,9 +477,12 @@ export function OrdersPanel() {
                       className="bg-secondary/50 rounded-lg px-2 py-1 text-xs font-medium border-none outline-none h-8 cursor-pointer"
                     >
                       <option value="Pending">Pendiente</option>
+                      <option value="Paid">Pagado</option>
                       <option value="Processing">Procesando</option>
                       <option value="Shipped">Enviado</option>
                       <option value="Delivered">Entregado</option>
+                      <option value="Cancelled">Cancelado</option>
+                      <option value="Refunded">Reembolsado</option>
                     </select>
                     <select
                       value={editForm.paymentStatus}
@@ -367,6 +492,7 @@ export function OrdersPanel() {
                       <option value="Paid">Pagado</option>
                       <option value="Pending">Pendiente</option>
                       <option value="Failed">Fallido</option>
+                      <option value="Refunded">Reembolsado</option>
                     </select>
                   </div>
                 )}
@@ -393,6 +519,10 @@ export function OrdersPanel() {
                           <Input value={editForm.customerPhone} onChange={(e) => setEditForm({ ...editForm, customerPhone: e.target.value })} className="h-9 text-sm" />
                         </div>
                       </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-medium text-muted-foreground uppercase">Documento / Cédula</label>
+                        <Input value={editForm.customerDocument} onChange={(e) => setEditForm({ ...editForm, customerDocument: e.target.value })} className="h-9 text-sm" />
+                      </div>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 gap-3">
@@ -400,14 +530,18 @@ export function OrdersPanel() {
                         <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Nombre Completo</p>
                         <p className="text-sm font-semibold">{selectedOrder.customer.name}</p>
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="p-4 rounded-xl border border-border bg-card">
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="p-4 rounded-xl border border-border bg-card col-span-1">
                           <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Email</p>
-                          <p className="text-sm font-semibold truncate">{selectedOrder.customer.email}</p>
+                          <p className="text-xs font-semibold truncate">{selectedOrder.customer.email}</p>
                         </div>
-                        <div className="p-4 rounded-xl border border-border bg-card">
+                        <div className="p-4 rounded-xl border border-border bg-card col-span-1">
                           <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Teléfono</p>
-                          <p className="text-sm font-semibold">{selectedOrder.customer.phone}</p>
+                          <p className="text-xs font-semibold">{selectedOrder.customer.phone}</p>
+                        </div>
+                        <div className="p-4 rounded-xl border border-border bg-card col-span-1">
+                          <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Documento</p>
+                          <p className="text-xs font-semibold">{selectedOrder.customer.documentNumber}</p>
                         </div>
                       </div>
                     </div>
@@ -418,13 +552,25 @@ export function OrdersPanel() {
                 <section className="space-y-4">
                   <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Detalles de Envío</h3>
                   {isEditing ? (
-                    <div className="p-4 rounded-xl bg-muted/20 border border-border">
-                      <label className="text-[10px] font-medium text-muted-foreground uppercase block mb-1">Dirección Completa</label>
-                      <textarea
-                        value={editForm.customerAddress}
-                        onChange={(e) => setEditForm({ ...editForm, customerAddress: e.target.value })}
-                        className="w-full min-h-20 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all resize-none"
-                      />
+                    <div className="space-y-3 p-4 rounded-xl bg-muted/20 border border-border">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-medium text-muted-foreground uppercase">Dirección Línea 1</label>
+                        <Input value={editForm.customerAddress} onChange={(e) => setEditForm({ ...editForm, customerAddress: e.target.value })} className="h-9 text-sm" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-medium text-muted-foreground uppercase">Dirección Línea 2 (Opcional)</label>
+                        <Input value={editForm.customerAddress2} onChange={(e) => setEditForm({ ...editForm, customerAddress2: e.target.value })} className="h-9 text-sm" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-medium text-muted-foreground uppercase">Ciudad</label>
+                          <Input value={editForm.customerCity} onChange={(e) => setEditForm({ ...editForm, customerCity: e.target.value })} className="h-9 text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-medium text-muted-foreground uppercase">Departamento / Estado</label>
+                          <Input value={editForm.customerState} onChange={(e) => setEditForm({ ...editForm, customerState: e.target.value })} className="h-9 text-sm" />
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <div className="p-4 rounded-xl border border-border bg-card flex gap-4">
@@ -476,11 +622,18 @@ export function OrdersPanel() {
               {/* Footer Fijo */}
               <div className="p-8 border-t border-border bg-card shrink-0">
                 <div className="flex gap-3">
-                  <Button className="flex-1 bg-primary text-white h-11 rounded-lg text-xs font-bold">
-                    <Mail className="h-4 w-4 mr-2" /> Notificar al Cliente
+                  <Button onClick={handleWhatsAppMessage} className="flex-1 bg-green-600 hover:bg-green-700 text-white h-11 rounded-lg text-xs font-bold">
+                    <Phone className="h-4 w-4 mr-2" /> WhatsApp
                   </Button>
-                  <Button variant="outline" className="h-11 w-11 rounded-lg border-border">
-                    <Download className="h-4 w-4" />
+                  <Button className="flex-1 bg-primary text-white h-11 rounded-lg text-xs font-bold">
+                    <Mail className="h-4 w-4 mr-2" /> Email
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleDeleteOrder(selectedOrder.id, selectedOrder.realId)}
+                    className="h-11 w-11 rounded-lg border-border text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -494,6 +647,23 @@ export function OrdersPanel() {
         onOpenChange={setIsShipmentModalOpen}
         onConfirm={handleConfirmShipment}
       />
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás completamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará permanentemente el pedido {orderToDelete?.id} y no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteOrder} className="bg-red-600 hover:bg-red-700 text-white">
+              Eliminar Pedido
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
