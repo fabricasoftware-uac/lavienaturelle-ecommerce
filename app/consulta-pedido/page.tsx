@@ -45,15 +45,16 @@ function TrackingContent() {
       const data = await getOrderByTracking(oId, dNum)
       
       if (data) {
+        const status = data.status || 'pending'
         const mappedOrder = {
           id: data.order_number || data.id,
           realId: data.id,
-          status: data.status.charAt(0).toUpperCase() + data.status.slice(1),
-          statusColor: data.status === 'delivered' ? 'green' : data.status === 'shipped' ? 'blue' : 'amber',
+          status: status.charAt(0).toUpperCase() + status.slice(1),
+          statusColor: status === 'delivered' ? 'green' : status === 'shipped' ? 'blue' : 'amber',
           trackingId: data.tracking_number || "No generado",
           carrier: data.courier_name || "N/A",
-          date: new Date(data.created_at).toLocaleDateString(),
-          total: Number(data.total_amount),
+          date: data.created_at ? new Date(data.created_at).toLocaleDateString() : "N/A",
+          total: Number(data.total_amount) || 0,
           documentNumber: data.document_number
         }
         setOrder(mappedOrder)

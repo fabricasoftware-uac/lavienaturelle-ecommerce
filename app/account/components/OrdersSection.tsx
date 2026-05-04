@@ -23,20 +23,27 @@ export function OrdersSection({ onViewDetails, onTrack }: OrdersSectionProps) {
       setLoading(true)
       const data = await getUserOrders(user.id)
       
-      const mappedOrders = data.map((o: any) => ({
-        id: o.order_number || o.id,
-        realId: o.id,
-        productName: o.order_items[0]?.product_name_snapshot || "Pedido",
-        mainImage: "/placeholder-product.png", // We could try to find the real image if we fetched it
-        status: o.status.charAt(0).toUpperCase() + o.status.slice(1),
-        statusColor: o.status === 'delivered' ? 'green' : o.status === 'shipped' ? 'blue' : 'amber',
-        trackingId: o.tracking_number || "Pendiente",
-        date: new Date(o.created_at).toLocaleDateString(),
-        items: o.order_items.length,
-        total: Number(o.total_amount),
-        carrier: o.courier_name || "Pendiente",
-        order_items: o.order_items // Keep for details
-      }))
+      const mappedOrders = data.map((o: any) => {
+        const status = o.status || 'pending'
+        return {
+          id: o.order_number || o.id,
+          realId: o.id,
+          full_name: o.full_name,
+          phone: o.phone,
+          productName: o.order_items?.[0]?.product_name_snapshot || "Pedido",
+          mainImage: "/placeholder-product.png",
+          status: status.charAt(0).toUpperCase() + status.slice(1),
+          statusColor: status === 'delivered' ? 'green' : status === 'shipped' ? 'blue' : 'amber',
+          tracking_number: o.tracking_number,
+          courier_name: o.courier_name,
+          trackingId: o.tracking_number || "Pendiente",
+          carrier: o.courier_name || "Pendiente",
+          date: o.created_at ? new Date(o.created_at).toLocaleDateString() : "N/A",
+          items: o.order_items?.length || 0,
+          total: Number(o.total_amount) || 0,
+          order_items: o.order_items || []
+        }
+      })
 
       setOrders(mappedOrders)
       setLoading(false)

@@ -12,9 +12,16 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { getWhatsAppTrackingLink } from "@/lib/whatsapp"
 import { cn } from "@/lib/utils"
+import { Order } from "@/types/database"
+
+export interface MappedOrder extends Partial<Order> {
+  statusColor?: string
+  trackingId?: string
+  carrier?: string
+}
 
 interface TrackingModalProps {
-  order: any
+  order: MappedOrder | any
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -23,9 +30,10 @@ export function TrackingModal({ order, open, onOpenChange }: TrackingModalProps)
   if (!order) return null
 
   const whatsappLink = getWhatsAppTrackingLink(
-    "Salomon V.",
-    order.trackingId,
-    order.carrier
+    order.full_name || "Cliente",
+    order.tracking_number || "N/A",
+    order.courier_name || "N/A",
+    order.phone || ""
   )
 
   return (
