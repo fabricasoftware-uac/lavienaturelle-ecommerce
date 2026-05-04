@@ -27,7 +27,7 @@ function LoginForm() {
     if (result.success) {
       // The role-based redirection is usually handled by the layout or middleware,
       // but we'll redirect to home or admin based on common patterns.
-      router.push("/")
+      router.push("/account")
     } else {
       setError(result.error || "Correo o contrasena invalidos")
       setIsLoading(false)
@@ -44,7 +44,6 @@ function LoginForm() {
         </div>
         <div className="relative z-10 flex flex-col items-center justify-center w-full p-12">
           <Link href="/" className="flex items-center gap-3 mb-8">
-            <Leaf className="h-12 w-12 text-primary" />
             <span className="font-serif text-3xl font-semibold text-foreground">La Vie Naturelle</span>
           </Link>
           <div className="max-w-md text-center">
@@ -53,7 +52,7 @@ function LoginForm() {
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               Inicia sesion para acceder a tu cuenta, rastrear pedidos y descubrir 
-              recomendaciones personalizadas para tu viaje de bienestar.
+              recomendaciones para tu bienestar.
             </p>
           </div>
           <div className="mt-12 grid grid-cols-2 gap-4">
