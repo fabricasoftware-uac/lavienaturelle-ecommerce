@@ -12,13 +12,17 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet"
 
+import { MappedOrder } from "@/types/database"
+
 interface OrderDetailsSheetProps {
-  order: any
+  order: MappedOrder | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
 export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsSheetProps) {
+  if (!order) return null;
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-md border-none bg-[#FDFCFB]">
@@ -45,21 +49,23 @@ export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsShe
           <div className="space-y-4">
             <h4 className="text-sm font-bold text-stone-900 border-b border-stone-100 pb-2">Artículos</h4>
             <div className="space-y-4">
-              {(order?.items_list || [
-                { name: "Aceite Esencial de Lavanda", price: 28.50, quantity: 1 },
-                { name: "Jabón de Romero", price: 12.00, quantity: 2 },
-              ]).map((item: any, i: number) => (
-                <div key={i} className="flex justify-between items-start">
-                  <div className="flex gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-stone-100 border border-stone-200 shrink-0" />
-                    <div>
-                      <p className="text-sm font-bold text-stone-800 leading-tight">{item.name}</p>
-                      <p className="text-xs text-stone-400 mt-0.5">Cantidad: {item.quantity}</p>
+              {(order?.order_items || []).map((item: any, i: number) => {
+                const imageUrl = item.products?.product_multimedia?.[0]?.url || "/logo-script.png";
+                return (
+                  <div key={i} className="flex justify-between items-start">
+                    <div className="flex gap-3">
+                      <div className="h-12 w-12 rounded-xl bg-stone-50 border border-stone-100 overflow-hidden shrink-0">
+                        <img src={imageUrl} alt={item.product_name_snapshot} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-stone-800 leading-tight">{item.product_name_snapshot}</p>
+                        <p className="text-xs text-stone-400 mt-0.5">Cantidad: {item.quantity}</p>
+                      </div>
                     </div>
+                    <p className="text-sm font-bold text-stone-900">{formatPrice(Number(item.unit_price) * item.quantity)}</p>
                   </div>
-                  <p className="text-sm font-bold text-stone-900">{formatPrice(item.price * item.quantity)}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -70,7 +76,7 @@ export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsShe
                  <MapPin className="h-3 w-3" /> Dirección de Envío
                </h4>
                <p className="text-sm font-medium text-stone-800 leading-relaxed">
-                 {order?.address || "Calle de las Flores #123, Col. Roma Norte, CDMX"}
+                 {order?.address || "Dirección no disponible"}
                </p>
             </div>
             <div className="pt-4 border-t border-stone-100">
@@ -78,7 +84,7 @@ export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsShe
                  <CreditCard className="h-3 w-3" /> Método de Pago
                </h4>
                <p className="text-sm font-medium text-stone-800">
-                 Tarjeta de Crédito (**** {order?.paymentMethod || "4421"})
+                 {order?.paymentMethod || "Tarjeta de Crédito"}
                </p>
             </div>
           </div>
@@ -87,15 +93,11 @@ export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsShe
           <div className="space-y-2 border-t border-stone-100 pt-6">
             <div className="flex justify-between text-sm">
               <span className="text-stone-500">Subtotal</span>
-              <span className="font-medium text-stone-900">{formatPrice(order?.total - 10)}</span>
+              <span className="font-medium text-stone-900">{formatPrice(order?.total)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-stone-500">Envío</span>
               <span className="font-medium text-green-600">Gratis</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-stone-500">Impuestos</span>
-              <span className="font-medium text-stone-900">{formatPrice(10)}</span>
             </div>
             <div className="flex justify-between items-center pt-4 border-t border-primary/10 mt-4">
               <span className="text-lg font-bold text-stone-900">Total</span>

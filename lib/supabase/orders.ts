@@ -106,7 +106,12 @@ export async function getUserOrders(userId: string) {
     .from('orders')
     .select(`
       *,
-      order_items (*)
+      order_items (
+        *,
+        products (
+          product_multimedia (url)
+        )
+      )
     `)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })

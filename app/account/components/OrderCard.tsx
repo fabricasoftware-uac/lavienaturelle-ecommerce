@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn, formatPrice } from "@/lib/utils"
 
+import { MappedOrder } from "@/types/database"
+
 interface OrderCardProps {
-  order: any
+  order: MappedOrder
   onViewDetails: () => void
   onTrack: () => void
 }

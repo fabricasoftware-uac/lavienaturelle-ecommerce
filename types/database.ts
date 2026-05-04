@@ -151,6 +151,41 @@ export interface ProductWithDetails extends Product {
   product_multimedia?: Pick<ProductMultimedia, 'url' | 'display_order'>[];
 }
 
+// Order with related items and product details
+export interface OrderWithDetails extends Order {
+  order_items: (OrderItem & {
+    products?: {
+      product_multimedia: { url: string }[]
+    } | null
+  })[]
+}
+
+// UI-mapped Order for Dashboard components
+export interface MappedOrder {
+  id: string;
+  realId: string;
+  full_name: string;
+  phone: string | null;
+  productName: string;
+  mainImage: string;
+  status: string;
+  statusColor: "green" | "blue" | "amber";
+  trackingId: string;
+  carrier: string;
+  date: string;
+  items: number;
+  total: number;
+  order_items: (OrderItem & {
+    products?: {
+      product_multimedia: { url: string }[]
+    } | null
+  })[];
+  address: string;
+  paymentMethod: string;
+  tracking_number?: string | null;
+  courier_name?: string | null;
+}
+
 // Application specific types (mapped from Database)
 export interface AppProduct {
   id: string;
