@@ -8,7 +8,6 @@ import { AddressesSection } from "./components/AddressesSection"
 import { ProfileSection } from "./components/ProfileSection"
 import { OrderDetailsSheet } from "./components/OrderDetailsSheet"
 import { TrackingModal } from "./components/TrackingModal"
-import { AddressDialog } from "./components/AddressDialog"
 import { NAVIGATION } from "./constants"
 import { Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -18,7 +17,6 @@ export default function ClientDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<any>(null)
   const [trackingOrder, setTrackingOrder] = useState<any>(null)
-  const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-[#FDFCFB]">
@@ -44,7 +42,7 @@ export default function ClientDashboard() {
           )}
 
           {activeSegment === "addresses" && (
-            <AddressesSection onAddNew={() => setIsAddressDialogOpen(true)} />
+            <AddressesSection />
           )}
 
           {activeSegment === "profile" && <ProfileSection />}
@@ -77,10 +75,6 @@ export default function ClientDashboard() {
             onOpenChange={(open) => !open && setTrackingOrder(null)} 
         />
 
-        <AddressDialog 
-            open={isAddressDialogOpen} 
-            onOpenChange={setIsAddressDialogOpen} 
-        />
       </main>
     </div>
   )

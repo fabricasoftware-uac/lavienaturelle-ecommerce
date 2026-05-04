@@ -17,7 +17,10 @@ import {
   ShoppingCart,
   Lock,
   X,
+  Plus
 } from "lucide-react"
+import { AddressDialog } from "@/components/address-dialog"
+import { getUserAddresses } from "@/lib/supabase/addresses"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/store-context"
@@ -25,7 +28,7 @@ import { cn, formatPrice } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { createOrder, saveUserAddress } from "@/lib/supabase/orders"
 import { Loader2 } from "lucide-react"
-import { Order, OrderStatus, PaymentStatus } from "@/types/database"
+import { Order, OrderStatus, PaymentStatus, Address } from "@/types/database"
 
 type CheckoutStep = "informacion" | "envio" | "pago" | "confirmacion"
 
@@ -41,6 +44,10 @@ function CheckoutForm() {
   const { cart, cartTotal, clearCart, user, register } = useStore()
   const [step, setStep] = useState<CheckoutStep>("informacion")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false)
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([])
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false)
+  
   const [formData, setFormData] = useState({
     email: user?.email || "",
     firstName: user?.name || "",
@@ -56,6 +63,51 @@ function CheckoutForm() {
     expiry: "",
     cvv: "",
   })
+  
+  const loadAddresses = async () => {
+    if (!user?.id) return
+    setIsLoadingAddresses(true)
+    const addresses = await getUserAddresses(user.id!)
+    setSavedAddresses(addresses)
+    setIsLoadingAddresses(false)
+    return addresses
+  }
+
+  // Load saved addresses
+  useEffect(() => {
+    if (user?.id) {
+      loadAddresses().then(addresses => {
+        if (addresses && addresses.length > 0) {
+          // Auto-select default address
+          const defaultAddr = addresses.find((a: Address) => a.is_default)
+          if (defaultAddr) {
+            handleSelectAddress(defaultAddr)
+          }
+        }
+      })
+    }
+  }, [user?.id])
+
+  const handleNewAddressSuccess = async () => {
+    const addresses = await loadAddresses()
+    if (addresses && addresses.length > 0) {
+      // Select the most recently created one (first in list usually)
+      handleSelectAddress(addresses[0])
+    }
+  }
+
+  const handleSelectAddress = (addr: Address) => {
+    setFormData(prev => ({
+      ...prev,
+      firstName: addr.full_name || prev.firstName,
+      phone: addr.phone || prev.phone,
+      address: addr.address_line1,
+      apartment: addr.address_line2 || "",
+      city: addr.city,
+      state: addr.state,
+      country: addr.country || "Colombia"
+    }))
+  }
 
   // Update form data when user profile loads
   useEffect(() => {
@@ -167,6 +219,7 @@ function CheckoutForm() {
 
           // Save address if user is logged in
           if (user?.id) {
+            const { saveUserAddress } = await import("@/lib/supabase/orders")
             await saveUserAddress(user.id, {
               address_line1: formData.address,
               address_line2: formData.apartment,
@@ -593,9 +646,55 @@ function CheckoutForm() {
               {/* Shipping Step */}
               {step === "envio" && (
                 <div className="space-y-6">
-                  <h2 className="font-serif text-xl font-semibold text-foreground">
-                    Direccion de Envio
-                  </h2>
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-serif text-xl font-semibold text-foreground">
+                      Direccion de Envio
+                    </h2>
+                    {user && (
+                      <Button 
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsAddressDialogOpen(true)}
+                        className="rounded-xl border-stone-200 text-stone-600 font-bold text-xs flex items-center gap-2"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        Nueva Dirección
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Saved Addresses List */}
+                  {user && savedAddresses.length > 0 && (
+                    <div className="space-y-3 mb-6">
+                      <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Tus Direcciones Guardadas</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {savedAddresses.map((addr) => {
+                          const isSelected = formData.address === addr.address_line1 && formData.city === addr.city;
+                          return (
+                            <button
+                              key={addr.id}
+                              type="button"
+                              onClick={() => handleSelectAddress(addr)}
+                              className={cn(
+                                "text-left p-4 rounded-2xl border transition-all duration-200",
+                                isSelected 
+                                  ? "border-primary bg-primary/5 ring-1 ring-primary/10 shadow-sm" 
+                                  : "border-stone-100 hover:border-stone-200 bg-white"
+                              )}
+                            >
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-bold text-stone-900">{addr.label}</span>
+                                {isSelected && <Check className="h-4 w-4 text-primary" />}
+                              </div>
+                              <p className="text-[10px] text-stone-500 truncate font-medium">{addr.address_line1}, {addr.city}</p>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
@@ -845,6 +944,12 @@ function CheckoutForm() {
             </div>
           </div>
         </div>
+        {/* Address Dialog */}
+        <AddressDialog 
+          open={isAddressDialogOpen}
+          onOpenChange={setIsAddressDialogOpen}
+          onSuccess={handleNewAddressSuccess}
+        />
       </main>
     </div>
   )

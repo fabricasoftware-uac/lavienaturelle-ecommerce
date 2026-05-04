@@ -18,11 +18,14 @@ export interface Profile {
 export interface Address {
   id: string;
   user_id: string;
+  label?: string | null;
+  full_name?: string | null;
   address_line1: string;
   address_line2?: string | null;
   city: string;
   state: string;
   country: string;
+  phone?: string | null;
   is_default: boolean;
   created_at: string;
   updated_at: string;
