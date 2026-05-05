@@ -18,6 +18,7 @@ export interface User {
   name: string
   document_number?: string
   phone?: string
+  created_at?: string
 }
 
 interface StoreContextType {
@@ -34,6 +35,7 @@ interface StoreContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   register: (name: string, email: string, password: string, documentNumber?: string, phone?: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
+  updateProfile: (data: { name?: string; phone?: string; document_number?: string }) => Promise<{ success: boolean; error?: string }>
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined)
@@ -71,6 +73,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               name: profile?.full_name || session.user.user_metadata?.full_name || "Usuario",
               document_number: profile?.document_number || session.user.user_metadata?.document_number,
               phone: profile?.phone || session.user.user_metadata?.phone,
+              created_at: profile?.created_at,
             })
           }
         } else {
@@ -162,6 +165,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [supabase])
 
+  const updateProfile = useCallback(async (data: { name?: string; phone?: string; document_number?: string }): Promise<{ success: boolean; error?: string }> => {
+    if (!user) return { success: false, error: "No authenticated user found" }
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        full_name: data.name,
+        phone: data.phone,
+        document_number: data.document_number,
+      })
+      .eq("id", user.id)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    // Update local state
+    setUser(prev => prev ? {
+      ...prev,
+      name: data.name ?? prev.name,
+      phone: data.phone ?? prev.phone,
+      document_number: data.document_number ?? prev.document_number,
+    } : null)
+
+    return { success: true }
+  }, [supabase, user])
+
   useEffect(() => {
     if (typeof window === "undefined") return
 
@@ -204,6 +234,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
+        updateProfile,
       }}
     >
       {children}

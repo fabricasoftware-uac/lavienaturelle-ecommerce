@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, Montserrat } from 'next/font/google'
 import { StoreProvider } from '@/lib/store-context'
+import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 
 const playfair = Playfair_Display({ 
@@ -28,7 +29,10 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${montserrat.variable} font-sans antialiased`}>
-        <StoreProvider>{children}</StoreProvider>
+        <StoreProvider>
+          {children}
+          <Toaster />
+        </StoreProvider>
       </body>
     </html>
   )

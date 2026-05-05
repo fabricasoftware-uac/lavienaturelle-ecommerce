@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Menu, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { NAVIGATION, USER_DATA } from "../constants"
+import { NAVIGATION } from "../constants"
 
 interface HeaderProps {
   activeSegment: string
@@ -11,6 +11,7 @@ interface HeaderProps {
 }
 
 export function Header({ activeSegment, setSidebarOpen }: HeaderProps) {
+
   return (
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-stone-100/60 px-6 sm:px-10 h-20 flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -29,11 +30,7 @@ export function Header({ activeSegment, setSidebarOpen }: HeaderProps) {
           </h1>
         </div>
         
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:flex flex-col items-end mr-2">
-              <p className="text-sm font-bold text-stone-900">{USER_DATA.name}</p>
-          </div>
-        </div>
+       
     </header>
   )
 }
