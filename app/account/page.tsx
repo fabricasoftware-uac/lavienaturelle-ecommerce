@@ -6,7 +6,12 @@ import { Header } from "./components/Header"
 import { OrdersSection } from "./components/OrdersSection"
 import { AddressesSection } from "./components/AddressesSection"
 import { ProfileSection } from "./components/ProfileSection"
-import { OrderDetailsSheet } from "./components/OrderDetailsSheet"
+import dynamic from "next/dynamic"
+
+const OrderDetailsSheet = dynamic(
+  () => import("./components/OrderDetailsSheet").then((mod) => mod.OrderDetailsSheet),
+  { ssr: false }
+)
 import { TrackingModal } from "./components/TrackingModal"
 import { NAVIGATION } from "./constants"
 import { Clock } from "lucide-react"
@@ -67,6 +72,10 @@ export default function ClientDashboard() {
             order={selectedOrder} 
             open={!!selectedOrder} 
             onOpenChange={(open) => !open && setSelectedOrder(null)} 
+            onTrack={(order) => {
+              setSelectedOrder(null)
+              setTrackingOrder(order)
+            }}
         />
 
         <TrackingModal 

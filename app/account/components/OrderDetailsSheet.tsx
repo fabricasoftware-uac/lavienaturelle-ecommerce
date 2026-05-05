@@ -13,14 +13,17 @@ import {
 } from "@/components/ui/sheet"
 
 import { MappedOrder } from "@/types/database"
+import { PDFDownloadLink } from "@react-pdf/renderer"
+import { OrderInvoice } from "./OrderInvoice"
 
 interface OrderDetailsSheetProps {
   order: MappedOrder | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  onTrack?: (order: MappedOrder) => void
 }
 
-export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsSheetProps) {
+export function OrderDetailsSheet({ order, open, onOpenChange, onTrack }: OrderDetailsSheetProps) {
   if (!order) return null;
 
   return (
@@ -95,10 +98,6 @@ export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsShe
               <span className="text-stone-500">Subtotal</span>
               <span className="font-medium text-stone-900">{formatPrice(order?.total)}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-stone-500">Envío</span>
-              <span className="font-medium text-green-600">Gratis</span>
-            </div>
             <div className="flex justify-between items-center pt-4 border-t border-primary/10 mt-4">
               <span className="text-lg font-bold text-stone-900">Total</span>
               <span className="text-2xl font-bold text-primary tracking-tight">{formatPrice(order?.total)}</span>
@@ -106,8 +105,27 @@ export function OrderDetailsSheet({ order, open, onOpenChange }: OrderDetailsShe
           </div>
 
           <div className="grid grid-cols-2 gap-3 pt-4">
-             <Button variant="outline" className="rounded-2xl border-stone-200 font-bold h-12">Descargar PDF</Button>
-             <Button className="rounded-2xl bg-stone-900 text-white font-bold h-12 shadow-lg shadow-stone-200">Rastrear</Button>
+             <PDFDownloadLink 
+               document={<OrderInvoice order={order} />} 
+               fileName={`Pedido_${order.id}.pdf`}
+               className="flex-1"
+             >
+               {({ loading }) => (
+                 <Button 
+                   variant="outline" 
+                   className="rounded-2xl border-stone-200 font-bold h-12 w-full"
+                   disabled={loading}
+                 >
+                   {loading ? "Generando..." : "Descargar PDF"}
+                 </Button>
+               )}
+             </PDFDownloadLink>
+             <Button 
+               className="rounded-2xl bg-stone-900 text-white font-bold h-12 shadow-lg shadow-stone-200"
+               onClick={() => onTrack?.(order)}
+             >
+               Rastrear
+             </Button>
           </div>
         </div>
       </SheetContent>
