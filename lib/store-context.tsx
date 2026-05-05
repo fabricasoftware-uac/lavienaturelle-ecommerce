@@ -36,6 +36,7 @@ interface StoreContextType {
   register: (name: string, email: string, password: string, documentNumber?: string, phone?: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
   updateProfile: (data: { name?: string; phone?: string; document_number?: string }) => Promise<{ success: boolean; error?: string }>
+  changePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined)
@@ -192,6 +193,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return { success: true }
   }, [supabase, user])
 
+  const changePassword = useCallback(async (newPassword: string): Promise<{ success: boolean; error?: string }> => {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword
+    })
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  }, [supabase])
+
   useEffect(() => {
     if (typeof window === "undefined") return
 
@@ -235,6 +248,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         updateProfile,
+        changePassword,
       }}
     >
       {children}

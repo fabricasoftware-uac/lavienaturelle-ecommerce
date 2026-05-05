@@ -1,23 +1,41 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Camera, Bell, Lock, Loader2, Save } from "lucide-react"
+import { Camera, Bell, Lock, Loader2, Save, KeyRound, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useStore } from "@/lib/store-context"
 import { useToast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog"
 
 export function ProfileSection() {
-  const { user, updateProfile } = useStore()
+  const { user, updateProfile, changePassword } = useStore()
   const { toast } = useToast()
   
   const [loading, setLoading] = useState(false)
+  const [passwordLoading, setPasswordLoading] = useState(false)
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     document_number: ""
+  })
+
+  const [passwordData, setPasswordData] = useState({
+    newPassword: "",
+    confirmPassword: ""
   })
 
   useEffect(() => {
@@ -68,6 +86,53 @@ export function ProfileSection() {
       })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePasswordChange = async () => {
+    if (passwordData.newPassword.length < 6) {
+      toast({
+        title: "Contraseña muy corta",
+        description: "La contraseña debe tener al menos 6 caracteres.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Error de validación",
+        description: "Las contraseñas no coinciden.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setPasswordLoading(true)
+    try {
+      const result = await changePassword(passwordData.newPassword)
+      if (result.success) {
+        toast({
+          title: "Contraseña actualizada",
+          description: "Tu contraseña ha sido cambiada con éxito.",
+        })
+        setShowPasswordDialog(false)
+        setPasswordData({ newPassword: "", confirmPassword: "" })
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "No se pudo cambiar la contraseña",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Ocurrió un error inesperado",
+        variant: "destructive"
+      })
+    } finally {
+      setPasswordLoading(false)
     }
   }
 
@@ -149,10 +214,74 @@ export function ProfileSection() {
                       </div>
                       <div>
                          <p className="text-sm font-bold text-stone-800">Contraseña</p>
-                         <p className="text-xs text-stone-400">Gestionada vía Magic Link / Auth Provider</p>
+                         <p className="text-xs text-stone-400">Protege tu cuenta con una contraseña segura</p>
                       </div>
                    </div>
-                   <Button variant="outline" disabled className="rounded-xl border-stone-100 text-stone-300 font-bold text-xs h-9 px-4 cursor-not-allowed">Cambiar</Button>
+                   
+                   <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+                      <DialogTrigger asChild>
+                         <Button variant="outline" className="rounded-xl border-stone-200 text-stone-600 font-bold text-xs h-9 px-4 hover:bg-stone-50">
+                            Cambiar
+                         </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md rounded-[32px] border-stone-100">
+                         <DialogHeader>
+                            <DialogTitle className="text-xl font-serif font-bold text-stone-900">Cambiar Contraseña</DialogTitle>
+                            <DialogDescription className="text-stone-500 font-medium">
+                               Ingresa tu nueva contraseña a continuación.
+                            </DialogDescription>
+                         </DialogHeader>
+                         <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                               <Label className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">Nueva Contraseña</Label>
+                               <div className="relative">
+                                  <Input 
+                                    type={showPassword ? "text" : "password"}
+                                    value={passwordData.newPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                    className="rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20 pr-10" 
+                                    placeholder="••••••••"
+                                  />
+                                  <button 
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
+                                  >
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                  </button>
+                               </div>
+                            </div>
+                            <div className="space-y-2">
+                               <Label className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">Confirmar Contraseña</Label>
+                               <Input 
+                                 type={showPassword ? "text" : "password"}
+                                 value={passwordData.confirmPassword}
+                                 onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                 className="rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20" 
+                                 placeholder="••••••••"
+                               />
+                            </div>
+                         </div>
+                         <DialogFooter className="sm:justify-end">
+                            <Button
+                               type="button"
+                               variant="ghost"
+                               className="rounded-2xl font-bold text-stone-500"
+                               onClick={() => setShowPasswordDialog(false)}
+                            >
+                               Cancelar
+                            </Button>
+                            <Button
+                               type="button"
+                               disabled={passwordLoading}
+                               className="rounded-2xl bg-stone-900 text-white font-bold px-6 h-12 shadow-lg shadow-stone-200"
+                               onClick={handlePasswordChange}
+                            >
+                               {passwordLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Actualizar Contraseña"}
+                            </Button>
+                         </DialogFooter>
+                      </DialogContent>
+                   </Dialog>
                 </div>
              </div>
           </div>
