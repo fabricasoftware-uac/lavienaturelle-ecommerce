@@ -37,6 +37,7 @@ interface StoreContextType {
   logout: () => Promise<void>
   updateProfile: (data: { name?: string; phone?: string; document_number?: string }) => Promise<{ success: boolean; error?: string }>
   changePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>
+  resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined)
@@ -205,6 +206,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return { success: true }
   }, [supabase])
 
+  const resetPassword = useCallback(async (email: string): Promise<{ success: boolean; error?: string }> => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/change-password`,
+    })
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  }, [supabase])
+
   useEffect(() => {
     if (typeof window === "undefined") return
 
@@ -249,6 +262,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         logout,
         updateProfile,
         changePassword,
+        resetPassword,
       }}
     >
       {children}

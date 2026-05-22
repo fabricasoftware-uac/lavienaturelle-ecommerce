@@ -43,7 +43,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Regla para CUSTOMER: Protege el perfil/compras
-  if (pathname.startsWith('/account') || pathname.startsWith('/checkout')) {
+  if (pathname.startsWith('/account')) {
     if (!user) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
