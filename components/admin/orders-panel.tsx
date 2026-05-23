@@ -79,45 +79,55 @@ export function OrdersPanel() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   useEffect(() => {
+    let cancelled = false
+
     async function loadOrders() {
       setLoading(true)
-      const data = await getOrders()
-      
-      // Map Supabase data to UI structure
-      const mappedOrders = data.map((o: any) => ({
-        id: o.order_number || o.id,
-        realId: o.id,
-        customer: {
-          name: o.full_name,
-          email: o.email,
-          phone: o.phone || "No especificado",
-          documentNumber: o.document_number || "No especificado",
-          address: `${o.shipping_address_line1}${o.shipping_address_line2 ? ', ' + o.shipping_address_line2 : ''}, ${o.shipping_city}, ${o.shipping_state}`,
-          addressLine1: o.shipping_address_line1,
-          addressLine2: o.shipping_address_line2 || "",
-          city: o.shipping_city,
-          state: o.shipping_state,
-        },
-        date: o.created_at,
-        shippingStatus: o.status.charAt(0).toUpperCase() + o.status.slice(1),
-        paymentStatus: o.payment_status.charAt(0).toUpperCase() + o.payment_status.slice(1),
-        total: Number(o.total_amount),
-        items: o.order_items.map((item: any) => ({
-          id: item.product_id,
-          name: item.product_name_snapshot,
-          price: Number(item.unit_price),
-          quantity: item.quantity
-        })),
-        history: [
-          { status: "Pedido Realizado", date: o.created_at }
-        ]
-      }))
-      
-      setOrders(mappedOrders)
-      setLoading(false)
+      try {
+        const data = await getOrders()
+        if (cancelled) return
+
+        // Map Supabase data to UI structure
+        const mappedOrders = data.map((o: any) => ({
+          id: o.order_number || o.id,
+          realId: o.id,
+          customer: {
+            name: o.full_name ?? "Sin nombre",
+            email: o.email ?? "",
+            phone: o.phone || "No especificado",
+            documentNumber: o.document_number || "No especificado",
+            address: `${o.shipping_address_line1 ?? ""}${o.shipping_address_line2 ? ', ' + o.shipping_address_line2 : ''}, ${o.shipping_city ?? ""}, ${o.shipping_state ?? ""}`,
+            addressLine1: o.shipping_address_line1 ?? "",
+            addressLine2: o.shipping_address_line2 || "",
+            city: o.shipping_city ?? "",
+            state: o.shipping_state ?? "",
+          },
+          date: o.created_at,
+          shippingStatus: (o.status ?? "pending").charAt(0).toUpperCase() + (o.status ?? "pending").slice(1),
+          paymentStatus: (o.payment_status ?? "pending").charAt(0).toUpperCase() + (o.payment_status ?? "pending").slice(1),
+          total: Number(o.total_amount ?? 0),
+          items: (o.order_items ?? []).map((item: any) => ({
+            id: item.product_id,
+            name: item.product_name_snapshot,
+            price: Number(item.unit_price),
+            quantity: item.quantity
+          })),
+          history: [
+            { status: "Pedido Realizado", date: o.created_at }
+          ]
+        }))
+
+        setOrders(mappedOrders)
+      } catch (err) {
+        console.error("Error loading orders:", err)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
     }
-    
+
     loadOrders()
+
+    return () => { cancelled = true }
   }, [])
 
   const handleOpenShipmentModal = (order: any) => {

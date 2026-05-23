@@ -33,7 +33,7 @@ export function ProductsPanel() {
     categories,
     loading,
     saving,
-    error, // Añadido desde el hook optimizado
+    error, 
     saveProduct,
     createProduct,
     addCategory,

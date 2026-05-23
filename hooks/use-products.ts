@@ -16,7 +16,7 @@ export function useProducts() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null) // Para mostrar feedback al usuario
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (signal?: { cancelled: boolean }) => {
     setLoading(true)
     setError(null)
     try {
@@ -29,6 +29,8 @@ export function useProducts() {
           product_multimedia (url, display_order)
         `).is('deleted_at', null).order('created_at', { ascending: false })
       ])
+
+      if (signal?.cancelled) return
 
       if (catsResponse.error) throw catsResponse.error
       if (prodsResponse.error) throw prodsResponse.error
@@ -60,15 +62,18 @@ export function useProducts() {
       
       setProducts(mappedProducts)
     } catch (err: any) {
+      if (signal?.cancelled) return
       console.error("Error fetching data:", err)
       setError(err.message || "Error al cargar los datos.")
     } finally {
-      setLoading(false)
+      if (!signal?.cancelled) setLoading(false)
     }
   }, [supabase])
 
   useEffect(() => {
-    fetchData()
+    const signal = { cancelled: false }
+    fetchData(signal)
+    return () => { signal.cancelled = true }
   }, [fetchData])
 
   const saveProduct = async (id: string, form: any, originalProduct: any) => {
