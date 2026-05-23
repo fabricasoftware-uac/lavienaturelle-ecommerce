@@ -10,7 +10,7 @@ import { useStore } from "@/lib/store-context"
 
 function LoginForm() {
   const router = useRouter()
-  const { login } = useStore()
+  const { login, getUserSession } = useStore()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -25,9 +25,12 @@ function LoginForm() {
     const result = await login(email, password)
     
     if (result.success) {
-      // The role-based redirection is usually handled by the layout or middleware,
-      // but we'll redirect to home or admin based on common patterns.
-      router.push("/account")
+      const session = await getUserSession()
+      if (session?.user.app_metadata.role === "admin") {
+        router.push("/admin")
+      } else {
+        router.push("/account")
+      }
     } else {
       setError(result.error || "Correo o contrasena invalidos")
       setIsLoading(false)

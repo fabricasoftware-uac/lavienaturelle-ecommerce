@@ -51,7 +51,7 @@ export async function proxy(request: NextRequest) {
 
   // Regla para INVITADOS: Si ya están logueados, no necesitan ver el /login o /register
   if ((pathname === '/login' || pathname === '/register') && user) {
-    const redirectPath = role === 'admin' ? '/admin/dashboard' : '/account'
+    const redirectPath = role === 'admin' ? '/admin' : '/account'
     return NextResponse.redirect(new URL(redirectPath, request.url))
   }
 

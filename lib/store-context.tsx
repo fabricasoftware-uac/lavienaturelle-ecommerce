@@ -38,6 +38,7 @@ interface StoreContextType {
   updateProfile: (data: { name?: string; phone?: string; document_number?: string }) => Promise<{ success: boolean; error?: string }>
   changePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>
+  getUserSession: () => Promise<Session | null>
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined)
@@ -194,6 +195,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return { success: true }
   }, [supabase, user])
 
+  const getUserSession = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession()
+    if (error) {
+      console.error("Error getting session:", error)
+      return null
+    }
+    return session
+  }
+
   const changePassword = useCallback(async (newPassword: string): Promise<{ success: boolean; error?: string }> => {
     const { error } = await supabase.auth.updateUser({
       password: newPassword
@@ -263,6 +273,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         updateProfile,
         changePassword,
         resetPassword,
+        getUserSession
       }}
     >
       {children}
