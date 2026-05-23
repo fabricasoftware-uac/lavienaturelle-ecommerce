@@ -10,7 +10,22 @@ import { useProducts } from "@/hooks/use-products"
 import { ProductsTable } from "./products/products-table"
 import { ProductMobileCard } from "./products/product-mobile-card"
 import { ProductFormSheet } from "./products/product-form-sheet"
-import { AppProduct, Category } from "@/types/database"
+import { AppProduct } from "@/types/database"
+
+const INITIAL_FORM_STATE: Partial<AppProduct> = {
+  name: "",
+  price: 0,
+  stock: 0,
+  description: "",
+  content: "",
+  origin: "",
+  ingredients: "",
+  benefits: [],
+  usage: "",
+  category: "",
+  badge: "",
+  images: [],
+}
 
 export function ProductsPanel() {
   const {
@@ -18,6 +33,7 @@ export function ProductsPanel() {
     categories,
     loading,
     saving,
+    error, // Añadido desde el hook optimizado
     saveProduct,
     createProduct,
     addCategory,
@@ -33,20 +49,8 @@ export function ProductsPanel() {
   const [isEditing, setIsEditing] = useState(false)
   const [activeProduct, setActiveProduct] = useState<AppProduct | null>(null)
   
-  const [form, setForm] = useState<Partial<AppProduct>>({
-    name: "",
-    price: 0,
-    stock: 0,
-    description: "",
-    content: "",
-    origin: "",
-    ingredients: "",
-    benefits: [],
-    usage: "",
-    category: "",
-    badge: "",
-    images: [],
-  })
+  // Estado del formulario
+  const [form, setForm] = useState<Partial<AppProduct>>(INITIAL_FORM_STATE)
 
   const handleOpenDetail = (product: AppProduct) => {
     setActiveProduct(product)
@@ -56,29 +60,13 @@ export function ProductsPanel() {
   }
 
   const handleOpenCreate = () => {
-    resetForm()
+    setForm(INITIAL_FORM_STATE) // Limpieza inmediata y segura
     setIsCreateOpen(true)
   }
 
-  const resetForm = () => {
-    setForm({
-      name: "",
-      price: 0,
-      stock: 0,
-      description: "",
-      content: "",
-      origin: "",
-      ingredients: "",
-      benefits: [],
-      usage: "",
-      category: "",
-      badge: "",
-      images: [],
-    })
-  }
-
   const handleSave = async () => {
-    const res = await saveProduct(activeProduct!.id, form, activeProduct!)
+    if (!activeProduct?.id) return
+    const res = await saveProduct(activeProduct.id, form, activeProduct)
     if (res.success) {
       setIsDetailOpen(false)
       setIsEditing(false)
@@ -90,14 +78,15 @@ export function ProductsPanel() {
     const res = await createProduct(form)
     if (res.success) {
       setIsCreateOpen(false)
-      resetForm()
+      setForm(INITIAL_FORM_STATE)
     }
   }
 
   const handleAddCategory = async (name: string) => {
     const res = await addCategory(name)
     if (res.success) {
-      setForm((prev: any) => ({ ...prev, category: res.data.name }))
+      // Sincronizamos con el nombre para que el selector del formulario lo encuentre
+      setForm((prev) => ({ ...prev, category: res.data.name }))
     }
   }
 
@@ -108,16 +97,30 @@ export function ProductsPanel() {
     }
   }
 
+  // Filtrado optimizado y seguro contra errores de runtime
   const filteredProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         p.id.toLowerCase().includes(searchQuery.toLowerCase())
+    const nameMatch = p.name?.toLowerCase() || ""
+    const idMatch = p.id?.toLowerCase() || ""
+    const search = searchQuery.toLowerCase()
+
+    const matchesSearch = nameMatch.includes(search) || idMatch.includes(search)
+    
+    // Filtramos usando el SLUG de la categoría para evitar discrepancias de mayúsculas o tildes
     const matchesCategory = categoryFilter === "All" || p.category === categoryFilter
     const matchesStock = stockFilter === "All" || p.stockStatus === stockFilter
+    
     return matchesSearch && matchesCategory && matchesStock
   })
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Banner de error global si el hook falla */}
+      {error && (
+        <div className="bg-destructive/15 text-destructive p-4 rounded-xl border border-destructive/20 text-sm font-medium">
+          ⚠️ {error} - Intenta recargar si el problema persiste.
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -152,7 +155,10 @@ export function ProductsPanel() {
               className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50 lg:min-w-37.5"
             >
               <option value="All">Todas las Categorías</option>
-              {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+              {/* IMPORTANTE: El value debe ser el SLUG para que coincida con tu p.category del hook */}
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.slug}>{cat.name}</option>
+              ))}
             </select>
             <select
               value={stockFilter}
@@ -198,7 +204,7 @@ export function ProductsPanel() {
         )}
       </div>
 
-      {/* Detail/Edit Sheet */}
+      {/* Detalle/Edit Sheet */}
       <ProductFormSheet 
         isOpen={isDetailOpen} 
         setIsOpen={setIsDetailOpen} 

@@ -1,45 +1,41 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { slugify } from "@/lib/utils"
 import { deleteImage } from "@/lib/supabase/storage"
 import { AppProduct, Category, ProductWithDetails } from "@/types/database"
 
 export function useProducts() {
-  const supabase = createClient()
+  //useMemo asegura que no recreamos la instancia de supabase en cada render innecesariamente
+  const supabase = useMemo(() => createClient(), [])
+  
   const [products, setProducts] = useState<AppProduct[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null) // Para mostrar feedback al usuario
 
   const fetchData = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
-      // Fetch categories
-      const { data: catsData, error: catsError } = await supabase
-        .from('categories')
-        .select('*')
-        .is('deleted_at', null)
-        .order('name')
-      
-      if (catsError) throw catsError
-      setCategories(catsData || [])
-
-      // Fetch products
-      const { data: prodsData, error: prodsError } = await supabase
-        .from('products')
-        .select(`
+      // Ejecutamos ambas consultas en paralelo para mejorar el rendimiento notablemente
+      const [catsResponse, prodsResponse] = await Promise.all([
+        supabase.from('categories').select('*').is('deleted_at', null).order('name'),
+        supabase.from('products').select(`
           *,
           categories (name, slug),
           product_multimedia (url, display_order)
-        `)
-        .is('deleted_at', null)
-        .order('created_at', { ascending: false })
-      
-      if (prodsError) throw prodsError
-      
-      const mappedProducts: AppProduct[] = (prodsData as ProductWithDetails[] || []).map((p) => ({
+        `).is('deleted_at', null).order('created_at', { ascending: false })
+      ])
+
+      if (catsResponse.error) throw catsResponse.error
+      if (prodsResponse.error) throw prodsResponse.error
+
+      setCategories(catsResponse.data || [])
+
+      const mappedProducts: AppProduct[] = (prodsResponse.data as ProductWithDetails[] || []).map((p) => ({
         id: p.id,
         name: p.name,
         sku: p.sku || "",
@@ -63,8 +59,9 @@ export function useProducts() {
       }))
       
       setProducts(mappedProducts)
-    } catch (error) {
-      console.error("Error fetching data:", error)
+    } catch (err: any) {
+      console.error("Error fetching data:", err)
+      setError(err.message || "Error al cargar los datos.")
     } finally {
       setLoading(false)
     }
@@ -76,8 +73,11 @@ export function useProducts() {
 
   const saveProduct = async (id: string, form: any, originalProduct: any) => {
     setSaving(true)
+    setError(null)
     try {
-      const { error } = await supabase
+      const targetCategoryId = categories.find(c => c.name === form.category)?.id
+
+      const { error: productError } = await supabase
         .from('products')
         .update({
           name: form.name,
@@ -91,13 +91,13 @@ export function useProducts() {
           benefits: form.benefits,
           usage_instructions: form.usage,
           badge: form.badge,
-          category_id: categories.find(c => c.name === form.category)?.id
+          category_id: targetCategoryId || null
         })
         .eq('id', id)
 
-      if (error) throw error
+      if (productError) throw productError
 
-      // 1. Physical deletion from Storage for removed images
+      // 1. Limpieza física de imágenes borradas
       const originalImages = originalProduct.images || []
       const currentImages = form.images || []
       const removedImages = originalImages.filter((img: string) => !currentImages.includes(img))
@@ -106,17 +106,19 @@ export function useProducts() {
         try {
           await deleteImage(imageUrl)
         } catch (err) {
-          console.error("Error deleting physical file from storage:", err)
+          console.error("Error borrando archivo del storage:", err)
         }
       }
 
-      // 2. Sync images in Database
+      // 2. Sincronización en Base de Datos de imágenes
       if (form.images && Array.isArray(form.images)) {
-        // Simple approach: delete existing and insert new ones
-        await supabase
+        // Borramos registros anteriores de multimedia
+        const { error: deleteMultiError } = await supabase
           .from('product_multimedia')
           .delete()
           .eq('product_id', id)
+
+        if (deleteMultiError) throw deleteMultiError
 
         if (form.images.length > 0) {
           const multimediaToInsert = form.images.map((url: string, index: number) => ({
@@ -134,11 +136,13 @@ export function useProducts() {
         }
       }
       
+      // Forzamos la re-validación de datos y esperamos a que termine
       await fetchData()
       return { success: true }
-    } catch (error) {
-      console.error("Error saving product:", error)
-      return { success: false, error }
+    } catch (err: any) {
+      console.error("Error saving product:", err)
+      setError(err.message || "Error al guardar el producto")
+      return { success: false, error: err }
     } finally {
       setSaving(false)
     }
@@ -146,11 +150,13 @@ export function useProducts() {
 
   const createProduct = async (form: any) => {
     setSaving(true)
+    setError(null)
     try {
       const productSlug = slugify(form.name)
-      const productSku = `LVN-${Math.random().toString(36).substr(2, 4).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
-      
-      const { data: newProd, error } = await supabase
+      const productSku = `LVN-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
+      const targetCategoryId = categories.find(c => c.name === form.category)?.id
+
+      const { data: newProd, error: insertError } = await supabase
         .from('products')
         .insert({
           name: form.name,
@@ -165,13 +171,13 @@ export function useProducts() {
           benefits: form.benefits,
           usage_instructions: form.usage,
           badge: form.badge,
-          category_id: categories.find(c => c.name === form.category)?.id,
+          category_id: targetCategoryId || null,
           status: 'published'
         })
         .select()
         .single()
 
-      if (error) throw error
+      if (insertError) throw insertError
 
       if (form.images && Array.isArray(form.images) && form.images.length > 0) {
         const multimediaToInsert = form.images.map((url: string, index: number) => ({
@@ -181,24 +187,28 @@ export function useProducts() {
           display_order: index
         }))
 
-        await supabase
+        const { error: multimediaError } = await supabase
           .from('product_multimedia')
           .insert(multimediaToInsert)
+
+        if (multimediaError) throw multimediaError
       }
 
       await fetchData()
       return { success: true }
-    } catch (error) {
-      console.error("Error creating product:", error)
-      return { success: false, error }
+    } catch (err: any) {
+      console.error("Error creating product:", err)
+      setError(err.message || "Error al crear el producto")
+      return { success: false, error: err }
     } finally {
       setSaving(false)
     }
   }
 
   const addCategory = async (newCatName: string) => {
+    setError(null)
     try {
-      const { data, error } = await supabase
+      const { data, error: catError } = await supabase
         .from('categories')
         .insert({
           name: newCatName,
@@ -207,31 +217,34 @@ export function useProducts() {
         .select()
         .single()
       
-      if (error) throw error
+      if (catError) throw catError
       
       setCategories(prev => [...prev, data])
       return { success: true, data }
-    } catch (error) {
-      console.error("Error adding category:", error)
-      return { success: false, error }
+    } catch (err: any) {
+      console.error("Error adding category:", err)
+      setError(err.message || "Error al añadir categoría")
+      return { success: false, error: err }
     }
   }
 
   const deleteProduct = async (id: string) => {
     setSaving(true)
+    setError(null)
     try {
-      const { error } = await supabase
+      const { error: deleteError } = await supabase
         .from('products')
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id)
 
-      if (error) throw error
+      if (deleteError) throw deleteError
       
       await fetchData()
       return { success: true }
-    } catch (error) {
-      console.error("Error deleting product:", error)
-      return { success: false, error }
+    } catch (err: any) {
+      console.error("Error deleting product:", err)
+      setError(err.message || "Error al eliminar producto")
+      return { success: false, error: err }
     } finally {
       setSaving(false)
     }
@@ -242,6 +255,7 @@ export function useProducts() {
     categories,
     loading,
     saving,
+    error, // Expuesto para pintar una alerta en el dashboard si algo falla
     saveProduct,
     createProduct,
     addCategory,
