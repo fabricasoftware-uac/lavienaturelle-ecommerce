@@ -2,20 +2,20 @@
 
 import { useState, useEffect, useMemo } from "react"
 import {
+  DollarSign,
   ShoppingCart,
   Package,
-  Users,
-  ShoppingBag,
+  Clock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
 
 interface DashboardStats {
+  monthlyRevenue: number
+  monthlyOrders: number
   pendingOrders: number
-  criticalStock: number
-  newUsersToday: number
-  shipmentsToday: number
+  lowStock: number
 }
 
 interface RecentOrder {
@@ -45,20 +45,24 @@ export default function AdminDashboardPage() {
     let cancelled = false
     async function loadDashboard() {
       try {
-        const [pendingOrders, lowStock, newUsers, recentShipments, ordersData] = await Promise.all([
+        const now = new Date()
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+
+        const [revenueRes, monthlyOrdersRes, pendingOrders, lowStock, ordersData] = await Promise.all([
+          supabase.from("orders").select("total_amount").gte("created_at", startOfMonth).not("status", "eq", "cancelled"),
+          supabase.from("orders").select("id", { count: "exact", head: true }).gte("created_at", startOfMonth).not("status", "eq", "cancelled"),
           supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "pending"),
           supabase.from("products").select("*", { count: "exact", head: true }).lt("stock_quantity", 5),
-          supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
-          supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "shipped"),
           supabase.from("orders").select("id, full_name, total_amount, status, created_at").order("created_at", { ascending: false }).limit(5),
         ])
 
         if (cancelled) return
+        const monthlyRevenue = (revenueRes.data ?? []).reduce((sum: number, o: { total_amount: string }) => sum + Number(o.total_amount), 0)
         setStats({
+          monthlyRevenue,
+          monthlyOrders: monthlyOrdersRes.count ?? 0,
           pendingOrders: pendingOrders.count ?? 0,
-          criticalStock: lowStock.count ?? 0,
-          newUsersToday: newUsers.count ?? 0,
-          shipmentsToday: recentShipments.count ?? 0,
+          lowStock: lowStock.count ?? 0,
         })
 
         const orders = (ordersData.data ?? []) as RecentOrderRow[]
@@ -68,7 +72,7 @@ export default function AdminDashboardPage() {
             customer: order.full_name,
             total: new Intl.NumberFormat("es-ES", {
               style: "currency",
-              currency: "EUR",
+              currency: "COP",
             }).format(Number(order.total_amount)),
             status: order.status,
             statusRaw: order.status,
@@ -102,17 +106,17 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {(() => {
           const safeStats = stats ?? {
+            monthlyRevenue: 0,
+            monthlyOrders: 0,
             pendingOrders: 0,
-            criticalStock: 0,
-            newUsersToday: 0,
-            shipmentsToday: 0,
+            lowStock: 0,
           }
 
           return [
-            { icon: ShoppingCart, value: safeStats.pendingOrders, label: "Pedidos Pendientes", change: "Requiere atención" },
-            { icon: Package, value: safeStats.criticalStock, label: "Stock Crítico", change: safeStats.criticalStock > 0 ? "Requiere acción" : "Sin novedad" },
-            { icon: Users, value: safeStats.newUsersToday, label: "Clientes Nuevos Hoy", change: `+${safeStats.newUsersToday} hoy` },
-            { icon: ShoppingBag, value: safeStats.shipmentsToday, label: "Envíos Hoy", change: `${safeStats.shipmentsToday} en camino` },
+            { icon: DollarSign, value: new Intl.NumberFormat("es-ES", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(safeStats.monthlyRevenue), label: "Ingresos del Mes", change: "Últimos 30 días" },
+            { icon: ShoppingCart, value: safeStats.monthlyOrders, label: "Pedidos del Mes", change: "Volumen de ventas" },
+            { icon: Clock, value: safeStats.pendingOrders, label: "Pendientes por Enviar", change: safeStats.pendingOrders > 0 ? "Requiere atención" : "Sin pendientes" },
+            { icon: Package, value: safeStats.lowStock, label: "Stock Bajo", change: safeStats.lowStock > 0 ? "Reabastecer" : "Sin novedad" },
           ]
         })().map((stat) => (
           <div
@@ -196,11 +200,11 @@ export default function AdminDashboardPage() {
                       <span
                         className={cn(
                           "inline-flex px-2.5 py-1 rounded-full text-xs font-medium",
-                          order.statusRaw === "delivered" && "bg-green-100 text-green-700",
-                          order.statusRaw === "processing" && "bg-blue-100 text-blue-700",
-                          order.statusRaw === "shipped"    && "bg-purple-100 text-purple-700",
-                          order.statusRaw === "pending"  && "bg-yellow-100 text-yellow-700",
-                          order.statusRaw === "paid" && "bg-teal-100 text-teal-700"
+                          order.statusRaw === "Entregado" && "bg-green-100 text-green-700",
+                          order.statusRaw === "Procesando" && "bg-blue-100 text-blue-700",
+                          order.statusRaw === "Enviado"    && "bg-purple-100 text-purple-700",
+                          order.statusRaw === "Pendiente"  && "bg-yellow-100 text-yellow-700",
+                          order.statusRaw === "Pagado" && "bg-teal-100 text-teal-700"
                         )}
                       >
                         {order.status}
