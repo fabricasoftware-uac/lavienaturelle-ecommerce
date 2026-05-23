@@ -11,15 +11,6 @@ interface ProductMobileCardProps {
 }
 
 export function ProductMobileCard({ product, onOpenDetail }: ProductMobileCardProps) {
-  const getStockBadge = (status: string) => {
-    switch (status) {
-      case "In Stock": return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">En Stock</Badge>
-      case "Low Stock": return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 font-medium">Stock Bajo</Badge>
-      case "Out of Stock": return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 font-medium">Sin Stock</Badge>
-      default: return <Badge variant="outline">{status}</Badge>
-    }
-  }
-
   const getProductBadge = (badge: string) => {
     if (!badge) return null
     if (badge === "Nuevo!") return <Badge className="bg-primary text-white border-none text-[10px] font-bold">{badge}</Badge>
@@ -50,7 +41,7 @@ export function ProductMobileCard({ product, onOpenDetail }: ProductMobileCardPr
         </div>
       </div>
       <div className="flex items-center justify-between border-t border-border/50 pt-4">
-        {getStockBadge(product.stockStatus)}
+      
         <Button 
           variant="ghost" 
           size="sm" 

@@ -160,16 +160,6 @@ export function ProductsPanel() {
                 <option key={cat.id} value={cat.slug}>{cat.name}</option>
               ))}
             </select>
-            <select
-              value={stockFilter}
-              onChange={(e) => setStockFilter(e.target.value)}
-              className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50"
-            >
-              <option value="All">Estado Stock</option>
-              <option value="In Stock">En Stock</option>
-              <option value="Low Stock">Bajo</option>
-              <option value="Out of Stock">Agotado</option>
-            </select>
           </div>
         </div>
       </div>

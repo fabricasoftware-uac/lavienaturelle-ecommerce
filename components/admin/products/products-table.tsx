@@ -73,7 +73,7 @@ export function ProductsTable({ products, loading, onOpenDetail }: ProductsTable
                     <span className="text-sm font-bold text-foreground tabular-nums">{formatPrice(p.price || 0)}</span>
                   </td>
                   <td className="px-6 py-5">
-                    {getStockBadge(p.stockStatus)}
+                    <span className="text-sm font-bold text-foreground tabular-nums">{p.stock}</span>
                   </td>
                   <td className="px-6 py-5 text-right">
                     <Button 
