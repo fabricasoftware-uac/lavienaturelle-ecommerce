@@ -186,6 +186,28 @@ export interface MappedOrder {
   courier_name?: string | null;
 }
 
+// Customer-facing product type (mapped from Database)
+export interface CatalogProduct {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  categoryName: string;
+  image: string;
+  images: string[];
+  description: string;
+  fullDescription: string;
+  badge: string;
+  details: {
+    weight: string;
+    origin: string;
+    ingredients: string;
+    usage: string;
+    benefits: string[];
+  };
+  inStock: boolean;
+}
+
 // Application specific types (mapped from Database)
 export interface AppProduct {
   id: string;

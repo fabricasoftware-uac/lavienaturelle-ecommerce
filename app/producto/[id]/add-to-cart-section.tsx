@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { ShoppingCart, Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useStore } from "@/lib/store-context"
+import { useStore, type Product } from "@/lib/store-context"
 
 interface AddToCartSectionProps {
-  product: any
+  product: Product
 }
 
 export function AddToCartSection({ product }: AddToCartSectionProps) {

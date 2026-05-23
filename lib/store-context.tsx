@@ -2,10 +2,9 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { AppProduct, Profile } from "@/types/database"
-import type { Session, AuthChangeEvent } from "@supabase/supabase-js"
+import { CatalogProduct, Profile } from "@/types/database"
 
-export type Product = AppProduct;
+export type Product = CatalogProduct;
 
 export interface CartItem extends Product {
   quantity: number

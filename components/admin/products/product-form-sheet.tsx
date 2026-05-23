@@ -271,7 +271,7 @@ export function ProductFormSheet({
                           <div className="flex-1 flex gap-2">
                             <select value={data.category} onChange={(e) => setForm({...data, category: e.target.value})} className="flex-1 bg-secondary/20 h-12 rounded-2xl border-none outline-none font-bold text-sm px-4">
                               <option value="">Seleccionar...</option>
-                              {categories.map((cat) => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+                              {categories.map((cat) => <option key={cat.id} value={cat.slug}>{cat.name}</option>)}
                             </select>
                             <Button type="button" onClick={() => setShowCategoryInput(true)} variant="outline" className="h-12 w-12 rounded-2xl border-border hover:bg-secondary shrink-0"><PlusCircle className="h-5 w-5 text-primary" /></Button>
                           </div>

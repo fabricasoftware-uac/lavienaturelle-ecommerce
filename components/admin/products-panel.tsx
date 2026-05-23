@@ -85,8 +85,8 @@ export function ProductsPanel() {
   const handleAddCategory = async (name: string) => {
     const res = await addCategory(name)
     if (res.success) {
-      // Sincronizamos con el nombre para que el selector del formulario lo encuentre
-      setForm((prev) => ({ ...prev, category: res.data.name }))
+      // Sincronizamos con el slug para mantener consistencia con el resto del flujo
+      setForm((prev) => ({ ...prev, category: res.data.slug }))
     }
   }
 

@@ -80,7 +80,7 @@ export function useProducts() {
     setSaving(true)
     setError(null)
     try {
-      const targetCategoryId = categories.find(c => c.name === form.category)?.id
+      const targetCategoryId = categories.find(c => c.slug === form.category)?.id
 
       const { error: productError } = await supabase
         .from('products')
@@ -159,7 +159,7 @@ export function useProducts() {
     try {
       const productSlug = slugify(form.name)
       const productSku = `LVN-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
-      const targetCategoryId = categories.find(c => c.name === form.category)?.id
+      const targetCategoryId = categories.find(c => c.slug === form.category)?.id
 
       const { data: newProd, error: insertError } = await supabase
         .from('products')

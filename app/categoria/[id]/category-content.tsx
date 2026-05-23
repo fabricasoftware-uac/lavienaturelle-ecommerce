@@ -7,16 +7,17 @@ import { ProductCard } from "@/components/product-card"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { getCategoryIcon } from "@/lib/products"
+import { CatalogProduct, Category } from "@/types/database"
 
 const PRODUCTS_PER_PAGE = 12
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "name"
 
 interface CategoryContentProps {
-  category: any
-  products: any[]
-  allCategories: any[]
-  allProducts: any[]
+  category: Category
+  products: CatalogProduct[]
+  allCategories: Category[]
+  allProducts: CatalogProduct[]
 }
 
 export function CategoryContent({ category, products, allCategories, allProducts }: CategoryContentProps) {
@@ -24,7 +25,7 @@ export function CategoryContent({ category, products, allCategories, allProducts
   const [gridSize, setGridSize] = useState<"compact" | "comfortable">("comfortable")
   const [sortBy, setSortBy] = useState<SortOption>("featured")
 
-  const CategoryIcon = getCategoryIcon(category.slug || category.id)
+  const CategoryIcon = getCategoryIcon(category.slug)
 
   // Filter and sort products
   const sortedProducts = useMemo(() => {
@@ -84,7 +85,7 @@ export function CategoryContent({ category, products, allCategories, allProducts
               Catálogo
             </Link>
             <span>/</span>
-            <span className="text-foreground">{category.namePlural || category.name}</span>
+            <span className="text-foreground">{category.name}</span>
           </nav>
 
           <div className="flex items-center gap-4">
@@ -93,7 +94,7 @@ export function CategoryContent({ category, products, allCategories, allProducts
             </div>
             <div>
               <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-foreground">
-                {category.namePlural || category.name}
+                {category.name}
               </h1>
               {category.description && (
                 <p className="text-muted-foreground mt-1">
@@ -245,21 +246,21 @@ export function CategoryContent({ category, products, allCategories, allProducts
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {allCategories
-                .filter((c) => (c.slug || c.id) !== (category.slug || category.id))
+                .filter((c) => c.slug !== category.slug)
                 .map((cat) => {
-                  const Icon = getCategoryIcon(cat.slug || cat.id)
-                  const productCount = allProducts.filter((p) => p.category === (cat.slug || cat.id)).length
+                  const Icon = getCategoryIcon(cat.slug)
+                  const productCount = allProducts.filter((p) => p.category === cat.slug).length
                   return (
                     <Link
                       key={cat.id}
-                      href={`/categoria/${cat.slug || cat.id}`}
+                      href={`/categoria/${cat.slug}`}
                       className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border hover:border-primary/50 hover:shadow-md transition-all"
                     >
                       <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
                         <Icon className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-foreground">{cat.namePlural || cat.name}</h3>
+                        <h3 className="font-medium text-foreground">{cat.name}</h3>
                         <p className="text-sm text-muted-foreground">
                           {productCount} producto{productCount !== 1 ? "s" : ""}
                         </p>

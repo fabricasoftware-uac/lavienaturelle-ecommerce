@@ -3,22 +3,22 @@
 import { useState, useMemo } from "react"
 import { Sparkles, Grid3X3, LayoutGrid, ChevronLeft, ChevronRight } from "lucide-react"
 import { ProductCard } from "@/components/product-card"
-import { products, categories, getCategoryIcon } from "@/lib/products"
+import { getCategoryIcon } from "@/lib/products"
 import { cn } from "@/lib/utils"
-import { AppProduct, Category } from "@/types/database"
+import { CatalogProduct, Category } from "@/types/database"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 const PRODUCTS_PER_PAGE = 8
 
 interface ProductCatalogProps {
-  initialProducts?: AppProduct[]
-  initialCategories?: Category[]
+  initialProducts: CatalogProduct[]
+  initialCategories: Category[]
 }
 
 export function ProductCatalog({ initialProducts, initialCategories }: ProductCatalogProps) {
-  const displayProducts = initialProducts || products
-  const displayCategories = initialCategories || categories
+  const displayProducts = initialProducts
+  const displayCategories = initialCategories
   
   const [activeCategory, setActiveCategory] = useState<string | "all">("all")
   const [gridSize, setGridSize] = useState<"compact" | "comfortable">("comfortable")
@@ -99,20 +99,20 @@ export function ProductCatalog({ initialProducts, initialCategories }: ProductCa
               Todos
             </button>
             {displayCategories.map((cat) => {
-              const Icon = getCategoryIcon(cat.id || cat.slug)
+              const Icon = getCategoryIcon(cat.slug)
               return (
                 <button
-                  key={cat.id || cat.slug}
-                  onClick={() => handleCategoryChange(cat.slug || cat.id)}
+                  key={cat.id}
+                  onClick={() => handleCategoryChange(cat.slug)}
                   className={cn(
                     "inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
-                    activeCategory === (cat.slug || cat.id)
+                    activeCategory === cat.slug
                       ? "bg-primary text-primary-foreground shadow-md"
                       : "bg-card text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border"
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  {cat.namePlural || cat.name}
+                  {cat.name}
                 </button>
               )
             })}
@@ -150,7 +150,7 @@ export function ProductCatalog({ initialProducts, initialCategories }: ProductCa
           <p className="text-sm text-muted-foreground">
             Mostrando {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} de {filteredProducts.length} producto{filteredProducts.length !== 1 ? "s" : ""}
             {activeCategory !== "all" && (
-              <span> en {displayCategories.find(c => (c.slug || c.id) === activeCategory)?.namePlural || displayCategories.find(c => (c.slug || c.id) === activeCategory)?.name}</span>
+              <span> en {displayCategories.find(c => c.slug === activeCategory)?.name}</span>
             )}
           </p>
           {activeCategory !== "all" && (

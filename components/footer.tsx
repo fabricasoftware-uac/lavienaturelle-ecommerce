@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { Mail, Phone, MapPin, Instagram, Facebook, Twitter } from "lucide-react"
-import { categories } from "@/lib/products"
 import Image from "next/image"
 
 

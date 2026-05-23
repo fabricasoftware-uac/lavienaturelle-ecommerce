@@ -1,8 +1,8 @@
 import { createClient as createServerClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
-import { AppProduct, Category, ProductWithDetails } from "@/types/database"
+import { CatalogProduct, Category, ProductWithDetails } from "@/types/database"
 
-export async function getProducts() {
+export async function getProducts(): Promise<CatalogProduct[]> {
   const cookieStore = await cookies()
   const supabase = createServerClient(cookieStore)
   
@@ -42,7 +42,7 @@ export async function getProducts() {
       benefits: p.benefits || []
     },
     inStock: p.stock_quantity > 0
-  })) as any[] // Keeping as any[] for now to avoid breaking UI that expects the old AppProduct structure if it differs slightly
+  })) as CatalogProduct[]
 }
 
 export async function getCategories() {
@@ -63,7 +63,7 @@ export async function getCategories() {
   return data as Category[]
 }
 
-export async function getProductBySlugOrId(id: string) {
+export async function getProductBySlugOrId(id: string): Promise<CatalogProduct | null> {
   const cookieStore = await cookies()
   const supabase = createServerClient(cookieStore)
   
