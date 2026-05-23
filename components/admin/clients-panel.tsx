@@ -1,27 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   Search,
-  Filter,
   Eye,
   Edit,
-  Trash2,
+  Save,
   User,
   Mail,
   Phone,
   MapPin,
-  Calendar,
-  ChevronRight,
-  MoreVertical,
-  UserX,
-  UserCheck,
-  Download,
-  Save,
-  X,
   Clock,
-  CheckCircle,
-  AlertCircle,
   Package,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -33,144 +22,167 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
-  SheetFooter,
 } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
 import { cn, formatPrice } from "@/lib/utils"
+import { createClient } from "@/lib/supabase/client"
 
-// Mock Data for Clients
-const INITIAL_CLIENTS = [
-  {
-    id: "CLI-1001",
-    name: "Carlos Mendoza",
-    email: "carlos.m@example.com",
-    registrationDate: "2026-01-15T10:30:00Z",
-    totalOrders: 12,
-    status: "Active",
-    phone: "+57 301 555 1234",
-    address: "Calle 127 #45-12, Bogotá, Colombia",
-    orderHistory: [
-      { id: "ORD-9821", date: "2026-04-10T15:20:00Z", paymentStatus: "Paid", total: 45.99 },
-      { id: "ORD-9750", date: "2026-03-22T09:15:00Z", paymentStatus: "Paid", total: 124.50 },
-      { id: "ORD-9612", date: "2026-02-05T18:45:00Z", paymentStatus: "Paid", total: 89.00 },
-    ]
-  },
-  {
-    id: "CLI-1002",
-    name: "Valentina Rojas",
-    email: "v.rojas@botanica.co",
-    registrationDate: "2026-02-20T14:45:00Z",
-    totalOrders: 5,
-    status: "Active",
-    phone: "+57 312 444 9876",
-    address: "Carrera 7 #72-10, Apto 402, Bogotá, Colombia",
-    orderHistory: [
-      { id: "ORD-9835", date: "2026-04-18T11:00:00Z", paymentStatus: "Pending", total: 67.20 },
-      { id: "ORD-9701", date: "2026-03-10T16:30:00Z", paymentStatus: "Paid", total: 210.00 },
-    ]
-  },
-  {
-    id: "CLI-1003",
-    name: "Andrés Felipe Sierra",
-    email: "andres.sierra@pyme.com",
-    registrationDate: "2026-03-05T08:20:00Z",
-    totalOrders: 2,
-    status: "Inactive",
-    phone: "+57 300 111 2233",
-    address: "Circular 4 #70-15, Medellín, Colombia",
-    orderHistory: [
-      { id: "ORD-9801", date: "2026-04-02T14:10:00Z", paymentStatus: "Failed", total: 55.00 },
-    ]
-  },
-  {
-    id: "CLI-1004",
-    name: "Mariana Holguín",
-    email: "m.holguin@gmail.com",
-    registrationDate: "2026-03-12T19:00:00Z",
-    totalOrders: 8,
-    status: "Active",
-    phone: "+57 315 777 5544",
-    address: "Calle 50 #12-45, Barranquilla, Colombia",
-    orderHistory: [
-      { id: "ORD-9840", date: "2026-04-19T20:15:00Z", paymentStatus: "Paid", total: 34.50 },
-      { id: "ORD-9790", date: "2026-03-28T12:40:00Z", paymentStatus: "Paid", total: 112.00 },
-    ]
-  },
-]
+interface OrderSummary {
+  id: string
+  order_number: string
+  date: string
+  payment_status: string
+  total: number
+}
+
+interface ClientData {
+  id: string
+  email: string
+  full_name: string
+  phone: string | null
+  document_number: string | null
+  role: string
+  created_at: string
+  totalOrders: number
+  orders: OrderSummary[]
+}
 
 export function ClientsPanel() {
-  const [clients, setClients] = useState(INITIAL_CLIENTS)
+  const supabase = useMemo(() => createClient(), [])
+  const [clients, setClients] = useState<ClientData[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("All")
   const [dateSort, setDateSort] = useState("desc")
-  
-  const [selectedClient, setSelectedClient] = useState<any>(null)
+
+  const [selectedClient, setSelectedClient] = useState<ClientData | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [editForm, setEditForm] = useState<any>(null)
+  const [editForm, setEditForm] = useState<Partial<ClientData> | null>(null)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200)
-    return () => clearTimeout(timer)
+    let cancelled = false
+    async function loadClients() {
+      try {
+        setLoading(true)
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("*")
+          .is("deleted_at", null)
+          .order("created_at", { ascending: false })
+
+        const profilesWithOrders: ClientData[] = []
+        if (profiles && profiles.length > 0) {
+          const profileIds = profiles.map((p: any) => p.id)
+          const { data: allOrders } = await supabase
+            .from("orders")
+            .select("id, order_number, created_at, payment_status, total_amount, user_id")
+            .in("user_id", profileIds)
+            .order("created_at", { ascending: false })
+
+          const ordersByUser: Record<string, typeof allOrders> = {}
+          const orderCountByUser: Record<string, number> = {}
+
+          for (const o of allOrders ?? []) {
+            if (!ordersByUser[o.user_id]) {
+              ordersByUser[o.user_id] = []
+              orderCountByUser[o.user_id] = 0
+            }
+            if (ordersByUser[o.user_id].length < 10) {
+              ordersByUser[o.user_id].push(o)
+            }
+            orderCountByUser[o.user_id]++
+          }
+
+          for (const p of profiles) {
+            const userOrders = ordersByUser[p.id] ?? []
+            profilesWithOrders.push({
+              id: p.id,
+              email: p.email,
+              full_name: p.full_name || "Sin nombre",
+              phone: p.phone,
+              document_number: p.document_number,
+              role: p.role,
+              created_at: p.created_at,
+              totalOrders: orderCountByUser[p.id] ?? 0,
+              orders: userOrders.map((o: any) => ({
+                id: o.id,
+                order_number: o.order_number,
+                date: o.created_at,
+                payment_status: o.payment_status,
+                total: Number(o.total_amount),
+              })),
+            })
+          }
+        }
+
+        if (cancelled) return
+        setClients(profilesWithOrders)
+      } catch (err) {
+        console.error("Error loading clients:", err)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    loadClients()
+    return () => { cancelled = true }
   }, [])
 
-  const handleOpenDetail = (client: any) => {
+  const handleOpenDetail = (client: ClientData) => {
     setSelectedClient(client)
     setEditForm({ ...client })
     setIsDetailOpen(true)
     setIsEditing(false)
   }
 
-  const handleToggleStatus = (clientId: string) => {
-    setClients(prev => prev.map(c => 
-      c.id === clientId 
-        ? { ...c, status: c.status === "Active" ? "Inactive" : "Active" } 
-        : c
-    ))
-    if (selectedClient && selectedClient.id === clientId) {
-      setSelectedClient({ ...selectedClient, status: selectedClient.status === "Active" ? "Inactive" : "Active" })
-    }
-  }
+  const handleSaveEdit = async () => {
+    if (!selectedClient || !editForm) return
+    setSaving(true)
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        full_name: editForm.full_name,
+        email: editForm.email,
+        phone: editForm.phone,
+      })
+      .eq("id", selectedClient.id)
 
-  const handleSaveEdit = () => {
-    setClients(prev => prev.map(c => c.id === selectedClient.id ? { ...editForm } : c))
-    setSelectedClient({ ...editForm })
-    setIsEditing(false)
+    if (!error) {
+      setClients(prev =>
+        prev.map(c =>
+          c.id === selectedClient.id
+            ? { ...c, full_name: editForm.full_name || c.full_name, email: editForm.email || c.email, phone: editForm.phone || c.phone }
+            : c
+        )
+      )
+      setSelectedClient(prev => prev ? { ...prev, ...editForm } : null)
+      setIsEditing(false)
+    }
+    setSaving(false)
   }
 
   const filteredClients = clients
     .filter(c => {
-      const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           c.id.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesStatus = statusFilter === "All" || c.status === statusFilter
-      return matchesSearch && matchesStatus
+      const q = searchQuery.toLowerCase()
+      return (
+        c.full_name.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q) ||
+        c.id.toLowerCase().includes(q)
+      )
     })
     .sort((a, b) => {
-      const dateA = new Date(a.registrationDate).getTime()
-      const dateB = new Date(b.registrationDate).getTime()
+      const dateA = new Date(a.created_at).getTime()
+      const dateB = new Date(b.created_at).getTime()
       return dateSort === "desc" ? dateB - dateA : dateA - dateB
     })
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Active": 
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-bold px-3">Activo</Badge>
-      case "Inactive": 
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 font-bold px-3">Inactivo</Badge>
-      default: 
-        return <Badge variant="outline">{status}</Badge>
-    }
-  }
-
   const getPaymentBadge = (status: string) => {
     switch (status) {
-      case "Paid": return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-100 text-[10px] font-bold">Pagado</Badge>
-      case "Pending": return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-100 text-[10px] font-bold">Pendiente</Badge>
-      case "Failed": return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-100 text-[10px] font-bold">Fallido</Badge>
-      default: return <Badge variant="outline">{status}</Badge>
+      case "completed": return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-100 text-[10px] font-bold">Pagado</Badge>
+      case "pending": return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-100 text-[10px] font-bold">Pendiente</Badge>
+      case "failed": return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-100 text-[10px] font-bold">Fallido</Badge>
+      case "refunded": return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-100 text-[10px] font-bold">Reembolsado</Badge>
+      default: return <Badge variant="outline" className="text-[10px] font-bold">{status}</Badge>
     }
   }
 
@@ -181,12 +193,6 @@ export function ClientsPanel() {
         <div>
           <h1 className="font-serif text-2xl font-semibold text-foreground tracking-tight">Gestión de Clientes</h1>
           <p className="text-muted-foreground mt-1 text-sm font-medium">Administra la base de datos de usuarios y su actividad.</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="bg-card h-11 rounded-xl px-5 font-bold text-xs uppercase tracking-widest border-border hover:bg-secondary transition-all">
-            <Download className="h-4 w-4 mr-2" />
-            Exportar
-          </Button>
         </div>
       </div>
 
@@ -202,16 +208,7 @@ export function ClientsPanel() {
               className="pl-10 bg-secondary/30 border-none h-11 rounded-xl text-sm font-medium"
             />
           </div>
-          <div className="grid grid-cols-2 lg:flex items-center gap-3">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50"
-            >
-              <option value="All">Todos los estados</option>
-              <option value="Active">Activos</option>
-              <option value="Inactive">Inactivos</option>
-            </select>
+          <div className="flex items-center gap-3">
             <select
               value={dateSort}
               onChange={(e) => setDateSort(e.target.value)}
@@ -234,7 +231,7 @@ export function ClientsPanel() {
                 <th className="px-6 py-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cliente</th>
                 <th className="px-6 py-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Registro</th>
                 <th className="px-6 py-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">Pedidos</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Estado</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Rol</th>
                 <th className="px-6 py-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right">Acciones</th>
               </tr>
             </thead>
@@ -248,26 +245,31 @@ export function ClientsPanel() {
               ) : (
                 filteredClients.map((c) => (
                   <tr key={c.id} className="hover:bg-primary/1 transition-colors group">
-                    <td className="px-6 py-5 text-xs font-bold text-muted-foreground">{c.id}</td>
+                    <td className="px-6 py-5 text-xs font-bold text-muted-foreground font-mono">{c.id.slice(0, 8)}</td>
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         <div>
-                          <p className="text-sm font-bold text-foreground leading-none">{c.name}</p>
+                          <p className="text-sm font-bold text-foreground leading-none">{c.full_name}</p>
                           <p className="text-[11px] text-muted-foreground mt-1 font-medium">{c.email}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="text-xs font-bold text-foreground/80">{new Date(c.registrationDate).toLocaleDateString()}</span>
-                        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">{new Date(c.registrationDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="text-xs font-bold text-foreground/80">{new Date(c.created_at).toLocaleDateString()}</span>
+                        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">{new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     </td>
                     <td className="px-6 py-5 text-center">
                       <span className="text-sm font-black text-foreground">{c.totalOrders}</span>
                     </td>
                     <td className="px-6 py-5">
-                      {getStatusBadge(c.status)}
+                      <Badge variant="outline" className={cn(
+                        "font-bold px-3 text-[10px]",
+                        c.role === "admin" ? "bg-purple-50 text-purple-700 border-purple-200" : "bg-blue-50 text-blue-700 border-blue-200"
+                      )}>
+                        {c.role === "admin" ? "Admin" : "Cliente"}
+                      </Badge>
                     </td>
                     <td className="px-6 py-5 text-right">
                       <Button 
@@ -293,13 +295,8 @@ export function ClientsPanel() {
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="bg-card rounded-2xl border border-border p-4 space-y-4 shadow-sm">
-              <div className="flex gap-4">
-                <Skeleton className="h-16 w-16 rounded-full shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-              </div>
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-3 w-1/2" />
               <Skeleton className="h-10 w-full rounded-xl" />
             </div>
           ))
@@ -315,10 +312,7 @@ export function ClientsPanel() {
                   <User className="h-6 w-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <span className="text-sm font-bold text-foreground leading-tight truncate">{c.name}</span>
-                    {getStatusBadge(c.status)}
-                  </div>
+                  <span className="text-sm font-bold text-foreground leading-tight block truncate">{c.full_name}</span>
                   <p className="text-[11px] font-medium text-muted-foreground mb-2 truncate">{c.email}</p>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-md">
@@ -328,10 +322,9 @@ export function ClientsPanel() {
                 </div>
               </div>
               <div className="flex items-center justify-between border-t border-border/50 pt-4">
-                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">Registrado: {new Date(c.registrationDate).toLocaleDateString()}</span>
+                <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">Registrado: {new Date(c.created_at).toLocaleDateString()}</span>
                 <Button variant="ghost" size="sm" className="h-8 text-[11px] font-bold text-primary">
                   Ver Perfil
-                  <ChevronRight className="h-3.5 w-3.5 ml-1" />
                 </Button>
               </div>
             </div>
@@ -352,11 +345,11 @@ export function ClientsPanel() {
                       <User className="h-8 w-8" />
                     </div>
                     <div>
-                      <SheetTitle className="text-lg sm:text-2xl font-bold tracking-tight text-foreground leading-none">{selectedClient.name}</SheetTitle>
+                      <SheetTitle className="text-lg sm:text-2xl font-bold tracking-tight text-foreground leading-none">{selectedClient.full_name}</SheetTitle>
                       <SheetDescription className="text-[10px] sm:text-xs font-semibold text-muted-foreground mt-2 uppercase tracking-widest flex items-center gap-2">
-                        <span className="bg-muted px-2 py-0.5 rounded">{selectedClient.id}</span>
+                        <span className="bg-muted px-2 py-0.5 rounded font-mono">{selectedClient.id.slice(0, 8)}</span>
                         <span className="h-1 w-1 rounded-full bg-border" />
-                        Registrado el {new Date(selectedClient.registrationDate).toLocaleDateString()}
+                        Registrado el {new Date(selectedClient.created_at).toLocaleDateString()}
                       </SheetDescription>
                     </div>
                   </div>
@@ -364,38 +357,26 @@ export function ClientsPanel() {
                     {isEditing ? (
                       <div className="flex gap-2 w-full">
                         <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="flex-1 sm:flex-initial h-10 rounded-xl px-5 text-[11px] font-bold text-muted-foreground uppercase">Cancelar</Button>
-                        <Button onClick={handleSaveEdit} className="flex-1 sm:flex-initial h-10 bg-primary text-white rounded-xl px-6 text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10">
-                          <Save className="h-3.5 w-3.5 mr-2" /> Guardar
+                        <Button onClick={handleSaveEdit} disabled={saving} className="flex-1 sm:flex-initial h-10 bg-primary text-white rounded-xl px-6 text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10">
+                          <Save className="h-3.5 w-3.5 mr-2" /> {saving ? "Guardando..." : "Guardar"}
                         </Button>
                       </div>
                     ) : (
-                      <div className="flex gap-2 w-full">
-                        <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="flex-1 sm:flex-initial h-10 rounded-xl px-5 text-[11px] font-bold uppercase tracking-wider border-border hover:bg-secondary">
-                          <Edit className="h-3.5 w-3.5 mr-2" /> Editar
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleToggleStatus(selectedClient.id)}
-                          className={cn(
-                            "flex-1 sm:flex-initial h-10 rounded-xl px-5 text-[11px] font-bold uppercase tracking-wider border-border",
-                            selectedClient.status === "Active" ? "text-red-600 hover:bg-red-50 hover:border-red-100" : "text-green-600 hover:bg-green-50 hover:border-green-100"
-                          )}
-                        >
-                          {selectedClient.status === "Active" ? (
-                            <><UserX className="h-3.5 w-3.5 mr-2" /> Suspender</>
-                          ) : (
-                            <><UserCheck className="h-3.5 w-3.5 mr-2" /> Activar</>
-                          )}
-                        </Button>
-                      </div>
+                      <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="h-10 rounded-xl px-5 text-[11px] font-bold uppercase tracking-wider border-border hover:bg-secondary">
+                        <Edit className="h-3.5 w-3.5 mr-2" /> Editar
+                      </Button>
                     )}
                   </div>
                 </div>
                 {!isEditing && (
                   <div className="flex flex-wrap gap-2">
-                    {getStatusBadge(selectedClient.status)}
                     <Badge variant="outline" className="bg-secondary/40 border-none font-bold text-[10px] px-3">{selectedClient.totalOrders} Pedidos realizados</Badge>
+                    <Badge variant="outline" className={cn(
+                      "font-bold text-[10px] px-3",
+                      selectedClient.role === "admin" ? "bg-purple-50 text-purple-700 border-purple-200" : "bg-blue-50 text-blue-700 border-blue-200"
+                    )}>
+                      {selectedClient.role === "admin" ? "Admin" : "Cliente"}
+                    </Badge>
                   </div>
                 )}
               </div>
@@ -413,25 +394,17 @@ export function ClientsPanel() {
                       <div className="space-y-5">
                         <div className="space-y-2">
                           <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Nombre Completo</label>
-                          <Input value={editForm.name} onChange={(e) => setEditForm({...editForm, name: e.target.value})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
+                          <Input value={editForm?.full_name || ""} onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Email</label>
-                            <Input value={editForm.email} onChange={(e) => setEditForm({...editForm, email: e.target.value})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
+                            <Input value={editForm?.email || ""} onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
                           </div>
                           <div className="space-y-2">
                             <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Teléfono</label>
-                            <Input value={editForm.phone} onChange={(e) => setEditForm({...editForm, phone: e.target.value})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
+                            <Input value={editForm?.phone || ""} onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
                           </div>
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Dirección de Envío</label>
-                          <textarea 
-                            value={editForm.address} 
-                            onChange={(e) => setEditForm({...editForm, address: e.target.value})} 
-                            className="w-full min-h-25 bg-secondary/20 rounded-2xl border-none p-4 font-bold text-sm outline-none resize-none" 
-                          />
                         </div>
                       </div>
                     </div>
@@ -443,19 +416,21 @@ export function ClientsPanel() {
                        </div>
                        <div className="p-5 rounded-3xl bg-secondary/10 border border-border/40 group hover:bg-secondary/20 transition-colors">
                          <p className="text-[10px] text-muted-foreground font-black uppercase mb-2 flex items-center gap-1.5"><Phone className="h-3 w-3" /> Teléfono</p>
-                         <p className="text-sm font-bold text-foreground">{selectedClient.phone}</p>
+                         <p className="text-sm font-bold text-foreground">{selectedClient.phone || "No registrado"}</p>
                        </div>
-                       <div className="p-6 rounded-3xl bg-secondary/10 border border-border/40 sm:col-span-2 group hover:bg-secondary/20 transition-colors">
-                         <div className="flex gap-4">
-                           <div className="h-12 w-12 rounded-2xl bg-white border border-border flex items-center justify-center shrink-0 shadow-sm">
-                             <MapPin className="h-5 w-5 text-primary" />
-                           </div>
-                           <div>
-                             <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Dirección Primaria de Envío</p>
-                             <p className="text-sm font-medium leading-relaxed italic text-foreground/80">{selectedClient.address}</p>
+                       {selectedClient.document_number && (
+                         <div className="p-6 rounded-3xl bg-secondary/10 border border-border/40 sm:col-span-2 group hover:bg-secondary/20 transition-colors">
+                           <div className="flex gap-4">
+                             <div className="h-12 w-12 rounded-2xl bg-white border border-border flex items-center justify-center shrink-0 shadow-sm">
+                               <MapPin className="h-5 w-5 text-primary" />
+                             </div>
+                             <div>
+                               <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Documento</p>
+                               <p className="text-sm font-medium leading-relaxed text-foreground/80">{selectedClient.document_number}</p>
+                             </div>
                            </div>
                          </div>
-                       </div>
+                       )}
                     </div>
                   )}
                 </section>
@@ -464,51 +439,43 @@ export function ClientsPanel() {
                 <section className="space-y-6">
                   <h3 className="text-[11px] font-black text-foreground uppercase tracking-widest flex items-center justify-between">
                     <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> Historial de Pedidos</span>
-                    <span className="text-[9px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded tracking-normal">Últimos {selectedClient.orderHistory.length} registros</span>
+                    <span className="text-[9px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded tracking-normal">{selectedClient.orders.length} registros</span>
                   </h3>
                   
-                  <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="bg-muted/10 border-b border-border">
-                          <th className="px-4 py-3 text-[9px] font-bold text-muted-foreground uppercase tracking-widest">ID Pedido</th>
-                          <th className="px-4 py-3 text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Fecha</th>
-                          <th className="px-4 py-3 text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Pago</th>
-                          <th className="px-4 py-3 text-[9px] font-bold text-muted-foreground uppercase tracking-widest text-right">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {selectedClient.orderHistory.map((order: any) => (
-                          <tr key={order.id} className="hover:bg-primary/1 transition-colors">
-                            <td className="px-4 py-4 text-xs font-bold text-foreground">{order.id}</td>
-                            <td className="px-4 py-4 text-xs font-medium text-muted-foreground">{new Date(order.date).toLocaleDateString()}</td>
-                            <td className="px-4 py-4">
-                              {getPaymentBadge(order.paymentStatus)}
-                            </td>
-                            <td className="px-4 py-4 text-right">
-                              <span className="text-xs font-black text-foreground">{formatPrice(order.total)}</span>
-                            </td>
+                  {selectedClient.orders.length > 0 ? (
+                    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-muted/10 border-b border-border">
+                            <th className="px-4 py-3 text-[9px] font-bold text-muted-foreground uppercase tracking-widest">ID Pedido</th>
+                            <th className="px-4 py-3 text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Fecha</th>
+                            <th className="px-4 py-3 text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Pago</th>
+                            <th className="px-4 py-3 text-[9px] font-bold text-muted-foreground uppercase tracking-widest text-right">Total</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {selectedClient.orders.map((order) => (
+                            <tr key={order.id} className="hover:bg-primary/1 transition-colors">
+                              <td className="px-4 py-4 text-xs font-bold text-foreground font-mono">{order.order_number}</td>
+                              <td className="px-4 py-4 text-xs font-medium text-muted-foreground">{new Date(order.date).toLocaleDateString()}</td>
+                              <td className="px-4 py-4">
+                                {getPaymentBadge(order.payment_status)}
+                              </td>
+                              <td className="px-4 py-4 text-right">
+                                <span className="text-xs font-black text-foreground">{formatPrice(order.total)}</span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center text-sm text-muted-foreground bg-secondary/20 rounded-2xl border border-border">
+                      Este cliente aún no ha realizado pedidos.
+                    </div>
+                  )}
                 </section>
               </div>
-
-              {/* Footer */}
-              {!isEditing && (
-                <div className="p-5 sm:p-8 border-t border-border bg-card/80 backdrop-blur-md shrink-0">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline" className="h-12 rounded-2xl border-border text-foreground font-black text-[10px] uppercase tracking-widest">
-                       Ver Todos los Pedidos
-                    </Button>
-                    <Button variant="outline" className="h-12 rounded-2xl border-destructive/20 text-destructive hover:bg-destructive/10 font-black text-[10px] uppercase tracking-widest">
-                       Suspender Cuenta
-                    </Button>
-                 </div>
-                </div>
-              )}
             </div>
           )}
         </SheetContent>

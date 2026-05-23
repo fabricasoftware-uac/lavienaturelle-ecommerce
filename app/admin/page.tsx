@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   ShoppingCart,
   Package,
@@ -27,68 +27,67 @@ interface RecentOrder {
   date: string
 }
 
+interface RecentOrderRow {
+  id: string
+  full_name: string
+  total_amount: number
+  status: string
+  created_at: string
+}
+
 export default function AdminDashboardPage() {
-  const supabase = createClient()
-  const [stats, setStats] = useState<DashboardStats>({
-    pendingOrders: 0,
-    criticalStock: 0,
-    newUsersToday: 0,
-    shipmentsToday: 0,
-  })
+  const supabase = useMemo(() => createClient(), [])
+  const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let cancelled = false
     async function loadDashboard() {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
+      try {
+        const [pendingOrders, lowStock, newUsers, recentShipments, ordersData] = await Promise.all([
+          supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "pending"),
+          supabase.from("products").select("*", { count: "exact", head: true }).lt("stock_quantity", 5),
+          supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
+          supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "shipped"),
+          supabase.from("orders").select("id, full_name, total_amount, status, created_at").order("created_at", { ascending: false }).limit(5),
+        ])
 
-      const [pendingRes, stockRes, usersRes, shipmentsRes, ordersRes] = await Promise.all([
-        supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['pending', 'processing']),
-        supabase.from('products').select('id', { count: 'exact', head: true }).lte('stock_quantity', 5).is('deleted_at', null),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).gte('created_at', today.toISOString()),
-        supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'shipped').gte('updated_at', today.toISOString()),
-        supabase.from('orders').select('id, full_name, total_amount, status, created_at').order('created_at', { ascending: false }).limit(5),
-      ])
+        if (cancelled) return
+        setStats({
+          pendingOrders: pendingOrders.count ?? 0,
+          criticalStock: lowStock.count ?? 0,
+          newUsersToday: newUsers.count ?? 0,
+          shipmentsToday: recentShipments.count ?? 0,
+        })
 
-      setStats({
-        pendingOrders: pendingRes.count ?? 0,
-        criticalStock: stockRes.count ?? 0,
-        newUsersToday: usersRes.count ?? 0,
-        shipmentsToday: shipmentsRes.count ?? 0,
-      })
-
-      const statusMap: Record<string, string> = {
-        pending: 'Pendiente',
-        paid: 'Pagado',
-        processing: 'Procesando',
-        shipped: 'Enviado',
-        delivered: 'Completado',
-        cancelled: 'Cancelado',
-        refunded: 'Reembolsado',
+        const orders = (ordersData.data ?? []) as RecentOrderRow[]
+        setRecentOrders(
+          orders.map((order: RecentOrderRow) => ({
+            id: order.id,
+            customer: order.full_name,
+            total: new Intl.NumberFormat("es-ES", {
+              style: "currency",
+              currency: "EUR",
+            }).format(Number(order.total_amount)),
+            status: order.status,
+            statusRaw: order.status,
+            date: new Date(order.created_at).toLocaleDateString("es-ES", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            }),
+          }))
+        )
+      } catch (err) {
+        console.error("Error loading dashboard:", err)
+      } finally {
+        if (!cancelled) setLoading(false)
       }
-
-      const timeAgo = (dateStr: string) => {
-        const diff = Date.now() - new Date(dateStr).getTime()
-        const hours = Math.floor(diff / 3600000)
-        if (hours < 1) return 'Hace unos minutos'
-        if (hours < 24) return `Hace ${hours} hora${hours !== 1 ? 's' : ''}`
-        const days = Math.floor(hours / 24)
-        return `Hace ${days} dia${days !== 1 ? 's' : ''}`
-      }
-
-      setRecentOrders((ordersRes.data ?? []).map(o => ({
-        id: o.id,
-        customer: o.full_name,
-        total: `$${Number(o.total_amount).toFixed(2)}`,
-        status: statusMap[o.status] || o.status,
-        statusRaw: o.status,
-        date: timeAgo(o.created_at),
-      })))
-      setLoading(false)
     }
     loadDashboard()
-  }, [supabase])
+    return () => { cancelled = true }
+  }, [])
   return (
     <>
       {/* Page Header */}
@@ -101,12 +100,21 @@ export default function AdminDashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {[
-          { icon: ShoppingCart, value: stats.pendingOrders, label: "Pedidos Pendientes", change: "Requiere atención" },
-          { icon: Package, value: stats.criticalStock, label: "Stock Crítico", change: stats.criticalStock > 0 ? "Requiere acción" : "Sin novedad" },
-          { icon: Users, value: stats.newUsersToday, label: "Clientes Nuevos Hoy", change: `+${stats.newUsersToday} hoy` },
-          { icon: ShoppingBag, value: stats.shipmentsToday, label: "Envíos Hoy", change: `${stats.shipmentsToday} en camino` },
-        ].map((stat) => (
+        {(() => {
+          const safeStats = stats ?? {
+            pendingOrders: 0,
+            criticalStock: 0,
+            newUsersToday: 0,
+            shipmentsToday: 0,
+          }
+
+          return [
+            { icon: ShoppingCart, value: safeStats.pendingOrders, label: "Pedidos Pendientes", change: "Requiere atención" },
+            { icon: Package, value: safeStats.criticalStock, label: "Stock Crítico", change: safeStats.criticalStock > 0 ? "Requiere acción" : "Sin novedad" },
+            { icon: Users, value: safeStats.newUsersToday, label: "Clientes Nuevos Hoy", change: `+${safeStats.newUsersToday} hoy` },
+            { icon: ShoppingBag, value: safeStats.shipmentsToday, label: "Envíos Hoy", change: `${safeStats.shipmentsToday} en camino` },
+          ]
+        })().map((stat) => (
           <div
             key={stat.label}
             className="bg-card rounded-xl p-6 border border-border"
