@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, Montserrat } from 'next/font/google'
-import { StoreProvider } from '@/lib/store-context'
+import { StoreProvider } from '@/lib/cart-context'
 import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 

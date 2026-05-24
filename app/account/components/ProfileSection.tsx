@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/cart-context"
 import { useToast } from "@/hooks/use-toast"
 import {
   Dialog,

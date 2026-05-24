@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { OrderCard } from "./OrderCard"
 import { getUserOrders } from "@/lib/supabase/orders"
-import { useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/cart-context"
 import { useState, useEffect } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { OrderWithDetails, MappedOrder } from "@/types/database"

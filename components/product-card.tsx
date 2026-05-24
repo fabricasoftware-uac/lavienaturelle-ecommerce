@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Plus, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useStore, type Product } from "@/lib/store-context"
+import { useStore, type Product } from "@/lib/cart-context"
 import { getCategoryById } from "@/lib/products"
 import { cn, formatPrice } from "@/lib/utils"
 

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/cart-context"
 import { createAddress, updateAddress } from "@/lib/supabase/addresses"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"

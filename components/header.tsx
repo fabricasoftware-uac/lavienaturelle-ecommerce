@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { ShoppingBag, User, Truck, Menu, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/cart-context"
 import Image from "next/image"
 import {
   Sheet,

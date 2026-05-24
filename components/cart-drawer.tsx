@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { X, Plus, Minus, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/cart-context"
 import { cn, formatPrice } from "@/lib/utils"
 
 export function CartDrawer() {

@@ -5,7 +5,7 @@ import { LogOut, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { NAVIGATION } from "../constants"
-import { useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/cart-context"
 import { LogoutDialog } from "@/components/logout-dialog"
 import { useState } from "react"
 

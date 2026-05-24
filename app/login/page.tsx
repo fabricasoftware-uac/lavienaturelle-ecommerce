@@ -6,12 +6,11 @@ import Link from "next/link"
 import { Leaf, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/cart-context"
 import { loginAction } from "./actions"
 
 function LoginForm() {
   const router = useRouter()
-  const { login, getUserSession } = useStore()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)

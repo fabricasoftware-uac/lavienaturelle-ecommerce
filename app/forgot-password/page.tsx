@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Mail, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/cart-context"
 
 export default function ForgotPasswordPage() {
   const { resetPassword } = useStore()

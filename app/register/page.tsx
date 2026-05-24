@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Leaf, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/cart-context"
 import Image from "next/image"
 
 function RegisterForm() {

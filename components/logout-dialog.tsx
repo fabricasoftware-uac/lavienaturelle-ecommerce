@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { useStore } from "@/lib/store-context"
+import { useStore } from "@/lib/cart-context"
 import { useRouter } from "next/navigation"
 
 interface LogoutDialogProps {
