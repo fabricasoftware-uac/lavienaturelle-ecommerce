@@ -6,12 +6,12 @@ import Link from "next/link"
 import { Leaf, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useStore } from "@/lib/cart-context"
+import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
 
 function RegisterForm() {
   const router = useRouter()
-  const { register } = useStore()
+  const supabase = createClient()
   
   const [name, setName] = useState("")
   const [documentNumber, setDocumentNumber] = useState("")
@@ -40,16 +40,26 @@ function RegisterForm() {
     }
 
     setIsLoading(true)
+
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          document_number: documentNumber,
+          phone,
+        },
+      },
+    })
     
-    const result = await register(name, email, password, documentNumber, phone)
-    
-    if (result.success) {
+    if (!signUpError) {
       setIsSuccess(true)
       setTimeout(() => {
         router.push("/")
       }, 1000)
     } else {
-      setError(result.error || "Error al crear la cuenta. Intentalo de nuevo.")
+      setError(signUpError.message)
       setIsLoading(false)
     }
   }

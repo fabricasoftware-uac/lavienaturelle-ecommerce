@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect   } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {
@@ -26,9 +26,19 @@ import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/cart-context"
 import { cn, formatPrice } from "@/lib/utils"
 import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 import { createOrder, saveUserAddress } from "@/lib/supabase/orders"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import { Order, OrderStatus, PaymentStatus, Address } from "@/lib/supabase/types/database"
+
+interface UserInfo {
+  id: string
+  email?: string
+  name?: string
+  phone?: string | null
+  document_number?: string | null
+}
 
 type CheckoutStep = "informacion" | "envio" | "pago" | "confirmacion"
 
@@ -41,18 +51,35 @@ const stepLabels: Record<CheckoutStep, string> = {
 
 function CheckoutForm() {
   const router = useRouter()
-  const { cart, cartTotal, clearCart, user, register } = useStore()
+  const supabase = createClient()
+  const { cart, cartTotal, clearCart } = useStore()
   const [step, setStep] = useState<CheckoutStep>("informacion")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false)
   const [savedAddresses, setSavedAddresses] = useState<any[]>([])
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false)
-  
+  const [user, setUser] = useState<UserInfo | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) {
+        const meta = data.user.user_metadata
+        setUser({
+          id: data.user.id,
+          email: data.user.email,
+          name: meta?.full_name || meta?.name || "",
+          phone: meta?.phone || null,
+          document_number: meta?.document_number || null,
+        })
+      }
+    })
+  }, [])
+
   const [formData, setFormData] = useState({
-    email: user?.email || "",
-    firstName: user?.name || "",
-    documentNumber: user?.document_number || "",
-    phone: user?.phone || "",
+    email: "",
+    firstName: "",
+    documentNumber: "",
+    phone: "",
     address: "",
     apartment: "",
     city: "",
@@ -114,8 +141,8 @@ function CheckoutForm() {
     if (user) {
       setFormData(prev => ({
         ...prev,
-        email: prev.email || user.email,
-        firstName: prev.firstName || user.name,
+        email: prev.email || user.email || "",
+        firstName: prev.firstName || user.name || "",
         documentNumber: prev.documentNumber || user.document_number || "",
         phone: prev.phone || user.phone || "",
       }))
@@ -148,17 +175,27 @@ function CheckoutForm() {
     }
 
     setIsRegistering(true)
-    
-    const success = await register(orderSummary.name, orderSummary.email, regPassword, orderSummary.documentNumber, orderSummary.phone)
-    
-    if (success) {
+
+    const { error } = await supabase.auth.signUp({
+      email: orderSummary.email,
+      password: regPassword,
+      options: {
+        data: {
+          full_name: orderSummary.name,
+          document_number: orderSummary.documentNumber,
+          phone: orderSummary.phone,
+        },
+      },
+    })
+
+    if (!error) {
       setRegistrationSuccess(true)
       setTimeout(() => {
         setShowRegisterModal(false)
         router.push("/account")
       }, 1000)
     } else {
-      setRegisterError("Error al crear la cuenta. Inténtalo de nuevo.")
+      setRegisterError(error.message)
       setIsRegistering(false)
     }
   }
@@ -229,11 +266,11 @@ function CheckoutForm() {
             })
           }
         } else {
-          alert("Hubo un error al procesar tu pedido: " + result.error)
+          toast.error(result.error || "Error al procesar el pedido")
         }
       } catch (err) {
         console.error("Checkout error:", err)
-        alert("Ocurrió un error inesperado.")
+        toast.error("Ocurrió un error inesperado. Intenta de nuevo.")
       } finally {
         setIsSubmitting(false)
       }

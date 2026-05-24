@@ -1,13 +1,11 @@
 import { createClient } from "./client"
-import { Order, OrderItem, Address } from "@/lib/supabase/types/database"
+import { Order, Address } from "@/types/database"
 
 export async function createOrder(orderData: Partial<Order>, items: any[]) {
-  const supabase = await createClient()
-  
-  // 1. Insert order
-  if (!orderData.order_number) {
-    orderData.order_number = `LVN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
-  }
+  const supabase = createClient()
+
+  const orderNumber = orderData.order_number || `LVN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+  orderData.order_number = orderNumber
 
   const { data: order, error: orderError } = await supabase
     .from('orders')
@@ -17,10 +15,12 @@ export async function createOrder(orderData: Partial<Order>, items: any[]) {
 
   if (orderError) {
     console.error("Error creating order:", orderError)
-    return { success: false, error: orderError.message }
+    const message = orderError.message.includes("row-level security")
+      ? "No se pudo procesar el pedido. Por favor intenta de nuevo o contacta al soporte."
+      : orderError.message
+    return { success: false, error: message }
   }
 
-  // 2. Insert order items
   const orderItems = items.map(item => ({
     order_id: order.id,
     product_id: item.id,
@@ -37,17 +37,15 @@ export async function createOrder(orderData: Partial<Order>, items: any[]) {
 
   if (itemsError) {
     console.error("Error creating order items:", itemsError)
-    // Optional: Delete the order if items fail (but Supabase doesn't have transactions across multiple calls easily without RPC)
-    return { success: false, error: itemsError.message }
+    return { success: false, error: "Error al guardar los productos del pedido." }
   }
 
-  return { success: true, orderId: order.id, orderNumber: order.order_number }
+  return { success: true, orderId: order.id, orderNumber }
 }
 
 export async function saveUserAddress(userId: string, addressData: Partial<Address>) {
   const supabase = createClient()
-  
-  // Insert the address for the user
+
   const { error } = await supabase
     .from('addresses')
     .insert({
