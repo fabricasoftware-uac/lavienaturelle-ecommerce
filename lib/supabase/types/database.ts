@@ -660,6 +660,7 @@ export interface CatalogProduct {
     benefits: string[]
   }
   inStock: boolean
+  stockQuantity: number
 }
 
 // Application specific types (mapped from Database)

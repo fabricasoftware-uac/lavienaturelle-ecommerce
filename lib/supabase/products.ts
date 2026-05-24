@@ -42,7 +42,8 @@ export async function getProducts(): Promise<CatalogProduct[]> {
       usage: p.usage_instructions || "",
       benefits: p.benefits || []
     },
-    inStock: p.stock_quantity > 0
+    inStock: p.stock_quantity > 0,
+    stockQuantity: p.stock_quantity
   })) as CatalogProduct[]
 }
 
@@ -102,6 +103,7 @@ export async function getProductBySlugOrId(id: string): Promise<CatalogProduct |
       usage: p.usage_instructions || "",
       benefits: p.benefits || []
     },
-    inStock: p.stock_quantity > 0
+    inStock: p.stock_quantity > 0,
+    stockQuantity: p.stock_quantity
   }
 }

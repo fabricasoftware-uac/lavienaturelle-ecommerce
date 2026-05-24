@@ -2,13 +2,15 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { X, Plus, Minus, ShoppingBag } from "lucide-react"
+import { X, Plus, Minus, ShoppingBag, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/lib/cart-context"
 import { cn, formatPrice } from "@/lib/utils"
 
 export function CartDrawer() {
   const { cart, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, cartTotal } = useStore()
+
+  const hasOutOfStock = cart.some((item) => (item.stockQuantity ?? 1) <= 0)
 
   return (
     <>
@@ -54,54 +56,69 @@ export function CartDrawer() {
             </div>
           ) : (
             <div className="space-y-4">
-              {cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex gap-4 p-4 bg-secondary/30 rounded-xl"
-                >
-                  <div className="relative h-20 w-20 shrink-0 rounded-lg overflow-hidden bg-muted">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-foreground text-sm leading-tight truncate">
-                      {item.name}
-                    </h3>
-                    <p className="text-primary font-semibold mt-1">{formatPrice(item.price)}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="ml-auto text-muted-foreground hover:text-destructive text-xs"
-                        onClick={() => removeFromCart(item.id)}
-                      >
-                        Eliminar
-                      </Button>
+              {cart.map((item) => {
+                const stock = item.stockQuantity ?? Infinity
+                const isLow = stock > 0 && stock <= 5
+                const isOut = stock <= 0
+                return (
+                  <div
+                    key={item.id}
+                    className="flex gap-4 p-4 bg-secondary/30 rounded-xl"
+                  >
+                    <div className="relative h-20 w-20 shrink-0 rounded-lg overflow-hidden bg-muted">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-foreground text-sm leading-tight truncate">
+                        {item.name}
+                      </h3>
+                      <p className="text-primary font-semibold mt-1">{formatPrice(item.price)}</p>
+                      {isLow && (
+                        <p className="text-xs text-amber-600 font-medium mt-1 flex items-center gap-1">
+                          <AlertTriangle className="h-3 w-3" />
+                          Solo {stock} {stock === 1 ? 'unidad' : 'unidades'} disponibles
+                        </p>
+                      )}
+                      {isOut && (
+                        <p className="text-xs text-red-500 font-medium mt-1">Agotado</p>
+                      )}
+                      <div className="flex items-center gap-2 mt-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-7 w-7"
+                          disabled={isOut || item.quantity >= stock}
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="ml-auto text-muted-foreground hover:text-destructive text-xs"
+                          onClick={() => removeFromCart(item.id)}
+                        >
+                          Eliminar
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
@@ -116,8 +133,11 @@ export function CartDrawer() {
             <p className="text-xs text-muted-foreground">Envio e impuestos calculados al finalizar</p>
             <div className="flex flex-col gap-2">
               <Link href="/checkout" onClick={() => setIsCartOpen(false)}>
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-14">
-                  Finalizar Compra
+                <Button
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-14"
+                  disabled={hasOutOfStock}
+                >
+                  {hasOutOfStock ? "Productos agotados en el carrito" : "Finalizar Compra"}
                 </Button>
               </Link>
               <Button

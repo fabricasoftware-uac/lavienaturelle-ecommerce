@@ -11,6 +11,8 @@ import {
   Truck,
   Shield,
   Leaf,
+  Package,
+  AlertCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CartDrawer } from "@/components/cart-drawer"
@@ -109,10 +111,24 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <span className="font-serif text-3xl font-bold text-primary">
                   {formatPrice(product.price)}
                 </span>
-                {product.inStock && (
-                  <span className="inline-flex items-center gap-1 text-sm text-chart-1 font-bold">
-                    <Check className="h-4 w-4" />
-                    En stock
+                {product.inStock ? (
+                  <span className="inline-flex items-center gap-1 text-sm font-bold">
+                    {product.stockQuantity <= 5 ? (
+                      <span className="inline-flex items-center gap-1 text-amber-600">
+                        <Package className="h-4 w-4" />
+                        Solo {product.stockQuantity} {product.stockQuantity === 1 ? 'unidad' : 'unidades'}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-chart-1">
+                        <Check className="h-4 w-4" />
+                        En stock
+                      </span>
+                    )}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-sm font-bold text-red-500">
+                    <AlertCircle className="h-4 w-4" />
+                    Agotado
                   </span>
                 )}
               </div>

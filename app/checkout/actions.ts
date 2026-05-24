@@ -84,6 +84,39 @@ export async function createOrderAction(
   }
 }
 
+export async function validateStockAction(
+  items: { id: string; quantity: number }[]
+): Promise<{ valid: boolean; error?: string }> {
+  const supabase = await createClient()
+
+  const productIds = items.map((i) => i.id)
+  const { data: products, error } = await supabase
+    .from('products')
+    .select('id, name, stock_quantity')
+    .in('id', productIds)
+
+  if (error) {
+    return { valid: false, error: 'Error al verificar inventario' }
+  }
+
+  const stockMap = new Map(products?.map((p: any) => [p.id, p]) || [])
+
+  for (const item of items) {
+    const product = stockMap.get(item.id)
+    if (!product) {
+      return { valid: false, error: `Producto no encontrado en el inventario` }
+    }
+    if (product.stock_quantity < item.quantity) {
+      return {
+        valid: false,
+        error: `Stock insuficiente para ${product.name}: disponible ${product.stock_quantity}, requerido ${item.quantity}`,
+      }
+    }
+  }
+
+  return { valid: true }
+}
+
 export async function saveUserAddressAction(
   userId: string,
   addressData: Partial<{
@@ -95,6 +128,22 @@ export async function saveUserAddressAction(
   }>
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient()
+
+  // Check if this exact address already exists for the user
+  const { data: existing } = await supabase
+    .from('addresses')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('address_line1', addressData.address_line1!)
+    .eq('city', addressData.city!)
+    .eq('state', addressData.state!)
+    .is('deleted_at', null)
+    .maybeSingle()
+
+  if (existing) {
+    // Address already exists – skip duplicate
+    return { success: true }
+  }
 
   const { error } = await supabase.from('addresses').insert({
     user_id: userId,

@@ -3,18 +3,22 @@
 import { useState } from "react"
 import { ShoppingCart, Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useStore, type Product } from "@/lib/cart-context"
+import { useStore } from "@/lib/cart-context"
+import type { CatalogProduct } from "@/lib/supabase/types/database"
 
 interface AddToCartSectionProps {
-  product: Product
+  product: CatalogProduct
 }
 
 export function AddToCartSection({ product }: AddToCartSectionProps) {
   const { addToCart } = useStore()
   const [quantity, setQuantity] = useState(1)
 
+  const maxQuantity = product.stockQuantity || 0
+
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
+    if (maxQuantity === 0) return
+    for (let i = 0; i < Math.min(quantity, maxQuantity); i++) {
       addToCart(product)
     }
   }
@@ -31,7 +35,7 @@ export function AddToCartSection({ product }: AddToCartSectionProps) {
         </button>
         <span className="w-14 text-center font-bold text-lg">{quantity}</span>
         <button
-          onClick={() => setQuantity(quantity + 1)}
+          onClick={() => setQuantity(Math.min(maxQuantity || 1, quantity + 1))}
           className="p-3.5 hover:bg-secondary/50 transition-colors"
           aria-label="Aumentar cantidad"
         >
@@ -40,11 +44,12 @@ export function AddToCartSection({ product }: AddToCartSectionProps) {
       </div>
       <Button 
         size="lg" 
+        disabled={maxQuantity === 0}
         className="flex-1 p-5 gap-3 rounded-xl text-base font-bold shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all active:scale-[0.98]"
         onClick={handleAddToCart}
       >
         <ShoppingCart className="h-5 w-5" />
-        Agregar al Carrito
+        {maxQuantity === 0 ? "Agotado" : "Agregar al Carrito"}
       </Button>
     </div>
   )

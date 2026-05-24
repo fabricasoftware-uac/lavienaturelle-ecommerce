@@ -27,7 +27,7 @@ import { useStore } from "@/lib/cart-context"
 import { cn, formatPrice } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { createOrderAction, saveUserAddressAction } from "./actions"
+import { createOrderAction, saveUserAddressAction, validateStockAction } from "./actions"
 import { claimGuestOrdersAction } from "../account/perfil/actions"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
@@ -240,6 +240,14 @@ function CheckoutForm() {
       }
 
       try {
+        // Validate stock before creating the order
+        const stockCheck = await validateStockAction(cart)
+        if (!stockCheck.valid) {
+          toast.error(stockCheck.error || "Stock insuficiente")
+          setIsSubmitting(false)
+          return
+        }
+
         const result = await createOrderAction(orderData, cart)
         
         if (result.success) {
