@@ -15,6 +15,9 @@ DECLARE
     v_order_id UUID;
     v_order_number TEXT;
     v_item JSONB;
+    v_product_id UUID;
+    v_quantity INT;
+    v_stock INT;
 BEGIN
     -- 1. Insert order
     INSERT INTO orders (
@@ -44,21 +47,49 @@ BEGIN
     )
     RETURNING id, order_number INTO v_order_id, v_order_number;
 
-    -- 2. Insert items
+    -- 2. Insert items + decrement stock atomically
     FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
     LOOP
+        v_product_id := (v_item->>'id')::UUID;
+        v_quantity := (v_item->>'quantity')::INT;
+
+        -- Check stock before decrement
+        SELECT stock_quantity INTO v_stock
+        FROM products
+        WHERE id = v_product_id
+        FOR UPDATE;  -- Lock row to prevent race conditions
+
+        IF v_stock IS NULL THEN
+            RAISE EXCEPTION 'Producto no encontrado: %', v_item->>'name';
+        END IF;
+
+        IF v_stock < v_quantity THEN
+            RAISE EXCEPTION 'Stock insuficiente para %: disponible %, requerido %',
+                v_item->>'name', v_stock, v_quantity;
+        END IF;
+
+        -- Insert order item
         INSERT INTO order_items (
             order_id, product_id, quantity, unit_price, total_price,
             product_name_snapshot, product_sku_snapshot
         ) VALUES (
             v_order_id,
-            (v_item->>'id')::UUID,
-            (v_item->>'quantity')::INT,
+            v_product_id,
+            v_quantity,
             (v_item->>'price')::NUMERIC,
-            ((v_item->>'price')::NUMERIC * (v_item->>'quantity')::INT),
+            ((v_item->>'price')::NUMERIC * v_quantity),
             v_item->>'name',
             COALESCE(v_item->>'sku', '')
         );
+
+        -- Decrement stock
+        UPDATE products
+        SET stock_quantity = stock_quantity - v_quantity,
+            status = CASE
+                WHEN stock_quantity - v_quantity <= 0 THEN 'out_of_stock'::product_status
+                ELSE status
+            END
+        WHERE id = v_product_id;
     END LOOP;
 
     RETURN jsonb_build_object('id', v_order_id, 'order_number', v_order_number);
