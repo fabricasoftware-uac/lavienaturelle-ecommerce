@@ -1,5 +1,5 @@
 import { createClient } from "./client"
-import { Order, OrderItem, Address } from "@/types/database"
+import { Order, OrderItem, Address } from "@/lib/supabase/types/database"
 
 export async function createOrder(orderData: Partial<Order>, items: any[]) {
   const supabase = createClient()

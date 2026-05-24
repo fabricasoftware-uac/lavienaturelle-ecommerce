@@ -17,7 +17,7 @@ import { createAddress, updateAddress } from "@/lib/supabase/addresses"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 
-import { Address } from "@/types/database"
+import { Address } from "@/lib/supabase/types/database"
 
 interface AddressDialogProps {
   open: boolean

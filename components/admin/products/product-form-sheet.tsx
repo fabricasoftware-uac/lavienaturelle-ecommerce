@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/sheet"
 import { cn, formatPrice } from "@/lib/utils"
 import { uploadImage, deleteImage } from "@/lib/supabase/storage"
-import { AppProduct, Category } from "@/types/database"
+import { AppProduct, Category } from "@/lib/supabase/types/database"
 
 interface ProductFormSheetProps {
   isOpen: boolean

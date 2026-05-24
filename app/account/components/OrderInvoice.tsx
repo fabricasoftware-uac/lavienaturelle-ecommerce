@@ -1,7 +1,7 @@
 "use client"
 
 import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer"
-import { MappedOrder } from "@/types/database"
+import { MappedOrder } from "@/lib/supabase/types/database"
 import { formatPrice } from "@/lib/utils"
 
 // Register fonts for a more premium look (optional, using standard ones for now)

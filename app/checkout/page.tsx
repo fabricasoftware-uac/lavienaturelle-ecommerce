@@ -28,7 +28,7 @@ import { cn, formatPrice } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { createOrder, saveUserAddress } from "@/lib/supabase/orders"
 import { Loader2 } from "lucide-react"
-import { Order, OrderStatus, PaymentStatus, Address } from "@/types/database"
+import { Order, OrderStatus, PaymentStatus, Address } from "@/lib/supabase/types/database"
 
 type CheckoutStep = "informacion" | "envio" | "pago" | "confirmacion"
 

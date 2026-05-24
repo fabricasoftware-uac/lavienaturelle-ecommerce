@@ -1,6 +1,6 @@
 import { createClient as createServerClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
-import { CatalogProduct, Category, ProductWithDetails } from "@/types/database"
+import { CatalogProduct, Category, ProductWithDetails } from "@/lib/supabase/types/database"
 
 export async function getProducts(): Promise<CatalogProduct[]> {
   // 1. Obtenemos el store de cookies del servidor

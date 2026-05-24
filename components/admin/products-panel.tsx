@@ -10,7 +10,7 @@ import { useProducts } from "@/hooks/use-products"
 import { ProductsTable } from "./products/products-table"
 import { ProductMobileCard } from "./products/product-mobile-card"
 import { ProductFormSheet } from "./products/product-form-sheet"
-import { AppProduct } from "@/types/database"
+import { AppProduct } from "@/lib/supabase/types/database"
 
 const INITIAL_FORM_STATE: Partial<AppProduct> = {
   name: "",

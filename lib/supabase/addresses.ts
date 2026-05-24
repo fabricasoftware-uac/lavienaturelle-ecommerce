@@ -1,5 +1,5 @@
 import { createClient } from "./client"
-import { Address } from "@/types/database"
+import { Address } from "@/lib/supabase/types/database"
 
 export async function getUserAddresses(userId: string): Promise<Address[]> {
   const supabase = createClient()

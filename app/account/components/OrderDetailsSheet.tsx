@@ -12,7 +12,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet"
 
-import { MappedOrder } from "@/types/database"
+import { MappedOrder } from "@/lib/supabase/types/database"
 import { PDFDownloadLink } from "@react-pdf/renderer"
 import { OrderInvoice } from "./OrderInvoice"
 

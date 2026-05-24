@@ -5,7 +5,7 @@ import { Sparkles, Grid3X3, LayoutGrid, ChevronLeft, ChevronRight } from "lucide
 import { ProductCard } from "@/components/product-card"
 import { getCategoryIcon } from "@/lib/products"
 import { cn } from "@/lib/utils"
-import { CatalogProduct, Category } from "@/types/database"
+import { CatalogProduct, Category } from "@/lib/supabase/types/database"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 

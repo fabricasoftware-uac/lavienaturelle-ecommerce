@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn, formatPrice } from "@/lib/utils"
 
-import { MappedOrder } from "@/types/database"
+import { MappedOrder } from "@/lib/supabase/types/database"
 
 interface OrderCardProps {
   order: MappedOrder

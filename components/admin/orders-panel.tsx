@@ -54,7 +54,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { ShipmentModal } from "./shipment-modal"
 import { getOrders, updateOrder, deleteOrder } from "@/lib/supabase/orders"
-import { Order, OrderStatus, PaymentStatus } from "@/types/database"
+import { Order, OrderStatus, PaymentStatus } from "@/lib/supabase/types/database"
 import { getWhatsAppContactLink, getWhatsAppTrackingLink } from "@/lib/whatsapp"
 
 // INITIAL_ORDERS removed - using Supabase data
