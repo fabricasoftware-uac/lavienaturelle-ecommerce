@@ -5,18 +5,17 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Plus, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useStore, type Product } from "@/lib/cart-context"
-import { getCategoryById } from "@/lib/products"
+import { useStore } from "@/lib/cart-context"
 import { cn, formatPrice } from "@/lib/utils"
+import { CatalogProduct } from "@/lib/supabase/types/database"
 
 interface ProductCardProps {
-  product: Product
+  product: CatalogProduct
 }
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useStore()
   const router = useRouter()
-  const category = getCategoryById(product.category)
 
   const handleViewProduct = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -47,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link href={`/producto/${product.id}`} className="block">
         <div className="relative aspect-4/5 overflow-hidden bg-secondary/30">
           <Image
-            src={product.image}
+            src={product.image || "/placeholder.png"}
             alt={product.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -83,7 +82,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="p-5">
         {/* Category */}
         <p className="text-xs text-primary font-medium uppercase tracking-wider mb-2">
-          {category?.name || product.category}
+          {product.categoryName}
         </p>
         
         {/* Title */}

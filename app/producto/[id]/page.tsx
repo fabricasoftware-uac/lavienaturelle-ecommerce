@@ -13,7 +13,6 @@ import {
   Leaf,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Header } from "@/components/navbar"
 import { CartDrawer } from "@/components/cart-drawer"
 import { Footer } from "@/components/footer"
 import { getProductBySlugOrId, getProducts } from "@/lib/supabase/products"
@@ -44,9 +43,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <CartDrawer />
-
       <main className="pt-20">
         {/* Breadcrumb */}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">

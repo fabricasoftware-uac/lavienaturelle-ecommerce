@@ -2,7 +2,7 @@ import { createClient } from "./client"
 import { Order, OrderItem, Address } from "@/lib/supabase/types/database"
 
 export async function createOrder(orderData: Partial<Order>, items: any[]) {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   // 1. Insert order
   if (!orderData.order_number) {
@@ -11,7 +11,7 @@ export async function createOrder(orderData: Partial<Order>, items: any[]) {
 
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .insert([orderData])
+    .insert([orderData as any])
     .select()
     .single()
 
@@ -53,8 +53,7 @@ export async function saveUserAddress(userId: string, addressData: Partial<Addre
     .insert({
       user_id: userId,
       ...addressData,
-      is_default: true,
-    })
+    } as any)
 
   if (error) {
     console.error("Error saving address:", error)

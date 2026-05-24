@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { ShoppingBag, User, Truck, Menu, LogOut, LayoutDashboard, Package, ShoppingCart, Users, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/lib/cart-context"
@@ -28,6 +28,7 @@ const adminNav = [
 
 export function Navbar({ role }: { role: string | null }) {
   const pathname = usePathname()
+  const router = useRouter()
   const { cartCount, setIsCartOpen } = useStore()
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
@@ -82,7 +83,7 @@ export function Navbar({ role }: { role: string | null }) {
             {/* Right */}
             <div className="flex items-center gap-2">
               <div className="hidden sm:block">
-                <NotificationCenter onNavigateToOrders={() => {}} />
+                <NotificationCenter onNavigateToOrders={() => router.push("/admin/pedidos")} />
               </div>
               <Link href="/admin">
                 <Button variant="outline" size="sm" className="hidden sm:inline-flex">
