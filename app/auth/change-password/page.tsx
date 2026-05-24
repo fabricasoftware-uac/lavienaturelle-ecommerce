@@ -5,29 +5,19 @@ import { useRouter } from "next/navigation"
 import { Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useStore } from "@/lib/cart-context"
+import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ChangePasswordPage() {
   const router = useRouter()
-  const { changePassword, user } = useStore()
+  const supabase = createClient()
   const { toast } = useToast()
-  
+
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-
-  // Optional: Redirect if no user is found after a short delay (allowing session to load)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!user) {
-        // We don't redirect immediately to allow the Supabase session to initialize from the URL hash
-      }
-    }, 2000)
-    return () => clearTimeout(timer)
-  }, [user])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,17 +34,17 @@ export default function ChangePasswordPage() {
     }
 
     setIsLoading(true)
-    
-    const result = await changePassword(password)
-    
-    if (result.success) {
+
+    const { error } = await supabase.auth.updateUser({ password })
+
+    if (!error) {
       toast({
         title: "Contraseña actualizada",
         description: "Tu contraseña ha sido restablecida correctamente. Ahora puedes iniciar sesión.",
       })
       router.push("/login")
     } else {
-      setError(result.error || "No se pudo actualizar la contraseña")
+      setError(error.message || "No se pudo actualizar la contraseña")
       setIsLoading(false)
     }
   }
@@ -66,7 +56,7 @@ export default function ChangePasswordPage() {
           <div className="h-16 w-16 bg-stone-900 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-stone-200">
             <ShieldCheck className="h-8 w-8 text-white" />
           </div>
-          
+
           <h1 className="text-3xl font-serif font-bold text-stone-900">Nueva Contraseña</h1>
           <p className="text-stone-500 font-medium">
             Por favor ingresa tu nueva contraseña segura.

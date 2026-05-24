@@ -532,6 +532,13 @@ export interface Database {
         Args: Record<PropertyKey, never>
         Returns: unknown
       }
+      get_order_by_tracking: {
+        Args: {
+          order_num: string
+          doc_num: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       user_role: 'admin' | 'customer'

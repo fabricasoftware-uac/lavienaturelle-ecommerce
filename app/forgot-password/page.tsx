@@ -5,10 +5,10 @@ import Link from "next/link"
 import { Mail, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useStore } from "@/lib/cart-context"
+import { createClient } from "@/lib/supabase/client"
 
 export default function ForgotPasswordPage() {
-  const { resetPassword } = useStore()
+  const supabase = createClient()
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSent, setIsSent] = useState(false)
@@ -18,13 +18,15 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     setError("")
     setIsLoading(true)
-    
-    const result = await resetPassword(email)
-    
-    if (result.success) {
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/change-password`,
+    })
+
+    if (!error) {
       setIsSent(true)
     } else {
-      setError(result.error || "No se pudo enviar el correo de recuperación")
+      setError(error.message || "No se pudo enviar el correo de recuperación")
     }
     setIsLoading(false)
   }
@@ -40,11 +42,11 @@ export default function ForgotPasswordPage() {
             <ArrowLeft className="h-4 w-4" />
             Volver al inicio de sesión
           </Link>
-          
+
           <div className="h-16 w-16 bg-stone-900 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-stone-200">
             <Mail className="h-8 w-8 text-white" />
           </div>
-          
+
           <h1 className="text-3xl font-serif font-bold text-stone-900">¿Olvidaste tu contraseña?</h1>
           <p className="text-stone-500 font-medium">
             No te preocupes, te enviaremos instrucciones para restablecerla.
@@ -62,7 +64,7 @@ export default function ForgotPasswordPage() {
                 Hemos enviado un enlace de recuperación a <strong>{email}</strong>. Por favor, revisa tu bandeja de entrada.
               </p>
             </div>
-            <Button 
+            <Button
               className="w-full rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-12 transition-all"
               onClick={() => setIsSent(false)}
             >

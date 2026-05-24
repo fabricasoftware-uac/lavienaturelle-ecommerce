@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useStore } from "@/lib/cart-context"
+import { createClient } from "@/lib/supabase/client"
 import { createAddress, updateAddress } from "@/lib/supabase/addresses"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
@@ -27,7 +27,10 @@ interface AddressDialogProps {
 }
 
 export function AddressDialog({ open, onOpenChange, address, onSuccess }: AddressDialogProps) {
-  const { user } = useStore()
+  const supabase = createClient()
+  const [userId, setUserId] = useState<string | null>(null)
+  const [userName, setUserName] = useState("")
+  const [userPhone, setUserPhone] = useState("")
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     label: "",
@@ -39,6 +42,16 @@ export function AddressDialog({ open, onOpenChange, address, onSuccess }: Addres
     phone: "",
     is_default: false
   })
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) {
+        setUserId(data.user.id)
+        setUserName(data.user.user_metadata?.full_name || data.user.user_metadata?.name || "")
+        setUserPhone(data.user.user_metadata?.phone || "")
+      }
+    })
+  }, [supabase])
 
   useEffect(() => {
     if (address) {
@@ -55,26 +68,26 @@ export function AddressDialog({ open, onOpenChange, address, onSuccess }: Addres
     } else {
       setFormData({
         label: "",
-        full_name: user?.name || "",
+        full_name: userName,
         address_line1: "",
         city: "",
         state: "",
         country: "Colombia",
-        phone: user?.phone || "",
+        phone: userPhone,
         is_default: false
       })
     }
-  }, [address, user, open])
+  }, [address, userName, userPhone, open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) return
+    if (!userId) return
 
     setLoading(true)
     try {
       const result = address 
-        ? await updateAddress(address.id, { ...formData, user_id: user.id })
-        : await createAddress({ ...formData, user_id: user.id })
+        ? await updateAddress(address.id, { ...formData, user_id: userId })
+        : await createAddress({ ...formData, user_id: userId })
 
       if (result.success) {
         toast.success(address ? "Dirección actualizada" : "Dirección guardada")

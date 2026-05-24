@@ -1,71 +1,9 @@
 import { createClient } from "./client"
-import { Order, Address } from "@/lib/supabase/types/database"
-
-export async function createOrder(orderData: Partial<Order>, items: any[]) {
-  const supabase = await createClient()
-  
-  // 1. Insert order
-  if (!orderData.order_number) {
-    orderData.order_number = `LVN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
-  }
-
-  const { data: order, error: orderError } = await supabase
-    .from('orders')
-    .insert([orderData as any])
-    .select()
-    .single()
-
-  if (orderError) {
-    console.error("Error creating order:", orderError)
-    return { success: false, error: orderError.message }
-  }
-
-  // 2. Insert order items
-  const orderItems = items.map(item => ({
-    order_id: order.id,
-    product_id: item.id,
-    quantity: item.quantity,
-    unit_price: item.price,
-    total_price: item.price * item.quantity,
-    product_name_snapshot: item.name,
-    product_sku_snapshot: item.sku || ''
-  }))
-
-  const { error: itemsError } = await supabase
-    .from('order_items')
-    .insert(orderItems)
-
-  if (itemsError) {
-    console.error("Error creating order items:", itemsError)
-    // Optional: Delete the order if items fail (but Supabase doesn't have transactions across multiple calls easily without RPC)
-    return { success: false, error: itemsError.message }
-  }
-
-  return { success: true, orderId: order.id, orderNumber: order.order_number }
-}
-
-export async function saveUserAddress(userId: string, addressData: Partial<Address>) {
-  const supabase = createClient()
-  
-  // Insert the address for the user
-  const { error } = await supabase
-    .from('addresses')
-    .insert({
-      user_id: userId,
-      ...addressData,
-    } as any)
-
-  if (error) {
-    console.error("Error saving address:", error)
-    return { success: false, error: error.message }
-  }
-
-  return { success: true }
-}
+import type { Order } from "@/lib/supabase/types/database"
 
 export async function getOrders() {
   const supabase = createClient()
-  
+
   const { data, error } = await supabase
     .from('orders')
     .select(`
@@ -84,7 +22,7 @@ export async function getOrders() {
 
 export async function updateOrder(orderId: string, updates: Partial<Order>) {
   const supabase = createClient()
-  
+
   const { error } = await supabase
     .from('orders')
     .update(updates)
@@ -98,38 +36,10 @@ export async function updateOrder(orderId: string, updates: Partial<Order>) {
   return { success: true }
 }
 
-export async function getUserOrders(userId: string) {
-  const supabase = createClient()
-  
-  const { data, error } = await supabase
-    .from('orders')
-    .select(`
-      *,
-      order_items (
-        *,
-        products (
-          product_multimedia (url)
-        )
-      )
-    `)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-
-  if (error) {
-    console.error("Error fetching user orders:", error)
-    return []
-  }
-
-  return data
-}
-
 export async function getOrderByTracking(orderNumber: string, documentNumber: string) {
   const supabase = createClient()
 
-  // Use SECURITY DEFINER RPC to bypass RLS for guest order lookups.
-  // This is safe because the function only returns the exact row matching
-  // both order_number and document_number.
-  const { data, error } = await supabase.rpc('get_order_by_tracking' as any, {
+  const { data, error } = await supabase.rpc('get_order_by_tracking', {
     order_num: orderNumber,
     doc_num: documentNumber,
   })
@@ -139,12 +49,12 @@ export async function getOrderByTracking(orderNumber: string, documentNumber: st
     return null
   }
 
-  return data
+  return data as Record<string, any> | null
 }
 
 export async function deleteOrder(orderId: string) {
   const supabase = createClient()
-  
+
   const { error } = await supabase
     .from('orders')
     .delete()
