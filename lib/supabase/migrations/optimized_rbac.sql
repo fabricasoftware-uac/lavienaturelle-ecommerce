@@ -72,8 +72,9 @@ CREATE POLICY "orders_read_own" ON orders FOR SELECT USING (
     auth.uid() = user_id OR 
     email = auth.jwt() ->> 'email'
 );
--- Admins: Control total (pueden editar tracking, transportadora, etc)
-CREATE POLICY "orders_admin_manage" ON orders FOR ALL USING (is_admin());
+-- Admins: ven todas las órdenes, pueden editar tracking/transportadora
+CREATE POLICY "orders_admin_select" ON orders FOR SELECT USING (is_admin());
+CREATE POLICY "orders_admin_update" ON orders FOR UPDATE USING (is_admin());
 
 -- ORDER ITEMS
 CREATE POLICY "order_items_insert_any" ON order_items FOR INSERT WITH CHECK (true);
@@ -84,7 +85,8 @@ CREATE POLICY "order_items_read_own" ON order_items FOR SELECT USING (
         AND (orders.user_id = auth.uid() OR orders.email = auth.jwt() ->> 'email')
     )
 );
-CREATE POLICY "order_items_admin_manage" ON order_items FOR ALL USING (is_admin());
+CREATE POLICY "order_items_admin_select" ON order_items FOR SELECT USING (is_admin());
+CREATE POLICY "order_items_admin_update" ON order_items FOR UPDATE USING (is_admin());
 
 -- PRODUCT REVIEWS
 CREATE POLICY "reviews_read_public" ON product_reviews FOR SELECT USING (status = 'approved' OR is_admin());
