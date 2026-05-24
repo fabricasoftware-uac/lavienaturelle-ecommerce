@@ -123,7 +123,19 @@ export function Navbar({ role }: { role: string | null }) {
                   </Button>
                 </Link>
                 <Button variant="ghost" size="sm" onClick={() => setShowLogoutDialog(true)} className="text-muted-foreground hover:text-destructive">
-                  Salir
+                  Cerrar sesión
+                </Button>
+              </div>
+            ) : role === "admin" ? (
+              <div className="hidden sm:flex items-center gap-2">
+                <Link href="/admin">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+                    <User className="h-4 w-4 mr-2" />
+                    Panel Admin
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={() => setShowLogoutDialog(true)} className="text-muted-foreground hover:text-destructive">
+                  Cerrar sesión
                 </Button>
               </div>
             ) : (

@@ -86,7 +86,7 @@ export function ProductsPanel() {
     const res = await addCategory(name)
     if (res.success) {
       // Sincronizamos con el slug para mantener consistencia con el resto del flujo
-      setForm((prev) => ({ ...prev, category: res.data.slug }))
+      setForm((prev) => ({ ...prev, category: res.data?.slug }))
     }
   }
 

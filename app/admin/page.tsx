@@ -57,7 +57,7 @@ export default function AdminDashboardPage() {
         ])
 
         if (cancelled) return
-        const monthlyRevenue = (revenueRes.data ?? []).reduce((sum: number, o: { total_amount: string }) => sum + Number(o.total_amount), 0)
+        const monthlyRevenue = (revenueRes.data ?? []).reduce((sum, order) => sum + Number(order.total_amount), 0)
         setStats({
           monthlyRevenue,
           monthlyOrders: monthlyOrdersRes.count ?? 0,
