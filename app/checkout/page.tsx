@@ -27,7 +27,7 @@ import { useStore } from "@/lib/cart-context"
 import { cn, formatPrice } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { createOrder, saveUserAddress } from "@/lib/supabase/orders"
+import { createOrderAction, saveUserAddressAction } from "./actions"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Order, OrderStatus, PaymentStatus, Address } from "@/lib/supabase/types/database"
@@ -238,7 +238,7 @@ function CheckoutForm() {
       }
 
       try {
-        const result = await createOrder(orderData, cart)
+        const result = await createOrderAction(orderData, cart)
         
         if (result.success) {
           // Store summary and order ID before clearing
@@ -256,8 +256,7 @@ function CheckoutForm() {
 
           // Save address if user is logged in
           if (user?.id) {
-            const { saveUserAddress } = await import("@/lib/supabase/orders")
-            await saveUserAddress(user.id, {
+            await saveUserAddressAction(user.id, {
               address_line1: formData.address,
               address_line2: formData.apartment,
               city: formData.city,
