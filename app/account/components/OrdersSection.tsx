@@ -14,7 +14,7 @@ interface OrdersSectionProps {
 }
 
 export function OrdersSection({ onViewDetails, onTrack }: OrdersSectionProps) {
-  const { user } = useStore()
+  
   const [orders, setOrders] = useState<MappedOrder[]>([])
   const [loading, setLoading] = useState(true)
 
