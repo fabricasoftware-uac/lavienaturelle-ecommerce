@@ -29,6 +29,16 @@ export async function getUserOrdersAction(): Promise<MappedOrder[]> {
     return []
   }
 
+  const statusLabel: Record<string, string> = {
+    pending: 'Pendiente',
+    paid: 'Pagado',
+    processing: 'Procesando',
+    shipped: 'Enviado',
+    delivered: 'Entregado',
+    cancelled: 'Cancelado',
+    refunded: 'Reembolsado',
+  }
+
   return (data as OrderWithDetails[]).map((o) => {
     const status = o.status || 'pending'
     return {
@@ -38,7 +48,7 @@ export async function getUserOrdersAction(): Promise<MappedOrder[]> {
       phone: o.phone ?? null,
       productName: o.order_items?.[0]?.product_name_snapshot || 'Pedido',
       mainImage: o.order_items?.[0]?.products?.product_multimedia?.[0]?.url || '/logo-script.png',
-      status: status.charAt(0).toUpperCase() + status.slice(1),
+      status: statusLabel[status] || status,
       statusColor: status === 'delivered' ? 'green' : status === 'shipped' ? 'blue' : 'amber',
       tracking_number: o.tracking_number ?? null,
       courier_name: o.courier_name ?? null,

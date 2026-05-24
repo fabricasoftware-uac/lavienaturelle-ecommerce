@@ -44,12 +44,22 @@ function TrackingContent() {
     try {
       const data = await getOrderByTracking(oId, dNum)
       
+      const statusLabel: Record<string, string> = {
+        pending: 'Pendiente',
+        paid: 'Pagado',
+        processing: 'Procesando',
+        shipped: 'Enviado',
+        delivered: 'Entregado',
+        cancelled: 'Cancelado',
+        refunded: 'Reembolsado',
+      }
+
       if (data) {
-        const status = data.status || 'pending'
+        const status = (data.status as string) || 'pending'
         const mappedOrder = {
           id: data.order_number || data.id,
           realId: data.id,
-          status: status.charAt(0).toUpperCase() + status.slice(1),
+          status: statusLabel[status] || status,
           statusColor: status === 'delivered' ? 'green' : status === 'shipped' ? 'blue' : 'amber',
           trackingId: data.tracking_number || "No generado",
           carrier: data.courier_name || "N/A",
