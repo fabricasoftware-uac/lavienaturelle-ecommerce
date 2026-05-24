@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import {
   Leaf,
   LayoutDashboard,
@@ -11,14 +11,11 @@ import {
   Users,
   TrendingUp,
   LogOut,
-  Search,
   Menu,
   X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { NotificationCenter } from "@/components/admin/notification-center"
 import { LogoutDialog } from "@/components/logout-dialog"
 
 const navigation = [
@@ -31,7 +28,6 @@ const navigation = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
@@ -62,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center justify-between h-16 px-4 border-b border-border">
             <Link href="/" className="flex items-center gap-2">
               <Leaf className="h-7 w-7 text-primary" />
-              <span className="font-serif text-lg font-semibold text-foreground">Admin</span>
+              <span className="font-serif text-lg font-semibold text-foreground">La Vie Naturelle</span>
             </Link>
             <Button
               variant="ghost"
@@ -113,32 +109,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Top Bar */}
         <header className="sticky top-0 z-30 bg-card/95 backdrop-blur border-b border-border">
           <div className="flex items-center justify-between h-16 px-4 sm:px-6">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              <div className="relative hidden sm:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Buscar..."
-                  className="pl-10 w-64 bg-secondary/50"
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <NotificationCenter onNavigateToOrders={() => router.push("/admin/pedidos")} />
-              <Link href="/">
-                <Button variant="outline" size="sm">
-                  Ver Tienda
-                </Button>
-              </Link>
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
           </div>
         </header>
 

@@ -68,8 +68,10 @@ export function ClientsPanel() {
         const { data: profiles } = await supabase
           .from("profiles")
           .select("*")
+          .eq("role", "customer")
           .is("deleted_at", null)
-          .order("created_at", { ascending: false })
+          .order("created_at", { ascending: false }
+          )
 
         const profilesWithOrders: ClientData[] = []
         if (profiles && profiles.length > 0) {
@@ -80,18 +82,20 @@ export function ClientsPanel() {
             .in("user_id", profileIds)
             .order("created_at", { ascending: false })
 
-          const ordersByUser: Record<string, typeof allOrders> = {}
+          const ordersByUser: Record<string, any[]> = {}
           const orderCountByUser: Record<string, number> = {}
 
           for (const o of allOrders ?? []) {
-            if (!ordersByUser[o.user_id]) {
-              ordersByUser[o.user_id] = []
-              orderCountByUser[o.user_id] = 0
+            if (!o || o.user_id == null) continue
+            const uid = String(o.user_id)
+            if (!ordersByUser[uid]) {
+              ordersByUser[uid] = []
+              orderCountByUser[uid] = 0
             }
-            if (ordersByUser[o.user_id].length < 10) {
-              ordersByUser[o.user_id].push(o)
+            if (ordersByUser[uid].length < 10) {
+              ordersByUser[uid].push(o)
             }
-            orderCountByUser[o.user_id]++
+            orderCountByUser[uid]++
           }
 
           for (const p of profiles) {
