@@ -1,5 +1,6 @@
 'use server'
 
+import { randomUUID } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { Order, OrderStatus, PaymentStatus } from '@/lib/supabase/types/database'
 
@@ -25,17 +26,17 @@ export async function createOrderAction(
   const supabase = await createClient()
 
   try {
-    // 1. Generate order number if not provided
+    // 1. Generate order number and id if not provided
     if (!orderData.order_number) {
       orderData.order_number = `LVN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
     }
+    const orderId = orderData.id ?? randomUUID()
+    const orderDataWithId = { ...orderData, id: orderId }
 
-    // 2. Insert order
-    const { data: order, error: orderError } = await supabase
+    // 2. Insert order (no .select() to avoid RLS SELECT denial for anon users)
+    const { error: orderError } = await supabase
       .from('orders')
-      .insert([orderData as any])
-      .select()
-      .single()
+      .insert([orderDataWithId as any])
 
     if (orderError) {
       console.error('Error creating order:', orderError)
@@ -44,7 +45,7 @@ export async function createOrderAction(
 
     // 3. Insert order items
     const orderItems = items.map((item) => ({
-      order_id: order.id,
+      order_id: orderId,
       product_id: item.id,
       quantity: item.quantity,
       unit_price: item.price,
@@ -64,8 +65,8 @@ export async function createOrderAction(
 
     return {
       success: true,
-      orderId: order.id,
-      orderNumber: order.order_number,
+      orderId,
+      orderNumber: orderData.order_number,
     }
   } catch (err: any) {
     console.error('Unexpected error creating order:', err)

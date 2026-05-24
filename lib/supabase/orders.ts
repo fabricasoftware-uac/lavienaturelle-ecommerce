@@ -125,16 +125,14 @@ export async function getUserOrders(userId: string) {
 
 export async function getOrderByTracking(orderNumber: string, documentNumber: string) {
   const supabase = createClient()
-  
-  const { data, error } = await supabase
-    .from('orders')
-    .select(`
-      *,
-      order_items (*)
-    `)
-    .eq('order_number', orderNumber.toUpperCase())
-    .eq('document_number', documentNumber)
-    .single()
+
+  // Use SECURITY DEFINER RPC to bypass RLS for guest order lookups.
+  // This is safe because the function only returns the exact row matching
+  // both order_number and document_number.
+  const { data, error } = await supabase.rpc('get_order_by_tracking', {
+    order_num: orderNumber,
+    doc_num: documentNumber,
+  })
 
   if (error) {
     console.error("Error fetching tracking order:", error)
