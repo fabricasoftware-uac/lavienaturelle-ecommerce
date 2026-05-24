@@ -129,7 +129,7 @@ export async function getOrderByTracking(orderNumber: string, documentNumber: st
   // Use SECURITY DEFINER RPC to bypass RLS for guest order lookups.
   // This is safe because the function only returns the exact row matching
   // both order_number and document_number.
-  const { data, error } = await supabase.rpc('get_order_by_tracking', {
+  const { data, error } = await supabase.rpc('get_order_by_tracking' as any, {
     order_num: orderNumber,
     doc_num: documentNumber,
   })
