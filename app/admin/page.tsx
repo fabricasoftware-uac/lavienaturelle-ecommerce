@@ -104,74 +104,72 @@ export default function AdminDashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {(() => {
-          const safeStats = stats ?? {
-            monthlyRevenue: 0,
-            monthlyOrders: 0,
-            pendingOrders: 0,
-            lowStock: 0,
-          }
+          {(() => {
+            const safeStats = stats ?? {
+              monthlyRevenue: 0,
+              monthlyOrders: 0,
+              pendingOrders: 0,
+              lowStock: 0,
+            }
 
-          return [
-            { icon: DollarSign, value: new Intl.NumberFormat("es-ES", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(safeStats.monthlyRevenue), label: "Ingresos del Mes", change: "Últimos 30 días" },
-            { icon: ShoppingCart, value: safeStats.monthlyOrders, label: "Pedidos del Mes", change: "Volumen de ventas" },
-            { icon: Clock, value: safeStats.pendingOrders, label: "Pendientes por Enviar", change: safeStats.pendingOrders > 0 ? "Requiere atención" : "Sin pendientes" },
-            { icon: Package, value: safeStats.lowStock, label: "Stock Bajo", change: safeStats.lowStock > 0 ? "Reabastecer" : "Sin novedad" },
-          ]
-        })().map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-card rounded-xl p-6 border border-border"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <stat.icon className="h-5 w-5 text-primary" />
+            return [
+              { icon: DollarSign, value: new Intl.NumberFormat("es-ES", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(safeStats.monthlyRevenue), label: "Ingresos del Mes", change: "Últimos 30 días" },
+              { icon: ShoppingCart, value: safeStats.monthlyOrders, label: "Pedidos del Mes", change: "Volumen de ventas" },
+              { icon: Clock, value: safeStats.pendingOrders, label: "Pendientes por Enviar", change: safeStats.pendingOrders > 0 ? "Requiere atención" : "Sin pendientes" },
+              { icon: Package, value: safeStats.lowStock, label: "Stock Bajo", change: safeStats.lowStock > 0 ? "Reabastecer" : "Sin novedad" },
+            ]
+          })().map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-card rounded-2xl p-6 border border-border shadow-sm group hover:border-primary/20 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="h-12 w-12 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center shadow-inner transition-transform group-hover:scale-110">
+                  <stat.icon className="h-5 w-5 text-primary" />
+                </div>
+                <span
+                  className={cn(
+                    "inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-lg",
+                    stat.change === "Últimos 30 días" || stat.change === "Volumen de ventas" ? "text-blue-600 bg-blue-50" :
+                    stat.change === "Requiere atención" ? "text-amber-600 bg-amber-50" :
+                    stat.change === "Reabastecer" ? "text-red-600 bg-red-50" :
+                    "text-green-600 bg-green-50"
+                  )}
+                >
+                  {stat.change}
+                </span>
               </div>
-              <span
-                className={cn(
-                  "inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md",
-                  "text-amber-600 bg-amber-50"
-                )}
-              >
-                {stat.change}
-              </span>
+              <div>
+                <p className="text-2xl font-bold text-foreground tabular-nums leading-none tracking-tight">{loading ? "..." : stat.value}</p>
+                <p className="text-xs font-bold text-muted-foreground mt-2 uppercase tracking-tighter opacity-80">{stat.label}</p>
+              </div>
             </div>
-            <p className="text-2xl font-semibold text-foreground">{loading ? "..." : stat.value}</p>
-            <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-card rounded-xl border border-border">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="font-medium text-foreground">Pedidos Recientes</h2>
-          <Button variant="ghost" size="sm" className="text-primary">
+      <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">Pedidos Recientes</h2>
+            <p className="text-xs font-medium text-muted-foreground">Últimos 5 pedidos registrados.</p>
+          </div>
+          <Button variant="ghost" size="sm" className="text-primary font-bold">
             Ver todos
           </Button>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-border">
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Pedido
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Cliente
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Total
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Estado
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Fecha
-                </th>
+              <tr className="text-[9px] font-bold text-muted-foreground uppercase opacity-60">
+                <th className="px-6 py-3">Pedido</th>
+                <th className="px-6 py-3">Cliente</th>
+                <th className="px-6 py-3">Total</th>
+                <th className="px-6 py-3">Estado</th>
+                <th className="px-6 py-3">Fecha</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-border/40">
               {loading ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center text-sm text-muted-foreground">
@@ -186,20 +184,20 @@ export default function AdminDashboardPage() {
                 </tr>
               ) : (
                 recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-secondary/30">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                  <tr key={order.id} className="hover:bg-muted/50 transition-colors group">
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-foreground">
                       {order.id}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-muted-foreground">
                       {order.customer}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-foreground">
                       {order.total}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold">
                       <span
                         className={cn(
-                          "inline-flex px-2.5 py-1 rounded-full text-xs font-medium",
+                          "inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold",
                           order.statusRaw === "Entregado" && "bg-green-100 text-green-700",
                           order.statusRaw === "Procesando" && "bg-blue-100 text-blue-700",
                           order.statusRaw === "Enviado"    && "bg-purple-100 text-purple-700",
@@ -210,7 +208,7 @@ export default function AdminDashboardPage() {
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-muted-foreground">
                       {order.date}
                     </td>
                   </tr>
