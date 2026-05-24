@@ -623,6 +623,7 @@ export interface MappedOrder {
   productName: string
   mainImage: string
   status: string
+  statusRaw: string
   statusColor: "green" | "blue" | "amber"
   trackingId: string
   carrier: string

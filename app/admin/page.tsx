@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { StatusBadge } from "@/components/status-badge"
 import { createClient } from "@/lib/supabase/client"
 
 interface DashboardStats {
@@ -194,19 +195,8 @@ export default function AdminDashboardPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-foreground">
                       {order.total}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold">
-                      <span
-                        className={cn(
-                          "inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold",
-                          order.statusRaw === "Entregado" && "bg-green-100 text-green-700",
-                          order.statusRaw === "Procesando" && "bg-blue-100 text-blue-700",
-                          order.statusRaw === "Enviado"    && "bg-purple-100 text-purple-700",
-                          order.statusRaw === "Pendiente"  && "bg-yellow-100 text-yellow-700",
-                          order.statusRaw === "Pagado" && "bg-teal-100 text-teal-700"
-                        )}
-                      >
-                        {order.status}
-                      </span>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <StatusBadge status={order.statusRaw} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-muted-foreground">
                       {order.date}

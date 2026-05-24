@@ -2,8 +2,8 @@
 
 import { MapPin, CreditCard } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { cn, formatPrice } from "@/lib/utils"
+import { StatusBadge } from "@/components/status-badge"
 import {
   Sheet,
   SheetContent,
@@ -31,14 +31,7 @@ export function OrderDetailsSheet({ order, open, onOpenChange, onTrack }: OrderD
       <SheetContent className="sm:max-w-md border-none bg-[#FDFCFB]">
         <SheetHeader className="p-6">
           <div className="flex items-center gap-3 mb-2">
-            <Badge variant="outline" className={cn(
-              "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-lg border-none",
-              order?.statusColor === "green" ? "bg-green-50 text-green-600" :
-              order?.statusColor === "blue" ? "bg-blue-50 text-blue-600" :
-              "bg-amber-50 text-amber-600"
-            )}>
-              {order?.status}
-            </Badge>
+            <StatusBadge status={order.statusRaw} />
             <span className="text-xs font-medium text-stone-400">#{order?.id}</span>
           </div>
           <SheetTitle className="text-2xl font-serif font-bold text-stone-900">Detalles del Pedido</SheetTitle>

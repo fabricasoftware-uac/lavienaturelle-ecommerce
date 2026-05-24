@@ -49,6 +49,7 @@ export async function getUserOrdersAction(): Promise<MappedOrder[]> {
       productName: o.order_items?.[0]?.product_name_snapshot || 'Pedido',
       mainImage: o.order_items?.[0]?.products?.product_multimedia?.[0]?.url || '/logo-script.png',
       status: statusLabel[status] || status,
+      statusRaw: status,
       statusColor: status === 'delivered' ? 'green' : status === 'shipped' ? 'blue' : 'amber',
       tracking_number: o.tracking_number ?? null,
       courier_name: o.courier_name ?? null,

@@ -2,9 +2,8 @@
 
 import { ShoppingBag, Truck, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { cn, formatPrice } from "@/lib/utils"
-
+import { StatusBadge } from "@/components/status-badge"
 import { MappedOrder } from "@/lib/supabase/types/database"
 
 interface OrderCardProps {
@@ -24,17 +23,10 @@ export function OrderCard({ order, onViewDetails, onTrack }: OrderCardProps) {
           <div className="flex-1 flex flex-col justify-between py-1">
              <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <div>
-                   <div className="flex items-center gap-3 mb-1.5">
-                      <h3 className="text-sm font-bold text-stone-900 line-clamp-1">{order.productName}</h3>
-                      <Badge variant="outline" className={cn(
-                        "text-[9px] font-bold uppercase tracking-widest border-none px-2.5 py-0.5 rounded-lg",
-                        order.statusColor === "green" ? "bg-green-50 text-green-600" :
-                        order.statusColor === "blue" ? "bg-blue-50 text-blue-600" :
-                        "bg-amber-50 text-amber-600"
-                      )}>
-                        {order.status}
-                      </Badge>
-                   </div>
+                    <div className="flex items-center gap-3 mb-1.5">
+                       <h3 className="text-sm font-bold text-stone-900 line-clamp-1">{order.productName}</h3>
+                       <StatusBadge status={order.statusRaw} />
+                    </div>
                    <div className="flex flex-wrap items-center gap-y-1 gap-x-4">
                       <p className="text-xs font-medium text-stone-400 flex items-center gap-1.5">
                         <ShoppingBag className="h-3 w-3" />

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { getWhatsAppTrackingLink, getWhatsAppHelpLink } from "@/lib/whatsapp"
 import { cn } from "@/lib/utils"
+import { StatusBadge } from "@/components/status-badge"
 import { toast } from "sonner"
 import { getOrderByTracking } from "@/lib/supabase/orders"
 import { useSearchParams, useRouter } from "next/navigation"
@@ -60,6 +61,7 @@ function TrackingContent() {
           id: data.order_number || data.id,
           realId: data.id,
           status: statusLabel[status] || status,
+          statusRaw: status,
           statusColor: status === 'delivered' ? 'green' : status === 'shipped' ? 'blue' : 'amber',
           trackingId: data.tracking_number || "No generado",
           carrier: data.courier_name || "N/A",
@@ -184,14 +186,7 @@ function TrackingContent() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Estado del Envío</p>
-                      <Badge variant="outline" className={cn(
-                        "text-[10px] font-bold uppercase tracking-widest border-none px-3 py-1 rounded-full",
-                        order.statusColor === "green" ? "bg-green-50 text-green-600" :
-                        order.statusColor === "blue" ? "bg-blue-50 text-blue-600" :
-                        "bg-amber-50 text-amber-600"
-                      )}>
-                        {order.status}
-                      </Badge>
+                      <StatusBadge status={order.statusRaw} />
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Fecha</p>

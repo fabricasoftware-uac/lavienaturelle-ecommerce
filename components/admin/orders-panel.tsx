@@ -55,6 +55,7 @@ import {
 import { ShipmentModal } from "./shipment-modal"
 import { getOrders, updateOrder, deleteOrder } from "@/lib/supabase/orders"
 import { Order, OrderStatus, PaymentStatus } from "@/lib/supabase/types/database"
+import { StatusBadge } from "@/components/status-badge"
 import { getWhatsAppContactLink, getWhatsAppTrackingLink } from "@/lib/whatsapp"
 
 // INITIAL_ORDERS removed - using Supabase data
@@ -329,20 +330,6 @@ export function OrdersPanel() {
     return matchesSearch && order.shippingStatus === statusFilter
   })
 
-  const getShippingBadge = (status: string) => {
-    const s = status.toLowerCase()
-    switch (s) {
-      case "pending": return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 font-medium">Pendiente</Badge>
-      case "paid": return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-medium">Pagado</Badge>
-      case "processing": return <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 font-medium">Procesando</Badge>
-      case "shipped": return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 font-medium">Enviado</Badge>
-      case "delivered": return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">Entregado</Badge>
-      case "cancelled": return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 font-medium">Cancelado</Badge>
-      case "refunded": return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 font-medium">Reembolsado</Badge>
-      default: return <Badge variant="outline">{status}</Badge>
-    }
-  }
-
   const getPaymentBadge = (status: string) => {
     const s = status.toLowerCase()
     switch (s) {
@@ -425,7 +412,7 @@ export function OrdersPanel() {
                   </div>
                 </td>
                 <td className="px-6 py-4 text-xs text-muted-foreground">{new Date(order.date).toLocaleDateString()}</td>
-                <td className="px-6 py-4">{getShippingBadge(order.shippingStatus)}</td>
+                <td className="px-6 py-4"><StatusBadge status={order.shippingStatus.toLowerCase()} /></td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-2">
                     {order.shippingStatus !== "Shipped" && order.shippingStatus !== "Delivered" && (
@@ -500,7 +487,7 @@ export function OrdersPanel() {
                 </div>
                 {!isEditing ? (
                   <div className="flex gap-4">
-                    {getShippingBadge(selectedOrder.shippingStatus)}
+                    <StatusBadge status={selectedOrder.shippingStatus.toLowerCase()} />
                     {getPaymentBadge(selectedOrder.paymentStatus)}
                   </div>
                 ) : (

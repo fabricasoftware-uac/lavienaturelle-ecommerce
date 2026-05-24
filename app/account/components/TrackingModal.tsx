@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Package, Truck, MessageCircle, AlertCircle, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { StatusBadge } from "@/components/status-badge"
 import { getWhatsAppTrackingLink } from "@/lib/whatsapp"
 import { cn } from "@/lib/utils"
 import { Order } from "@/lib/supabase/types/database"
@@ -60,14 +60,7 @@ export function TrackingModal({ order, open, onOpenChange }: TrackingModalProps)
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Estado Actual</p>
-              <Badge variant="outline" className={cn(
-                "text-[10px] font-bold uppercase tracking-widest border-none px-3 py-1 rounded-full",
-                order.statusColor === "green" ? "bg-green-50 text-green-600" :
-                order.statusColor === "blue" ? "bg-blue-50 text-blue-600" :
-                "bg-amber-50 text-amber-600"
-              )}>
-                {order.status}
-              </Badge>
+              <StatusBadge status={order.statusRaw} />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
