@@ -28,6 +28,7 @@ import { cn, formatPrice } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { createOrderAction, saveUserAddressAction } from "./actions"
+import { claimGuestOrdersAction } from "../account/perfil/actions"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Order, OrderStatus, PaymentStatus, Address } from "@/lib/supabase/types/database"
@@ -189,6 +190,7 @@ function CheckoutForm() {
     })
 
     if (!error) {
+      await claimGuestOrdersAction()
       setRegistrationSuccess(true)
       setTimeout(() => {
         setShowRegisterModal(false)

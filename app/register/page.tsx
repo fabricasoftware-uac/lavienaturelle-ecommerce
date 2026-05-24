@@ -7,6 +7,7 @@ import { Leaf, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2, Phone } f
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
+import { claimGuestOrdersAction } from "@/app/account/perfil/actions"
 import Image from "next/image"
 
 function RegisterForm() {
@@ -54,6 +55,7 @@ function RegisterForm() {
     })
     
     if (!signUpError) {
+      await claimGuestOrdersAction()
       setIsSuccess(true)
       setTimeout(() => {
         router.push("/")

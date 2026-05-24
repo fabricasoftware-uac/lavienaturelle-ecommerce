@@ -546,6 +546,13 @@ export interface Database {
         }
         Returns: Json
       }
+      claim_guest_orders: {
+        Args: {
+          p_email: string
+          p_user_id: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       user_role: 'admin' | 'customer'

@@ -80,3 +80,24 @@ export async function changePasswordAction(
 
   return { success: true }
 }
+
+export async function claimGuestOrdersAction(): Promise<{ count: number }> {
+  const supabase = await createClient()
+
+  const { data } = await supabase.auth.getClaims()
+  const userId = data?.claims?.sub
+  const email = data?.claims?.email
+  if (!userId || !email) return { count: 0 }
+
+  const { data: count, error } = await supabase.rpc('claim_guest_orders', {
+    p_email: email,
+    p_user_id: userId,
+  })
+
+  if (error) {
+    console.error('Error claiming guest orders:', error)
+    return { count: 0 }
+  }
+
+  return { count: count ?? 0 }
+}
