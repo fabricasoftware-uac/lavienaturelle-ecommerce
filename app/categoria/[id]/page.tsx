@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { Header } from "@/components/header"
+import { Header } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { CartDrawer } from "@/components/cart-drawer"
 import { getProducts, getCategories } from "@/lib/supabase/products"

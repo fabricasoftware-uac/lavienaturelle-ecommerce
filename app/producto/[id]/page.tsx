@@ -13,7 +13,7 @@ import {
   Leaf,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Header } from "@/components/header"
+import { Header } from "@/components/navbar"
 import { CartDrawer } from "@/components/cart-drawer"
 import { Footer } from "@/components/footer"
 import { getProductBySlugOrId, getProducts } from "@/lib/supabase/products"

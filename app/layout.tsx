@@ -2,7 +2,11 @@ import type { Metadata } from 'next'
 import { Playfair_Display, Montserrat } from 'next/font/google'
 import { StoreProvider } from '@/lib/cart-context'
 import { Toaster } from '@/components/ui/toaster'
+import { createClient } from "@/lib/supabase/server"
 import './globals.css'
+import { Navbar } from '@/components/navbar'
+
+
 
 const playfair = Playfair_Display({ 
   subsets: ["latin"],
@@ -21,15 +25,19 @@ export const metadata: Metadata = {
   description: 'Descubre productos naturales premium - Shampoo, Acondicionador, Tónicos, Aceites y mas.',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.getClaims()
+  const role = data?.claims.app_metadata?.role || null
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${montserrat.variable} font-sans antialiased`} suppressHydrationWarning>
         <StoreProvider>
+          <Navbar role={role} />
           {children}
           <Toaster />
         </StoreProvider>

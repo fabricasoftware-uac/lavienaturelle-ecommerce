@@ -18,3 +18,7 @@ export async function loginAction(email: string, password: string) {
   
   return { success: true, role }
 }
+export async function logoutAction() {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+}

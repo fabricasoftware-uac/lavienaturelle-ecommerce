@@ -15,8 +15,8 @@ import {
 import { LogoutDialog } from "@/components/logout-dialog"
 import { useState } from "react"
 
-export function Header() {
-  const { cartCount, setIsCartOpen, user } = useStore()
+export function Navbar({ role }: { role: string | null }) {
+  const { cartCount, setIsCartOpen } = useStore()
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
   return (
@@ -56,14 +56,14 @@ export function Header() {
                   
                   <div className="h-px bg-border my-2" />
                   
-                  {user ? (
+                  {role === "admin" ? (
                     <div className="flex flex-col gap-4">
                       <Link 
-                        href={user.role === "admin" ? "/admin" : "/account"}
+                        href="/admin"
                         className="flex items-center gap-3 text-lg font-medium text-foreground hover:text-primary transition-colors"
                       >
                         <User className="h-5 w-5 text-stone-500" />
-                        Mi Cuenta
+                        Panel de Administración
                       </Link>
                       <button 
                         onClick={() => setShowLogoutDialog(true)}
@@ -114,12 +114,12 @@ export function Header() {
             </Link>
 
             {/* User Account */}
-            {user ? (
+            {role === "customer" ? (
               <div className="hidden sm:flex items-center gap-2">
-                <Link href={user.role === "admin" ? "/admin" : "/account"}>
+                <Link href="/account">
                   <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
                     <User className="h-4 w-4 mr-2" />
-                    {user.name}
+                    Mi cuenta
                   </Button>
                 </Link>
                 <Button variant="ghost" size="sm" onClick={() => setShowLogoutDialog(true)} className="text-muted-foreground hover:text-destructive">

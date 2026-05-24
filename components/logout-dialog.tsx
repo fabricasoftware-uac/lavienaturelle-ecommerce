@@ -1,5 +1,6 @@
 "use client"
 
+import { logoutAction } from "@/app/login/actions"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,14 +20,13 @@ interface LogoutDialogProps {
 }
 
 export function LogoutDialog({ open, onOpenChange }: LogoutDialogProps) {
-  const { logout } = useStore()
   const router = useRouter()
 
   const handleLogout = async () => {
-    await logout()
+    await logoutAction()
     onOpenChange(false)
-    // Use window.location.href for a full refresh to clear all session states and cookies
-    window.location.href = "/"
+    router.push("/login")
+    router.refresh()
   }
 
   return (
