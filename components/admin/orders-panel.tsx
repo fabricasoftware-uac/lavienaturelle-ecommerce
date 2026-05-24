@@ -63,8 +63,7 @@ export function OrdersPanel() {
   const [orders, setOrders] = useState<any[]>([]) // Keeping any[] for the mapped UI structure but could define a UIOther interface
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [shippingFilter, setShippingFilter] = useState("All")
-  const [paymentFilter, setPaymentFilter] = useState("All")
+  const [statusFilter, setStatusFilter] = useState("All")
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -182,6 +181,37 @@ export function OrdersPanel() {
     setShipmentModalOrder(null)
   }
 
+  const handleConfirmDelivery = async (order: any) => {
+    if (!order) return
+
+    const res = await updateOrder(order.realId, {
+      status: "delivered",
+    })
+
+    if (res.success) {
+      setOrders(prev => prev.map(o =>
+        o.realId === order.realId
+          ? {
+              ...o,
+              shippingStatus: "Delivered" as const,
+              history: [
+                { status: "Delivered", date: new Date().toISOString() },
+                ...o.history,
+              ],
+            }
+          : o
+      ))
+
+      toast.success("Pedido actualizado", {
+        description: `El pedido ${order.id} ha sido marcado como entregado.`,
+      })
+    } else {
+      toast.error("Error al actualizar", {
+        description: res.error,
+      })
+    }
+  }
+
   const handleOpenDetail = (order: any) => {
     setSelectedOrder(order)
     setEditForm({
@@ -294,9 +324,9 @@ export function OrdersPanel() {
 
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) || order.customer.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesShipping = shippingFilter === "All" || order.shippingStatus === shippingFilter
-    const matchesPayment = paymentFilter === "All" || order.paymentStatus === paymentFilter
-    return matchesSearch && matchesShipping && matchesPayment
+    if (statusFilter === "All") return matchesSearch
+    if (statusFilter === "Paid") return matchesSearch && (order.shippingStatus === "Paid" || order.paymentStatus === "Paid" || order.paymentStatus === "Completed")
+    return matchesSearch && order.shippingStatus === statusFilter
   })
 
   const getShippingBadge = (status: string) => {
@@ -351,33 +381,16 @@ export function OrdersPanel() {
               className="pl-10 bg-secondary/30 border-none h-10 rounded-lg text-sm"
             />
           </div>
-          <div className="flex items-center gap-4">
-            <select
-              value={shippingFilter}
-              onChange={(e) => setShippingFilter(e.target.value)}
-              className="bg-secondary/30 rounded-lg px-2 py-1.5 text-xs font-medium border-none h-9 outline-none"
-            >
-              <option value="All">Todos los envíos</option>
-              <option value="Pending">Pendiente</option>
-              <option value="Paid">Pagado</option>
-              <option value="Processing">Procesando</option>
-              <option value="Shipped">Enviado</option>
-              <option value="Delivered">Entregado</option>
-              <option value="Cancelled">Cancelado</option>
-              <option value="Refunded">Reembolsado</option>
-            </select>
-            <select
-              value={paymentFilter}
-              onChange={(e) => setPaymentFilter(e.target.value)}
-              className="bg-secondary/30 rounded-lg px-2 py-1.5 text-xs font-medium border-none h-9 outline-none"
-            >
-              <option value="All">Todos los pagos</option>
-              <option value="Paid">Pagado</option>
-              <option value="Pending">Pendiente</option>
-              <option value="Failed">Fallido</option>
-              <option value="Refunded">Reembolsado</option>
-            </select>
-          </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="bg-secondary/30 rounded-lg px-3 py-1.5 text-xs font-medium border-none h-9 outline-none"
+          >
+            <option value="All">Todos</option>
+            <option value="Paid">Pagado</option>
+            <option value="Shipped">Enviado</option>
+            <option value="Delivered">Entregado</option>
+          </select>
         </div>
       </div>
 
@@ -423,6 +436,17 @@ export function OrdersPanel() {
                         className="bg-primary text-white hover:bg-primary/90 h-8 text-xs font-semibold px-3 rounded-lg cursor-pointer"
                       >
                         Enviar
+                      </Button>
+                    )}
+                    {order.shippingStatus === "Shipped" && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleConfirmDelivery(order)}
+                        className="bg-green-600 text-white hover:bg-green-700 h-8 text-xs font-semibold px-3 rounded-lg cursor-pointer"
+                      >
+                        <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
+                        Entregar
                       </Button>
                     )}
                     <Button 
