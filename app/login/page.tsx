@@ -7,6 +7,7 @@ import { Leaf, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/store-context"
+import { loginAction } from "./actions"
 
 function LoginForm() {
   const router = useRouter()
@@ -22,17 +23,13 @@ function LoginForm() {
     setError("")
     setIsLoading(true)
     
-    const result = await login(email, password)
+    const result = await loginAction(email, password)
     
     if (result.success) {
-      const session = await getUserSession()
-      if (session?.user.app_metadata.role === "admin") {
-        router.push("/admin")
-      } else {
-        router.push("/account")
-      }
+      router.push("/")
+      router.refresh()
     } else {
-      setError(result.error || "Correo o contrasena invalidos")
+      setError(result.error || "Correo o contraseña inválidos")
       setIsLoading(false)
     }
   }

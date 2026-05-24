@@ -3,11 +3,12 @@ import { cookies } from "next/headers"
 import { CatalogProduct, Category, ProductWithDetails } from "@/types/database"
 
 export async function getProducts(): Promise<CatalogProduct[]> {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(cookieStore)
+  // 1. Obtenemos el store de cookies del servidor
+  // 2. Se lo pasamos a tu inicializador (con un solo await si tu función es asíncrona)
+  const supabase = await createServerClient()
   
-  const { data, error } = await supabase
-    .from('products')
+  // 3. Limpiamos el query quitando el doble await
+  const { data, error } = await supabase.from('products')
     .select(`
       *,
       categories (id, name, slug),
@@ -46,8 +47,7 @@ export async function getProducts(): Promise<CatalogProduct[]> {
 }
 
 export async function getCategories() {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(cookieStore)
+  const supabase = await createServerClient()
   
   const { data, error } = await supabase
     .from('categories')
@@ -64,8 +64,7 @@ export async function getCategories() {
 }
 
 export async function getProductBySlugOrId(id: string): Promise<CatalogProduct | null> {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(cookieStore)
+  const supabase = await createServerClient()
   
   const { data, error } = await supabase
     .from('products')
