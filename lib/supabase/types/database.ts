@@ -539,6 +539,13 @@ export interface Database {
         }
         Returns: Json
       }
+      create_order_with_items: {
+        Args: {
+          p_order: Json
+          p_items: Json
+        }
+        Returns: Json
+      }
     }
     Enums: {
       user_role: 'admin' | 'customer'

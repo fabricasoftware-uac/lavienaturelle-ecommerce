@@ -1,8 +1,7 @@
 'use server'
 
-import { randomUUID } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
-import { Order, OrderStatus, PaymentStatus } from '@/lib/supabase/types/database'
+import { Order } from '@/lib/supabase/types/database'
 
 interface CartItem {
   id: string
@@ -26,47 +25,58 @@ export async function createOrderAction(
   const supabase = await createClient()
 
   try {
-    // 1. Generate order number and id if not provided
+    // 1. Generate order number if not provided
     if (!orderData.order_number) {
       orderData.order_number = `LVN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
     }
-    const orderId = orderData.id ?? randomUUID()
-    const orderDataWithId = { ...orderData, id: orderId }
 
-    // 2. Insert order (no .select() to avoid RLS SELECT denial for anon users)
-    const { error: orderError } = await supabase
-      .from('orders')
-      .insert([orderDataWithId as any])
-
-    if (orderError) {
-      console.error('Error creating order:', orderError)
-      return { success: false, error: orderError.message }
+    // 2. Build JSON payloads for the RPC
+    const p_order = {
+      order_number: orderData.order_number,
+      user_id: orderData.user_id || null,
+      email: orderData.email,
+      full_name: orderData.full_name,
+      phone: orderData.phone || null,
+      document_number: orderData.document_number || null,
+      total_amount: orderData.total_amount,
+      shipping_cost: orderData.shipping_cost || 0,
+      tax_amount: orderData.tax_amount || 0,
+      shipping_address_line1: orderData.shipping_address_line1,
+      shipping_address_line2: orderData.shipping_address_line2 || null,
+      shipping_city: orderData.shipping_city,
+      shipping_state: orderData.shipping_state,
+      shipping_country: orderData.shipping_country || 'Colombia',
+      payment_status: orderData.payment_status || 'pending',
+      payment_method: orderData.payment_method || null,
+      status: orderData.status || 'pending',
     }
 
-    // 3. Insert order items
-    const orderItems = items.map((item) => ({
-      order_id: orderId,
-      product_id: item.id,
+    const p_items = items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      sku: item.sku || '',
+      price: item.price,
       quantity: item.quantity,
-      unit_price: item.price,
-      total_price: item.price * item.quantity,
-      product_name_snapshot: item.name,
-      product_sku_snapshot: item.sku || '',
     }))
 
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems)
+    // 3. Use SECURITY DEFINER RPC to bypass RLS entirely.
+    //    Inserts order + items atomically and returns { id, order_number }.
+    const { data, error } = await supabase.rpc('create_order_with_items', {
+      p_order,
+      p_items,
+    })
 
-    if (itemsError) {
-      console.error('Error creating order items:', itemsError)
-      return { success: false, error: itemsError.message }
+    if (error) {
+      console.error('Error creating order via RPC:', error)
+      return { success: false, error: error.message }
     }
+
+    const result = data as Record<string, any> | null
 
     return {
       success: true,
-      orderId,
-      orderNumber: orderData.order_number,
+      orderId: result?.id as string,
+      orderNumber: result?.order_number as string,
     }
   } catch (err: any) {
     console.error('Unexpected error creating order:', err)
