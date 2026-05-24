@@ -36,6 +36,7 @@ export function AddressDialog({ open, onOpenChange, address, onSuccess }: Addres
     label: "",
     full_name: "",
     address_line1: "",
+    address_line2: "",
     city: "",
     state: "",
     country: "Colombia",
@@ -59,6 +60,7 @@ export function AddressDialog({ open, onOpenChange, address, onSuccess }: Addres
         label: address.label || "",
         full_name: address.full_name || "",
         address_line1: address.address_line1 || "",
+        address_line2: address.address_line2 || "",
         city: address.city || "",
         state: address.state || "",
         country: address.country || "Colombia",
@@ -70,6 +72,7 @@ export function AddressDialog({ open, onOpenChange, address, onSuccess }: Addres
         label: "",
         full_name: userName,
         address_line1: "",
+        address_line2: "",
         city: "",
         state: "",
         country: "Colombia",
@@ -119,14 +122,13 @@ export function AddressDialog({ open, onOpenChange, address, onSuccess }: Addres
           <div className="p-8 pt-2 space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="label" className="text-[10px] font-bold text-stone-400 uppercase tracking-widest pl-1">Etiqueta</Label>
-                <Input 
-                  id="label" 
+                <Label htmlFor="label" className="text-[10px] font-bold text-stone-400 uppercase tracking-widest pl-1">Alias o apodo</Label>
+                <Input
+                  id="label"
                   value={formData.label}
                   onChange={(e) => setFormData({...formData, label: e.target.value})}
-                  placeholder="Ej. Casa, Oficina" 
-                  className="rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20" 
-                  required
+                  placeholder="Ej. Casa, Oficina"
+                  className="rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20"
                 />
               </div>
               <div className="space-y-2">
@@ -144,13 +146,23 @@ export function AddressDialog({ open, onOpenChange, address, onSuccess }: Addres
             
             <div className="space-y-2">
               <Label htmlFor="address_line1" className="text-[10px] font-bold text-stone-400 uppercase tracking-widest pl-1">Dirección</Label>
-              <Input 
-                id="address_line1" 
+              <Input
+                id="address_line1"
                 value={formData.address_line1}
                 onChange={(e) => setFormData({...formData, address_line1: e.target.value})}
-                placeholder="Calle, número, apto..." 
-                className="rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20" 
+                placeholder="Calle, número, apto..."
+                className="rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20"
                 required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="address_line2" className="text-[10px] font-bold text-stone-400 uppercase tracking-widest pl-1">Descripción (opcional)</Label>
+              <Input
+                id="address_line2"
+                value={formData.address_line2}
+                onChange={(e) => setFormData({...formData, address_line2: e.target.value})}
+                placeholder="Apartamento, casa, bloque, etc."
+                className="rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20"
               />
             </div>
 
