@@ -5,6 +5,7 @@ import { Plus, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "sonner"
 
 import { useProducts } from "@/hooks/use-products"
 import { ProductsTable } from "./products/products-table"
@@ -43,6 +44,7 @@ export function ProductsPanel() {
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("All")
   const [stockFilter, setStockFilter] = useState("All")
+
   
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
@@ -66,6 +68,10 @@ export function ProductsPanel() {
 
   const handleSave = async () => {
     if (!activeProduct?.id) return
+    if (Number(form.stock) < 0) {
+      toast.error("El stock no puede ser negativo")
+      return
+    }
     const res = await saveProduct(activeProduct.id, form, activeProduct)
     if (res.success) {
       setIsDetailOpen(false)
@@ -75,6 +81,10 @@ export function ProductsPanel() {
 
   const handleCreate = async (e?: any) => {
     if (e) e.preventDefault()
+    if (Number(form.stock) < 0) {
+      toast.error("El stock no puede ser negativo")
+      return
+    }
     const res = await createProduct(form)
     if (res.success) {
       setIsCreateOpen(false)

@@ -254,9 +254,10 @@ export function ProductFormSheet({
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Stock</label>
-                        <Input type="number" value={data.stock} onChange={(e) => setForm({...data, stock: Number(e.target.value)})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
-                      </div>
+                         <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Stock</label>
+                         <Input type="number" min={0} value={data.stock} onChange={(e) => setForm({...data, stock: Math.max(0, Number(e.target.value))})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
+                       </div>
+
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Categoría</label>

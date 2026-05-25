@@ -675,7 +675,7 @@ export interface AppProduct {
   price: number
   stock: number
   stockStatus: "In Stock" | "Low Stock" | "Out of Stock"
-  status: "Active" | "Draft"
+  status: "Active" | "Draft" | "Out of Stock"
   image: string
   images: string[]
   description: string

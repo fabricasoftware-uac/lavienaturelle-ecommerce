@@ -47,7 +47,7 @@ export function useProducts() {
         price: Number(p.price),
         stock: p.stock_quantity || 0,
         stockStatus: (p.stock_quantity || 0) > 10 ? "In Stock" : (p.stock_quantity || 0) > 0 ? "Low Stock" : "Out of Stock",
-        status: p.status === 'published' ? 'Active' : 'Draft',
+        status: p.status === 'published' ? 'Active' : p.status === 'out_of_stock' ? 'Out of Stock' : 'Draft',
         image: p.product_multimedia?.[0]?.url || "/logo-script.png",
         images: p.product_multimedia?.map((m: any) => m.url) || [],
         description: p.description || "",
@@ -96,7 +96,7 @@ export function useProducts() {
           benefits: form.benefits,
           usage_instructions: form.usage,
           badge: form.badge,
-          category_id: targetCategoryId || null
+          category_id: targetCategoryId || null,
         })
         .eq('id', id)
 

@@ -24,7 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="group relative bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-border/50">
+    <div className={cn("group relative bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-border/50", !product.inStock && "opacity-55")}>
       {/* Badge */}
       {product.badge && (
         <div className="absolute top-3 left-3 z-10">
@@ -60,12 +60,16 @@ export function ProductCard({ product }: ProductCardProps) {
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                addToCart(product)
+                if (product.inStock) addToCart(product)
               }}
-              className="flex-1 bg-card/95 hover:bg-card text-foreground border border-border shadow-lg rounded-xl"
+              disabled={!product.inStock}
+              className="flex-1 bg-card/95 hover:bg-card text-foreground border border-border shadow-lg rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar
+              {product.inStock ? (
+                <><Plus className="h-4 w-4 mr-2" /> Agregar</>
+              ) : (
+                "Agotado"
+              )}
             </Button>
             <Button
               variant="outline"

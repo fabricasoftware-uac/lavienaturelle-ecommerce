@@ -15,6 +15,7 @@ export async function getProducts(): Promise<CatalogProduct[]> {
       product_multimedia (url, display_order)
     `)
     .is('deleted_at', null)
+    .in('status', ['published', 'out_of_stock'])
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -74,6 +75,7 @@ export async function getProductBySlugOrId(id: string): Promise<CatalogProduct |
       categories (id, name, slug),
       product_multimedia (url, display_order)
     `)
+    .in('status', ['published', 'out_of_stock'])
     .or(`id.eq.${id},slug.eq.${id}`)
     .is('deleted_at', null)
     .single()

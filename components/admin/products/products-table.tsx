@@ -76,9 +76,9 @@ export function ProductsTable({ products, loading, onOpenDetail }: ProductsTable
                     <span className="text-sm font-bold text-foreground tabular-nums">{p.stock}</span>
                   </td>
                   <td className="px-6 py-5 text-right">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => onOpenDetail(p)}
                       className="h-10 text-[11px] font-bold px-5 rounded-xl border-border hover:bg-secondary hover:text-primary transition-all cursor-pointer shadow-sm group/btn"
                     >
