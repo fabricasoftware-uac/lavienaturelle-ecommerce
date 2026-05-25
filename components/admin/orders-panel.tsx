@@ -56,6 +56,7 @@ import { ShipmentModal } from "./shipment-modal"
 import { getOrders, updateOrder, deleteOrder } from "@/lib/supabase/orders"
 import { Order, OrderStatus, PaymentStatus } from "@/lib/supabase/types/database"
 import { StatusBadge } from "@/components/status-badge"
+import { InfiniteScroll } from "@/components/infinite-scroll"
 import { getWhatsAppContactLink, getWhatsAppTrackingLink } from "@/lib/whatsapp"
 
 // INITIAL_ORDERS removed - using Supabase data
@@ -65,6 +66,8 @@ export function OrdersPanel() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("All")
+  const [displayCount, setDisplayCount] = useState(20)
+  const STEP = 10
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -330,6 +333,12 @@ export function OrdersPanel() {
     return matchesSearch && order.shippingStatus === statusFilter
   })
 
+  // Reset display count when filters change
+  useEffect(() => { setDisplayCount(STEP) }, [searchQuery, statusFilter])
+
+  const visibleOrders = filteredOrders.slice(0, displayCount)
+  const hasMore = displayCount < filteredOrders.length
+
   const getPaymentBadge = (status: string) => {
     const s = status.toLowerCase()
     switch (s) {
@@ -364,13 +373,13 @@ export function OrdersPanel() {
             <Input
               placeholder="Buscar pedido..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => { setSearchQuery(e.target.value); setDisplayCount(STEP) }}
               className="pl-10 bg-secondary/30 border-none h-10 rounded-lg text-sm"
             />
           </div>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => { setStatusFilter(e.target.value); setDisplayCount(STEP) }}
             className="bg-secondary/30 rounded-lg px-3 py-1.5 text-xs font-medium border-none h-9 outline-none"
           >
             <option value="All">Todos</option>
@@ -382,83 +391,87 @@ export function OrdersPanel() {
       </div>
 
       {/* Table */}
-      <div className="bg-card rounded-xl border border-border shadow-sm overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-muted/10 border-b border-border">
-              <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">ID</th>
-              <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Cliente</th>
-              <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Dirección</th>
-              <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Fecha</th>
-              <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Estado</th>
-              <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {loading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <tr key={i}><td colSpan={5} className="px-6 py-4"><Skeleton className="h-6 w-full" /></td></tr>
-              ))
-            ) : filteredOrders.map((order) => (
-              <tr key={order.id} className="hover:bg-muted/5 transition-colors">
-                <td className="px-6 py-4 text-sm font-medium">{order.id}</td>
-                <td className="px-6 py-4">
-                  <div className="text-sm font-semibold">{order.customer.name}</div>
-                  <div className="text-[11px] text-muted-foreground">{order.customer.email}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-xs text-muted-foreground max-w-45 truncate font-medium" title={order.customer.address}>
-                    {order.customer.address}
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-xs text-muted-foreground">{new Date(order.date).toLocaleDateString()}</td>
-                <td className="px-6 py-4"><StatusBadge status={order.shippingStatus.toLowerCase()} /></td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    {order.shippingStatus !== "Shipped" && order.shippingStatus !== "Delivered" && (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => handleOpenShipmentModal(order)}
-                        className="bg-primary text-white hover:bg-primary/90 h-8 text-xs font-semibold px-3 rounded-lg cursor-pointer"
-                      >
-                        Enviar
-                      </Button>
-                    )}
-                    {order.shippingStatus === "Shipped" && (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => handleConfirmDelivery(order)}
-                        className="bg-green-600 text-white hover:bg-green-700 h-8 text-xs font-semibold px-3 rounded-lg cursor-pointer"
-                      >
-                        <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-                        Entregar
-                      </Button>
-                    )}
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => handleOpenDetail(order)} 
-                      className="h-8 text-xs font-semibold px-3 rounded-lg border-border hover:bg-secondary cursor-pointer"
-                    >
-                      Ver Detalles
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleDeleteOrder(order.id, order.realId)} 
-                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </td>
+      <InfiniteScroll loadMore={() => setDisplayCount(prev => prev + STEP)} hasMore={hasMore}>
+        <div className="bg-card rounded-xl border border-border shadow-sm overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-muted/10 border-b border-border">
+                <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">ID</th>
+                <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Cliente</th>
+                <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Dirección</th>
+                <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Fecha</th>
+                <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Estado</th>
+                <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {loading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i}><td colSpan={6} className="px-6 py-4"><Skeleton className="h-6 w-full" /></td></tr>
+                ))
+              ) : (
+                visibleOrders.map((order) => (
+                  <tr key={order.id} className="hover:bg-muted/5 transition-colors">
+                    <td className="px-6 py-4 text-sm font-medium">{order.id}</td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-semibold">{order.customer.name}</div>
+                      <div className="text-[11px] text-muted-foreground">{order.customer.email}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-xs text-muted-foreground max-w-45 truncate font-medium" title={order.customer.address}>
+                        {order.customer.address}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-xs text-muted-foreground">{new Date(order.date).toLocaleDateString()}</td>
+                    <td className="px-6 py-4"><StatusBadge status={order.shippingStatus.toLowerCase()} /></td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {order.shippingStatus !== "Shipped" && order.shippingStatus !== "Delivered" && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleOpenShipmentModal(order)}
+                            className="bg-primary text-white hover:bg-primary/90 h-8 text-xs font-semibold px-3 rounded-lg cursor-pointer"
+                          >
+                            Enviar
+                          </Button>
+                        )}
+                        {order.shippingStatus === "Shipped" && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleConfirmDelivery(order)}
+                            className="bg-green-600 text-white hover:bg-green-700 h-8 text-xs font-semibold px-3 rounded-lg cursor-pointer"
+                          >
+                            <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
+                            Entregar
+                          </Button>
+                        )}
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleOpenDetail(order)} 
+                          className="h-8 text-xs font-semibold px-3 rounded-lg border-border hover:bg-secondary cursor-pointer"
+                        >
+                          Ver Detalles
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleDeleteOrder(order.id, order.realId)} 
+                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </InfiniteScroll>
 
       {/* Sidebar de Detalles (Fixed Scroll) */}
       <Sheet open={isDetailOpen} onOpenChange={setIsDetailOpen}>

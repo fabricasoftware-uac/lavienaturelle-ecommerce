@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn, formatPrice } from "@/lib/utils"
+import { InfiniteScroll } from "@/components/infinite-scroll"
 import { createClient } from "@/lib/supabase/client"
 
 interface OrderSummary {
@@ -53,6 +54,8 @@ export function ClientsPanel() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [dateSort, setDateSort] = useState("desc")
+  const [displayCount, setDisplayCount] = useState(20)
+  const STEP = 10
 
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
@@ -180,6 +183,11 @@ export function ClientsPanel() {
       return dateSort === "desc" ? dateB - dateA : dateA - dateB
     })
 
+  useEffect(() => { setDisplayCount(STEP) }, [searchQuery, dateSort])
+
+  const visibleClients = filteredClients.slice(0, displayCount)
+  const hasMore = displayCount < filteredClients.length
+
   const getPaymentBadge = (status: string) => {
     switch (status) {
       case "completed": return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-100 text-[10px] font-bold">Pagado</Badge>
@@ -208,7 +216,7 @@ export function ClientsPanel() {
             <Input
               placeholder="Buscar por nombre, email o ID..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => { setSearchQuery(e.target.value); setDisplayCount(STEP) }}
               className="pl-10 bg-secondary/30 border-none h-11 rounded-xl text-sm font-medium"
             />
           </div>
@@ -247,7 +255,7 @@ export function ClientsPanel() {
               ) : filteredClients.length === 0 ? (
                 <tr><td colSpan={6} className="px-6 py-24 text-center text-muted-foreground font-medium italic opacity-60">No se encontraron clientes.</td></tr>
               ) : (
-                filteredClients.map((c) => (
+                visibleClients.map((c) => (
                   <tr key={c.id} className="hover:bg-primary/1 transition-colors group">
                     <td className="px-6 py-5 text-xs font-bold text-muted-foreground font-mono">{c.id.slice(0, 8)}</td>
                     <td className="px-6 py-5">
@@ -294,6 +302,8 @@ export function ClientsPanel() {
         </div>
       </div>
 
+      <InfiniteScroll loadMore={() => setDisplayCount(prev => prev + STEP)} hasMore={hasMore} />
+
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {loading ? (
@@ -309,7 +319,7 @@ export function ClientsPanel() {
             No se encontraron clientes.
           </div>
         ) : (
-          filteredClients.map((c) => (
+          visibleClients.map((c) => (
             <div key={c.id} className="bg-card rounded-2xl border border-border p-4 shadow-sm active:scale-[0.98] transition-all" onClick={() => handleOpenDetail(c)}>
               <div className="flex gap-4 mb-4">
                 <div className="h-14 w-14 rounded-full bg-secondary/50 border border-border flex items-center justify-center text-primary shrink-0 transition-transform">
@@ -334,6 +344,8 @@ export function ClientsPanel() {
             </div>
           ))
         )}
+
+      <InfiniteScroll loadMore={() => setDisplayCount(prev => prev + STEP)} hasMore={hasMore} />
       </div>
 
       {/* Client Detail Sheet */}

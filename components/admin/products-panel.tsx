@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Plus, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,6 +11,7 @@ import { useProducts } from "@/hooks/use-products"
 import { ProductsTable } from "./products/products-table"
 import { ProductMobileCard } from "./products/product-mobile-card"
 import { ProductFormSheet } from "./products/product-form-sheet"
+import { InfiniteScroll } from "@/components/infinite-scroll"
 import { AppProduct } from "@/lib/supabase/types/database"
 
 const INITIAL_FORM_STATE: Partial<AppProduct> = {
@@ -44,6 +45,8 @@ export function ProductsPanel() {
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("All")
   const [stockFilter, setStockFilter] = useState("All")
+  const [displayCount, setDisplayCount] = useState(20)
+  const STEP = 20
 
   
   const [isDetailOpen, setIsDetailOpen] = useState(false)
@@ -121,6 +124,12 @@ export function ProductsPanel() {
     
     return matchesSearch && matchesCategory && matchesStock
   })
+  .sort((a, b) => a.name.localeCompare(b.name))
+
+  useEffect(() => { setDisplayCount(STEP) }, [searchQuery, categoryFilter, stockFilter])
+
+  const visibleProducts = filteredProducts.slice(0, displayCount)
+  const hasMore = displayCount < filteredProducts.length
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -154,17 +163,18 @@ export function ProductsPanel() {
             <Input
               placeholder="Buscar por nombre o ID..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => { setSearchQuery(e.target.value); setDisplayCount(STEP) }}
               className="pl-10 bg-secondary/30 border-none h-11 rounded-xl text-sm font-medium"
             />
           </div>
           <div className="grid grid-cols-2 lg:flex items-center gap-3">
             <select
               value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
+              onChange={(e) => { setCategoryFilter(e.target.value); setDisplayCount(STEP) }}
               className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50 lg:min-w-37.5"
             >
               <option value="All">Todas las Categorías</option>
+              {/* onChange también resetea página */}
               {/* IMPORTANTE: El value debe ser el SLUG para que coincida con tu p.category del hook */}
               {categories.map(cat => (
                 <option key={cat.id} value={cat.slug}>{cat.name}</option>
@@ -175,11 +185,13 @@ export function ProductsPanel() {
       </div>
 
       {/* Desktop Table */}
-      <ProductsTable 
-        products={filteredProducts} 
-        loading={loading} 
-        onOpenDetail={handleOpenDetail} 
-      />
+      <InfiniteScroll loadMore={() => setDisplayCount(prev => prev + STEP)} hasMore={hasMore}>
+        <ProductsTable 
+          products={visibleProducts} 
+          loading={loading} 
+          onOpenDetail={handleOpenDetail} 
+        />
+      </InfiniteScroll>
 
       {/* Mobile Cards */}
       <div className="md:hidden space-y-4">
