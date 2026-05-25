@@ -27,6 +27,7 @@ import {
   PieChart,
   Pie,
 } from "recharts"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn, formatPrice } from "@/lib/utils"
@@ -483,7 +484,9 @@ export function AnalyticsPanel() {
                       <p className="text-[10px] font-bold text-red-600/80 uppercase tracking-widest mt-1">{lowStock.length} Productos por agotar</p>
                    </div>
                 </div>
-                <Button className="h-8 text-[10px] font-bold px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white transition-all shadow-md shadow-red-200">Abastecer</Button>
+                <Link href="/admin/productos">
+  <Button className="h-8 text-[10px] font-bold px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white transition-all shadow-md shadow-red-200">Abastecer</Button>
+</Link>
               </div>
               {lowStock.length > 0 ? (
                 <div className="space-y-4">
