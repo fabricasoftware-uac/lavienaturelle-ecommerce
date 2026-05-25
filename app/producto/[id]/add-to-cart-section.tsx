@@ -45,7 +45,7 @@ export function AddToCartSection({ product }: AddToCartSectionProps) {
       <Button 
         size="lg" 
         disabled={maxQuantity === 0}
-        className="flex-1 p-5 gap-3 rounded-xl text-base font-bold shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all active:scale-[0.98]"
+        className="flex-1 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14 shadow-lg shadow-stone-200 transition-all active:scale-[0.98] gap-3"
         onClick={handleAddToCart}
       >
         <ShoppingCart className="h-5 w-5" />

@@ -114,7 +114,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 {product.inStock ? (
                   <span className="inline-flex items-center gap-1 text-sm font-bold">
                     {product.stockQuantity <= 5 ? (
-                      <span className="inline-flex items-center gap-1 text-amber-600">
+                      <span className="inline-flex items-center gap-1 text-chart-4">
                         <Package className="h-4 w-4" />
                         Solo {product.stockQuantity} {product.stockQuantity === 1 ? 'unidad' : 'unidades'}
                       </span>
@@ -126,7 +126,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     )}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-sm font-bold text-red-500">
+                  <span className="inline-flex items-center gap-1 text-sm font-bold text-destructive">
                     <AlertCircle className="h-4 w-4" />
                     Agotado
                   </span>
@@ -160,14 +160,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
               {/* Trust Badges */}
               <div className="grid grid-cols-2 gap-4 pt-6">
-                <div className="flex items-center gap-3 text-sm text-muted-foreground bg-stone-50/50 p-3 rounded-2xl border border-stone-100">
-                  <div className="p-2 rounded-lg bg-white shadow-sm">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/50 p-3 rounded-2xl border border-border">
+                  <div className="p-2 rounded-lg bg-card shadow-sm">
                     <Shield className="h-4 w-4 text-primary" />
                   </div>
                   <span className="font-medium">Garantía La Vie</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground bg-stone-50/50 p-3 rounded-2xl border border-stone-100">
-                  <div className="p-2 rounded-lg bg-white shadow-sm">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/50 p-3 rounded-2xl border border-border">
+                  <div className="p-2 rounded-lg bg-card shadow-sm">
                     <Leaf className="h-4 w-4 text-primary" />
                   </div>
                   <span className="font-medium">100% Natural</span>
@@ -208,7 +208,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                         <div className="mt-1 p-1 rounded-full bg-white shadow-sm border border-primary/10">
                           <Check className="h-3 w-3 text-primary" />
                         </div>
-                        <span className="text-stone-600 font-medium text-sm">{benefit}</span>
+                        <span className="text-muted-foreground font-medium text-sm">{benefit}</span>
                       </li>
                     ))}
                   </ul>
@@ -220,11 +220,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 border-t border-stone-100">
+          <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 border-t border-border">
              <div className="flex items-center justify-between mb-10">
                 <div>
-                  <h2 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900">También te puede gustar</h2>
-                  <p className="text-stone-500 text-sm mt-1">Productos seleccionados para complementar tu rutina.</p>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">También te puede gustar</h2>
+                  <p className="text-muted-foreground text-sm mt-1">Productos seleccionados para complementar tu rutina.</p>
                 </div>
              </div>
              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -238,7 +238,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20 flex justify-center">
           <Link
             href="/#catalogo"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-stone-50 text-stone-500 hover:text-stone-900 hover:bg-stone-100 transition-all font-bold text-xs uppercase tracking-widest group"
+            className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all font-bold text-xs uppercase tracking-widest group"
           >
             <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Volver al catálogo completo

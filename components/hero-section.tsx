@@ -38,14 +38,18 @@ export function HeroSection() {
               <Link href="#catalogo">
                 <Button
                   size="lg"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+                  className="rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14 px-10 shadow-lg shadow-stone-200 transition-all active:scale-[0.98]"
                 >
                   Ver Coleccion
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               <Link href="#nosotros">
-                <Button size="lg" variant="outline" className="px-8">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="rounded-2xl h-14 px-10 font-bold border-stone-200 text-stone-600 hover:bg-stone-50 transition-all"
+                >
                   Conocer Mas
                 </Button>
               </Link>
