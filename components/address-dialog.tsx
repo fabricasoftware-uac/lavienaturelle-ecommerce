@@ -108,7 +108,7 @@ export function AddressDialog({ open, onOpenChange, address, onSuccess }: Addres
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] rounded-[40px] border-none shadow-2xl p-0 overflow-hidden bg-[#FDFCFB]">
+      <DialogContent className="sm:max-w-[500px] rounded-[40px] border-none shadow-2xl p-0 overflow-hidden bg-background">
         <form onSubmit={handleSubmit}>
           <DialogHeader className="p-8 pb-4">
             <DialogTitle className="text-2xl font-serif font-bold text-stone-900">

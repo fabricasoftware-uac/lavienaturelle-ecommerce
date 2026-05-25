@@ -8,7 +8,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB]">
+    <div className="min-h-screen bg-background">
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <main className="lg:pl-72 min-h-screen">
         <Header setSidebarOpen={setSidebarOpen} />

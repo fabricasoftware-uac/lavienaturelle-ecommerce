@@ -90,7 +90,7 @@ function TrackingContent() {
   const whatsappLink = order ? getWhatsAppHelpLink(order.id) : "#"
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex flex-col items-center justify-center p-6 sm:p-12">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 sm:p-12">
       {/* Background Decorative Elements */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
         <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]" />
@@ -279,7 +279,7 @@ function TrackingContent() {
 export default function GuestTrackingPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
       </div>
     }>

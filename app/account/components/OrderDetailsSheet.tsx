@@ -28,7 +28,7 @@ export function OrderDetailsSheet({ order, open, onOpenChange, onTrack }: OrderD
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-md border-none bg-[#FDFCFB]">
+      <SheetContent className="sm:max-w-md border-none bg-background">
         <SheetHeader className="p-6">
           <div className="flex items-center gap-3 mb-2">
             <StatusBadge status={order.statusRaw} />
