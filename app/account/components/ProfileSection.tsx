@@ -280,18 +280,6 @@ export function ProfileSection({ user, onUpdate, onChangePassword }: ProfileSect
             </div>
           </div>
         </div>
-
-        <div className="space-y-8">
-          <div className="bg-red-50/50 border border-red-100 p-8 rounded-4xl space-y-4">
-            <h3 className="text-sm font-bold text-red-900 uppercase tracking-widest">Zona de Riesgo</h3>
-            <p className="text-xs text-red-800 leading-relaxed font-medium">
-              Al eliminar tu cuenta, perderás todos tus beneficios y el historial de tus pedidos de forma permanente.
-            </p>
-            <Button variant="link" className="p-0 h-auto text-red-600 font-bold text-xs hover:text-red-700">
-              Eliminar Cuenta definitivamente
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   )
