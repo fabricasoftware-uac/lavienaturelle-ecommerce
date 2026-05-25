@@ -141,7 +141,7 @@ function RegisterForm() {
         <div className="w-full max-w-md space-y-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm text-stone-500 hover:text-stone-900 transition-colors font-medium"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
             <ArrowLeft className="h-4 w-4" />
             Volver a la tienda
@@ -157,10 +157,10 @@ function RegisterForm() {
             />
           </div>
 
-          <div className="bg-white border border-stone-100 p-10 rounded-[40px] shadow-sm space-y-6">
+          <div className="bg-white border border-border p-10 rounded-[40px] shadow-sm space-y-6">
             <div className="text-center space-y-2">
-              <h1 className="font-serif text-3xl font-bold text-stone-900">Crear Cuenta</h1>
-              <p className="text-stone-500 font-medium">
+              <h1 className="font-serif text-3xl font-bold text-foreground">Crear Cuenta</h1>
+              <p className="text-muted-foreground font-medium">
                 Registrate para comenzar a disfrutar de beneficios exclusivos
               </p>
             </div>
@@ -174,25 +174,25 @@ function RegisterForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="name" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
+                <label htmlFor="name" className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                   Nombre Completo
                 </label>
                 <div className="relative group">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300 group-focus-within:text-primary transition-colors" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
                     id="name"
                     type="text"
                     placeholder="Juan Perez"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="pl-12 rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20 bg-stone-50/30"
+                    className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="documentNumber" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
+                <label htmlFor="documentNumber" className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                   Numero de Documento
                 </label>
                 <div className="relative group">
@@ -202,7 +202,7 @@ function RegisterForm() {
                     placeholder="1234567890"
                     value={documentNumber}
                     onChange={(e) => setDocumentNumber(e.target.value)}
-                    className="rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20 bg-stone-50/30"
+                    className="rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                     required
                   />
                 </div>
@@ -211,36 +211,36 @@ function RegisterForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="phone" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
+                <label htmlFor="phone" className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                   Telefono
                 </label>
                 <div className="relative group">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300 group-focus-within:text-primary transition-colors" />
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
                     id="phone"
                     type="tel"
                     placeholder="300 123 4567"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="pl-12 rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20 bg-stone-50/30"
+                    className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="email" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
+                <label htmlFor="email" className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                   Correo Electronico
                 </label>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300 group-focus-within:text-primary transition-colors" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="ejemplo@correo.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-12 rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20 bg-stone-50/30"
+                    className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                     required
                   />
                 </div>
@@ -249,36 +249,36 @@ function RegisterForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="password" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
+                <label htmlFor="password" className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                   Contrasena
                 </label>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300 group-focus-within:text-primary transition-colors" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Min. 6 caracteres"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-12 rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20 bg-stone-50/30"
+                    className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
+                <label htmlFor="confirmPassword" className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                   Confirmar Contrasena
                 </label>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300 group-focus-within:text-primary transition-colors" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
                     id="confirmPassword"
                     type={showPassword ? "text" : "password"}
                     placeholder="Repite tu contrasena"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-12 rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20 bg-stone-50/30"
+                    className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                     required
                   />
                 </div>
@@ -298,9 +298,9 @@ function RegisterForm() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-stone-500 font-medium pt-4">
+          <p className="text-center text-sm text-muted-foreground font-medium pt-4">
             Ya tienes una cuenta?{" "}
-            <Link href="/login" className="text-stone-900 hover:underline font-bold ml-1">
+            <Link href="/login" className="text-foreground hover:underline font-bold ml-1">
               Inicia sesion
             </Link>
           </p>
@@ -473,7 +473,7 @@ function RegisterForm() {
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Ya tienes una cuenta?{" "}
-            <Link href="/login" className="text-stone-900 hover:underline font-bold ml-1">
+            <Link href="/login" className="text-foreground hover:underline font-bold ml-1">
               Inicia Sesion
             </Link>
           </p>

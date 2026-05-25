@@ -290,13 +290,13 @@ function CheckoutForm() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md mx-auto">
-          <div className="w-20 h-20 bg-stone-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <ShoppingCart className="h-10 w-10 text-stone-300" />
+          <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+            <ShoppingCart className="h-10 w-10 text-muted-foreground" />
           </div>
-          <h1 className="font-serif text-3xl font-bold text-stone-900 mb-4">
+          <h1 className="font-serif text-3xl font-bold text-foreground mb-4">
             Tu carrito está vacío
           </h1>
-          <p className="text-stone-500 mb-8 leading-relaxed">
+          <p className="text-muted-foreground mb-8 leading-relaxed">
             Parece que aún no has añadido tesoros naturales a tu carrito. ¡Explora nuestra colección y encuentra algo especial!
           </p>
           <Link href="/">
@@ -313,7 +313,7 @@ function CheckoutForm() {
     return (
       <div className="min-h-screen bg-green py-12 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
-          <div className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] border border-stone-100 overflow-hidden">
+          <div className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] border border-border overflow-hidden">
             {/* Success Header */}
             <div className="bg-primary  px-8 py-12 text-center relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-full">
@@ -337,8 +337,8 @@ function CheckoutForm() {
             <div className="p-8 sm:p-12 space-y-10">
               {/* Order Info Cards */}
               <div className="grid sm:grid-cols-2 gap-4">
-                <div className="bg-stone-50 rounded-2xl p-5 border border-stone-100">
-                  <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">ID del Pedido</p>
+                <div className="bg-muted rounded-2xl p-5 border border-border">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">ID del Pedido</p>
                   <p className="text-lg font-bold">{orderId}</p>
                 </div>
               </div>
@@ -352,8 +352,8 @@ function CheckoutForm() {
                       <User className="h-7 w-7 text-primary" />
                     </div>
                     <div className="flex-1 text-center md:text-left">
-                      <h3 className="text-xl font-bold text-stone-900 mb-1">¿Quieres guardar tu información?</h3>
-                      <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                      <h3 className="text-xl font-bold text-foreground mb-1">¿Quieres guardar tu información?</h3>
+                      <p className="text-xs text-muted-foreground font-medium leading-relaxed">
                         Crea una cuenta en un clic usando los datos de este pedido para rastrear tus envíos y comprar más rápido la próxima vez.
                       </p>
                       <Button 
@@ -369,27 +369,27 @@ function CheckoutForm() {
 
               {/* Order Summary Summary */}
               <div className="space-y-4">
-                <h3 className="text-xs font-bold text-stone-400 uppercase tracking-widest ml-1">Resumen de la compra</h3>
-                <div className="border border-stone-100 rounded-3xl overflow-hidden divide-y divide-stone-100">
+                <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1">Resumen de la compra</h3>
+                <div className="border border-border rounded-3xl overflow-hidden divide-y divide-stone-100">
                   {orderSummary.items.slice(0, 2).map((item: any) => (
                     <div key={item.id} className="p-4 flex items-center gap-4 bg-white">
-                      <div className="relative h-12 w-12 rounded-xl overflow-hidden bg-stone-50 shrink-0">
+                      <div className="relative h-12 w-12 rounded-xl overflow-hidden bg-muted shrink-0">
                         <Image src={item.image} alt={item.name} fill className="object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-stone-900 truncate">{item.name}</p>
-                        <p className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Cant: {item.quantity}</p>
+                        <p className="text-sm font-bold text-foreground truncate">{item.name}</p>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Cant: {item.quantity}</p>
                       </div>
-                      <p className="text-sm font-bold text-stone-900">{formatPrice(item.price * item.quantity)}</p>
+                      <p className="text-sm font-bold text-foreground">{formatPrice(item.price * item.quantity)}</p>
                     </div>
                   ))}
                   {orderSummary.items.length > 2 && (
-                    <div className="p-3 text-center bg-stone-50/50">
-                      <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Y {orderSummary.items.length - 2} productos más</p>
+                    <div className="p-3 text-center bg-muted/50">
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Y {orderSummary.items.length - 2} productos más</p>
                     </div>
                   )}
-                  <div className="p-6 bg-stone-50 flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Total Pagado</span>
+                  <div className="p-6 bg-muted flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Total Pagado</span>
                     <span className="font-serif text-2xl font-bold text-primary">{formatPrice(orderSummary.total)}</span>
                   </div>
                 </div>
@@ -442,8 +442,8 @@ function CheckoutForm() {
                     <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                       <Check className="h-8 w-8 text-green-600" />
                     </div>
-                    <h3 className="font-serif text-xl font-bold text-stone-900 mb-2">¡Cuenta creada!</h3>
-                    <p className="text-sm text-stone-500">Te estamos redirigiendo a tu perfil...</p>
+                    <h3 className="font-serif text-xl font-bold text-foreground mb-2">¡Cuenta creada!</h3>
+                    <p className="text-sm text-muted-foreground">Te estamos redirigiendo a tu perfil...</p>
                   </div>
                 ) : (
                   <form onSubmit={handleRegister} className="space-y-4">
@@ -455,26 +455,26 @@ function CheckoutForm() {
 
                     <div className="space-y-4 opacity-60">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Nombre</label>
-                        <Input disabled value={orderSummary.name} className="h-11 bg-stone-50 border-stone-100" />
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nombre</label>
+                        <Input disabled value={orderSummary.name} className="h-11 bg-muted border-border" />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Email</label>
-                        <Input disabled value={orderSummary.email} className="h-11 bg-stone-50 border-stone-100" />
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Email</label>
+                        <Input disabled value={orderSummary.email} className="h-11 bg-muted border-border" />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Documento</label>
-                        <Input disabled value={orderSummary.documentNumber} className="h-11 bg-stone-50 border-stone-100" />
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Documento</label>
+                        <Input disabled value={orderSummary.documentNumber} className="h-11 bg-muted border-border" />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Teléfono</label>
-                        <Input disabled value={orderSummary.phone} className="h-11 bg-stone-50 border-stone-100" />
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Teléfono</label>
+                        <Input disabled value={orderSummary.phone} className="h-11 bg-muted border-border" />
                       </div>
                     </div>
 
                     <div className="space-y-4 pt-2">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-stone-900 uppercase tracking-widest flex items-center gap-2">
+                        <label className="text-[10px] font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                           <Lock className="h-3 w-3" /> Contraseña
                         </label>
                         <Input 
@@ -487,7 +487,7 @@ function CheckoutForm() {
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-stone-900 uppercase tracking-widest">Confirmar Contraseña</label>
+                        <label className="text-[10px] font-bold text-foreground uppercase tracking-widest">Confirmar Contraseña</label>
                         <Input 
                           type="password" 
                           required 
@@ -702,7 +702,7 @@ function CheckoutForm() {
                         variant="outline"
                         size="sm"
                         onClick={() => setIsAddressDialogOpen(true)}
-                        className="rounded-xl border-stone-200 text-stone-600 font-bold text-xs flex items-center gap-2"
+                        className="rounded-xl border-border text-muted-foreground font-bold text-xs flex items-center gap-2"
                       >
                         <Plus className="h-3.5 w-3.5" />
                         Nueva Dirección
@@ -713,7 +713,7 @@ function CheckoutForm() {
                   {/* Saved Addresses List */}
                   {user && savedAddresses.length > 0 && (
                     <div className="space-y-3 mb-6">
-                      <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Tus Direcciones Guardadas</p>
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Tus Direcciones Guardadas</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {savedAddresses.map((addr) => {
                           const isSelected = formData.address === addr.address_line1 && formData.city === addr.city;
@@ -726,14 +726,14 @@ function CheckoutForm() {
                                 "text-left p-4 rounded-2xl border transition-all duration-200",
                                 isSelected 
                                   ? "border-primary bg-primary/5 ring-1 ring-primary/10 shadow-sm" 
-                                  : "border-stone-100 hover:border-stone-200 bg-white"
+                                  : "border-border hover:border-border bg-white"
                               )}
                             >
                               <div className="flex items-center justify-between mb-1">
-                                <span className="text-sm font-bold text-stone-900">{addr.label}</span>
+                                <span className="text-sm font-bold text-foreground">{addr.label}</span>
                                 {isSelected && <Check className="h-4 w-4 text-primary" />}
                               </div>
-                              <p className="text-[10px] text-stone-500 truncate font-medium">{addr.address_line1}, {addr.city}</p>
+                              <p className="text-[10px] text-muted-foreground truncate font-medium">{addr.address_line1}, {addr.city}</p>
                             </button>
                           )
                         })}

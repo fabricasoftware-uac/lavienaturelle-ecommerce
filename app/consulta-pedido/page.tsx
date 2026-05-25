@@ -102,9 +102,9 @@ function TrackingContent() {
         <div className="mb-8">
            <Link 
              href="/" 
-             className="inline-flex items-center gap-2 text-stone-400 hover:text-stone-900 transition-colors text-xs font-bold uppercase tracking-widest group"
+             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-xs font-bold uppercase tracking-widest group"
            >
-              <div className="w-8 h-8 rounded-full border border-stone-100 flex items-center justify-center group-hover:border-stone-200 group-hover:bg-white transition-all">
+              <div className="w-8 h-8 rounded-full border border-border flex items-center justify-center group-hover:border-border group-hover:bg-white transition-all">
                 <ChevronLeft className="w-4 h-4" />
               </div>
               Volver al Inicio
@@ -113,23 +113,23 @@ function TrackingContent() {
 
         {/* Header */}
         <div className="text-center mb-10 space-y-3">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white shadow-sm border border-stone-100 mb-2">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white shadow-sm border border-border mb-2">
             <Package className="w-7 h-7 text-primary" />
           </div>
-          <h1 className="text-3xl font-serif font-bold text-stone-900 tracking-tight">Rastrea tu Pedido</h1>
-          <p className="text-stone-500 text-sm max-w-sm mx-auto font-medium">
+          <h1 className="text-3xl font-serif font-bold text-foreground tracking-tight">Rastrea tu Pedido</h1>
+          <p className="text-muted-foreground text-sm max-w-sm mx-auto font-medium">
             Ingresa los detalles de tu compra para conocer el estado de tu envío en tiempo real.
           </p>
         </div>
 
         {/* Search Form */}
-        <div className="bg-white rounded-[2.5rem] p-8 sm:p-10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] border border-stone-100">
+        <div className="bg-white rounded-[2.5rem] p-8 sm:p-10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] border border-border">
           <form onSubmit={handleSearch} className="space-y-6">
             <div className="space-y-5">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest ml-1">ID de Pedido</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">ID de Pedido</label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-primary transition-colors">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
                     <Search className="w-4 h-4" />
                   </div>
                   <Input
@@ -137,15 +137,15 @@ function TrackingContent() {
                     value={orderId}
                     onChange={(e) => setOrderId(e.target.value)}
                     required
-                    className="h-14 pl-11 rounded-2xl bg-stone-50 border-transparent focus:border-primary/20 focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all text-sm font-semibold"
+                    className="h-14 pl-11 rounded-2xl bg-muted border-transparent focus:border-primary/20 focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all text-sm font-semibold"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest ml-1">Número de Documento</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Número de Documento</label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-primary transition-colors">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
                     <User className="w-4 h-4" />
                   </div>
                   <Input
@@ -153,7 +153,7 @@ function TrackingContent() {
                     value={documentNumber}
                     onChange={(e) => setDocumentNumber(e.target.value)}
                     required
-                    className="h-14 pl-11 rounded-2xl bg-stone-50 border-transparent focus:border-primary/20 focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all text-sm font-semibold"
+                    className="h-14 pl-11 rounded-2xl bg-muted border-transparent focus:border-primary/20 focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all text-sm font-semibold"
                   />
                 </div>
               </div>
@@ -185,31 +185,31 @@ function TrackingContent() {
                 <div className="space-y-6 pt-8 border-t border-stone-50">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Estado del Envío</p>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Estado del Envío</p>
                       <StatusBadge status={order.statusRaw} />
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Fecha</p>
-                      <p className="text-xs font-bold text-stone-900">{order.date}</p>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Fecha</p>
+                      <p className="text-xs font-bold text-foreground">{order.date}</p>
                     </div>
                   </div>
 
                   {!(order.status === "Pending" || order.status === "Paid") && (
                     <>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="p-5 rounded-3xl bg-stone-50 border border-stone-100 space-y-1">
-                          <div className="flex items-center gap-2 text-stone-400 mb-1">
+                        <div className="p-5 rounded-3xl bg-muted border border-border space-y-1">
+                          <div className="flex items-center gap-2 text-muted-foreground mb-1">
                             <Truck className="w-3.5 h-3.5" />
                             <span className="text-[10px] font-bold uppercase tracking-wider">Transportadora</span>
                           </div>
-                          <p className="text-sm font-bold text-stone-900">{order.carrier}</p>
+                          <p className="text-sm font-bold text-foreground">{order.carrier}</p>
                         </div>
-                        <div className="p-5 rounded-3xl bg-stone-50 border border-stone-100 space-y-1">
-                          <div className="flex items-center gap-2 text-stone-400 mb-1">
+                        <div className="p-5 rounded-3xl bg-muted border border-border space-y-1">
+                          <div className="flex items-center gap-2 text-muted-foreground mb-1">
                             <Package className="w-3.5 h-3.5" />
                             <span className="text-[10px] font-bold uppercase tracking-wider">Número de Guía</span>
                           </div>
-                          <p className="text-sm font-bold text-stone-900 tracking-tight">{order.trackingId}</p>
+                          <p className="text-sm font-bold text-foreground tracking-tight">{order.trackingId}</p>
                         </div>
                       </div>
 
@@ -218,8 +218,8 @@ function TrackingContent() {
                           <AlertCircle className="w-5 h-5 text-primary" />
                         </div>
                         <div className="space-y-1">
-                          <p className="text-xs font-bold text-stone-900">Nota importante</p>
-                          <p className="text-[11px] leading-relaxed text-stone-600 font-medium">
+                          <p className="text-xs font-bold text-foreground">Nota importante</p>
+                          <p className="text-[11px] leading-relaxed text-muted-foreground font-medium">
                             Para ver detalles granulares del recorrido de tu paquete, te recomendamos ingresar el número de guía directamente en el portal oficial de <strong>{order.carrier}</strong>.
                           </p>
                         </div>
@@ -228,10 +228,10 @@ function TrackingContent() {
                   )}
 
                   {(order.status === "Pending" || order.status === "Paid") && (
-                    <div className="p-8 rounded-3xl bg-stone-50 border border-stone-100 text-center space-y-2">
-                       <Clock className="w-8 h-8 text-stone-300 mx-auto" />
-                       <p className="text-sm font-bold text-stone-900">Preparando tu envío</p>
-                       <p className="text-xs text-stone-500 font-medium">Estamos alistando tus productos. Una vez sea despachado, podrás ver aquí el número de guía.</p>
+                    <div className="p-8 rounded-3xl bg-muted border border-border text-center space-y-2">
+                       <Clock className="w-8 h-8 text-muted-foreground mx-auto" />
+                       <p className="text-sm font-bold text-foreground">Preparando tu envío</p>
+                       <p className="text-xs text-muted-foreground font-medium">Estamos alistando tus productos. Una vez sea despachado, podrás ver aquí el número de guía.</p>
                     </div>
                   )}
 
@@ -242,7 +242,7 @@ function TrackingContent() {
                       rel="noopener noreferrer"
                       className="flex-1"
                     >
-                      <Button variant="outline" className="w-full h-12 rounded-2xl border-stone-100 bg-white hover:bg-stone-50 text-stone-900 font-bold text-xs gap-2 transition-all group">
+                      <Button variant="outline" className="w-full h-12 rounded-2xl border-border bg-white hover:bg-muted text-foreground font-bold text-xs gap-2 transition-all group">
                         <MessageCircle className="w-4 h-4 text-green-500 group-hover:scale-110 transition-transform" />
                         Solicitar ayuda por WhatsApp
                       </Button>
@@ -252,12 +252,12 @@ function TrackingContent() {
                 </div>
               ) : (
                 <div className="text-center py-10 space-y-4 animate-in zoom-in-95 duration-300">
-                  <div className="w-20 h-20 bg-stone-50 rounded-full flex items-center justify-center mx-auto">
-                    <AlertCircle className="w-10 h-10 text-stone-300" />
+                  <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto">
+                    <AlertCircle className="w-10 h-10 text-muted-foreground" />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm font-bold text-stone-900">No encontramos resultados</p>
-                    <p className="text-xs text-stone-500 max-w-[240px] mx-auto leading-relaxed">
+                    <p className="text-sm font-bold text-foreground">No encontramos resultados</p>
+                    <p className="text-xs text-muted-foreground max-w-[240px] mx-auto leading-relaxed">
                       Verifica que el ID de Pedido y tu Documento coincidan con la información de tu compra.
                     </p>
                   </div>
@@ -268,7 +268,7 @@ function TrackingContent() {
         </div>
 
         {/* Footer Info */}
-        <p className="mt-8 text-center text-[10px] text-stone-400 font-medium uppercase tracking-[0.2em]">
+        <p className="mt-8 text-center text-[10px] text-muted-foreground font-medium uppercase tracking-[0.2em]">
           La Vie Naturelle — Ecommerce Boutique
         </p>
       </div>
