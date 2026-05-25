@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   Leaf,
   LayoutDashboard,
@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { LogoutDialog } from "@/components/logout-dialog"
+import { NotificationCenter } from "@/components/admin/notification-center"
 
 const navigation = [
   { name: "Panel",      icon: LayoutDashboard, href: "/admin" },
@@ -28,6 +29,7 @@ const navigation = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
@@ -117,6 +119,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <Menu className="h-5 w-5" />
             </Button>
+            <div className="flex items-center gap-2 ml-auto">
+              <NotificationCenter onNavigateToOrders={() => router.push("/admin/pedidos")} />
+            </div>
           </div>
         </header>
 

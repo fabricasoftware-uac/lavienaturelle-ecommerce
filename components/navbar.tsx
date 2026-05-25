@@ -32,6 +32,11 @@ export function Navbar({ role }: { role: string | null }) {
   const { cartCount, setIsCartOpen } = useStore()
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
+  // Admin and Account layouts have their own navigation
+  if (pathname.startsWith('/admin') || pathname.startsWith('/account')) {
+    return null
+  }
+
   const isActive = (href: string) => {
     if (href === "/admin") return pathname === "/admin"
     return pathname.startsWith(href)
