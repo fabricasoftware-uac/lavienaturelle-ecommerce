@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { Leaf, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -70,102 +71,107 @@ function LoginForm() {
       </div>
 
       {/* Right Panel - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-8 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Volver a la tienda
-          </Link>
-
-          <div className="lg:hidden flex items-center gap-2 mb-8">
-            <Leaf className="h-8 w-8 text-primary" />
-            <span className="font-serif text-xl font-semibold text-foreground">La Vie Naturelle</span>
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="w-full max-w-md space-y-8">
+          {/* Logo (Mobile) */}
+          <div className="flex lg:hidden items-center justify-center mb-4">
+            <Link href="/" className="flex items-center gap-3">
+              <Image
+                src="/logo_header.png"
+                alt="La Vie Naturelle Logo"
+                width={40}
+                height={40}
+                className="object-contain"
+              />
+            </Link>
           </div>
 
-          <h1 className="font-serif text-3xl font-semibold text-foreground mb-2">Iniciar Sesion</h1>
-          <p className="text-muted-foreground mb-8">
-            Ingresa tus credenciales para acceder a tu cuenta
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-foreground">
-                Correo Electronico
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="tu@ejemplo.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
+          <div className="bg-white border border-stone-100 p-10 rounded-[40px] shadow-sm space-y-6">
+            <div className="text-center space-y-2">
+              <h1 className="font-serif text-3xl font-bold text-stone-900">Iniciar Sesion</h1>
+              <p className="text-stone-500 font-medium">
+                Ingresa tus credenciales para acceder a tu cuenta
+              </p>
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Contrasena
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Ingresa tu contrasena"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="p-4 rounded-2xl bg-red-50 text-red-600 text-sm font-bold border border-red-100">
+                  {error}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
+                  Correo Electronico
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="tu@ejemplo.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-12 rounded-2xl border-stone-100 h-14 focus-visible:ring-primary/20 bg-stone-50/30"
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="flex items-center justify-between">
-              <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                Olvidaste tu contrasena?
-              </Link>
-            </div>
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
+                  Contrasena
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Ingresa tu contrasena"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-12 pr-12 rounded-2xl border-stone-100 h-14 focus-visible:ring-primary/20 bg-stone-50/30"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-300 hover:text-stone-600 transition-colors cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
 
-            <Button
-              type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-              disabled={isLoading}
-            >
-              {isLoading ? "Iniciando sesion..." : "Iniciar Sesion"}
-            </Button>
-          </form>
+              <div className="flex items-center justify-between pt-2">
+                <Link href="/forgot-password" className="text-xs font-bold text-primary hover:underline">
+                  Olvidaste tu contrasena?
+                </Link>
+              </div>
 
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            No tienes una cuenta?{" "}
-            <a href="/register" className="text-primary hover:underline font-medium">
-              Crear una
-            </a>
-          </p>
+              <Button
+                type="submit"
+                className="w-full rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14 shadow-lg shadow-stone-200 transition-all"
+                disabled={isLoading}
+              >
+                {isLoading ? "Iniciando sesion..." : "Iniciar Sesion"}
+              </Button>
+            </form>
+
+            <p className="text-center text-sm text-stone-500 font-medium pt-4">
+              No tienes una cuenta?{" "}
+              <a href="/register" className="text-stone-900 hover:underline font-bold ml-1">
+                Crear una
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   )
 }
+
 
 export default function LoginPage() {
   return <LoginForm />
