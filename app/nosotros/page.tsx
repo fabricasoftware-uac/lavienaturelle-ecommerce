@@ -151,7 +151,7 @@ function AboutPageContent() {
               y compromiso con el desarrollo sostenible del territorio.
             </p>
             <Link href="/#catalogo">
-              <Button size="lg" variant="outline" className="rounded-2xl h-14 px-10 font-bold border-background/20 text-background hover:bg-background/10 transition-all">
+              <Button size="lg" variant="outline" className="rounded-2xl h-14 px-10 font-bold">
                 Explorar Productos
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
