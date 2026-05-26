@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight, Leaf, Sparkles, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ArrowRight, Leaf, Shield, Sparkles } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export function HeroSection() {
   return (
@@ -44,13 +44,13 @@ export function HeroSection() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="#nosotros">
+              <Link href="/nosotros">
                 <Button
                   size="lg"
                   variant="outline"
                   className="rounded-2xl h-14 px-10 font-bold border-stone-200 text-stone-600 hover:bg-stone-50 transition-all"
                 >
-                  Conocer Mas
+                  Conócenos!
                 </Button>
               </Link>
             </div>

@@ -55,7 +55,7 @@ export function Footer() {
                   <Mail className="h-5 w-5 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-background/90 group-hover:text-primary transition-colors">
-                  hola@lavienaturelle.com
+                  lavienaturel.info@gmail.com
                 </span>
               </li>
               <li className="flex items-center gap-4 group cursor-pointer">
@@ -63,17 +63,14 @@ export function Footer() {
                   <Phone className="h-5 w-5 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-background/90 group-hover:text-primary transition-colors">
-                  +52 (55) 1234-5678
+                  +57 3246763231
                 </span>
               </li>
               <li className="flex items-start gap-4 group cursor-pointer">
                 <div className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
                   <MapPin className="h-5 w-5 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-background/90 group-hover:text-primary transition-colors leading-relaxed pt-2">
-                  Calle Natural 123, Ciudad Verde<br />
-                  <span className="text-background/50 font-light">COL 06600, Colombia</span>
-                </span>
+                  <span className="text-background/50 font-light">Popayan, Cauca. Colombia</span>
               </li>
             </ul>
           </div>
@@ -82,12 +79,8 @@ export function Footer() {
         {/* Footer Bottom */}
         <div className="mt-20 pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-background/40">
-            &copy; {new Date().getFullYear()} La Vie Naturelle. Esencia de la tierra.
+            &copy; {new Date().getFullYear()} La Vie Naturelle.
           </p>
-          <div className="flex gap-8 text-[11px] font-bold uppercase tracking-[0.15em] text-background/40">
-            <a href="#" className="hover:text-background/70 transition-colors">Privacidad</a>
-            <a href="#" className="hover:text-background/70 transition-colors">Términos</a>
-          </div>
         </div>
       </div>
     </footer>

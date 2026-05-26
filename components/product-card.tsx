@@ -30,11 +30,12 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="absolute top-3 left-3 z-10">
           <span
             className={cn(
-              "px-3 py-1 text-xs font-medium rounded-full shadow-sm",
-              product.badge === "Mas Vendido" && "bg-primary text-primary-foreground",
-              product.badge === "Nuevo" && "bg-accent text-accent-foreground",
-              product.badge === "Popular" && "bg-chart-4 text-foreground",
-              product.badge === "Organico" && "bg-chart-3 text-foreground"
+              "px-3 py-1 text-[10px] font-bold rounded-full shadow-lg backdrop-blur-sm tracking-wide",
+              product.badge === "Nuevo!" && "bg-emerald-500 text-white shadow-emerald-200",
+              product.badge === "Oferta!" && "bg-orange-500 text-white shadow-orange-200",
+              product.badge === "Mas Vendido" && "bg-primary text-primary-foreground shadow-primary/20",
+              product.badge === "Popular" && "bg-violet-500 text-white shadow-violet-200",
+              product.badge === "Organico" && "bg-green-600 text-white shadow-green-200"
             )}
           >
             {product.badge}
