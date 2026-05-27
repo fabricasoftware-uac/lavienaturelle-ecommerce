@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
 import { createAddress, updateAddress } from "@/lib/supabase/addresses"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
+import { useColombiaLocations } from "@/hooks/use-colombia"
 
 import { Address } from "@/lib/supabase/types/database"
 
@@ -28,6 +30,8 @@ interface AddressDialogProps {
 
 export function AddressDialog({ open, onOpenChange, address, onSuccess }: AddressDialogProps) {
   const supabase = createClient()
+  const { departmentNames, getCities, loading: loadingLocations } = useColombiaLocations()
+  const [cities, setCities] = useState<string[]>([])
   const [userId, setUserId] = useState<string | null>(null)
   const [userName, setUserName] = useState("")
   const [userPhone, setUserPhone] = useState("")
@@ -81,6 +85,21 @@ export function AddressDialog({ open, onOpenChange, address, onSuccess }: Addres
       })
     }
   }, [address, userName, userPhone, open])
+
+  // Update cities list when department changes
+  useEffect(() => {
+    if (formData.state) {
+      const deptCities = getCities(formData.state)
+      setCities(deptCities)
+      // Reset city if current selection is not in the new list
+      if (!deptCities.includes(formData.city)) {
+        setFormData((prev) => ({ ...prev, city: "" }))
+      }
+    } else {
+      setCities([])
+      setFormData((prev) => ({ ...prev, city: "" }))
+    }
+  }, [formData.state])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -168,26 +187,42 @@ export function AddressDialog({ open, onOpenChange, address, onSuccess }: Addres
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="city" className="text-[10px] font-bold text-stone-400 uppercase tracking-widest pl-1">Ciudad</Label>
-                <Input 
-                  id="city" 
-                  value={formData.city}
-                  onChange={(e) => setFormData({...formData, city: e.target.value})}
-                  placeholder="Ciudad" 
-                  className="rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20" 
-                  required
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="state" className="text-[10px] font-bold text-stone-400 uppercase tracking-widest pl-1">Departamento</Label>
-                <Input 
-                  id="state" 
+                <select
+                  id="state"
                   value={formData.state}
                   onChange={(e) => setFormData({...formData, state: e.target.value})}
-                  placeholder="Departamento" 
-                  className="rounded-2xl border-stone-100 h-12 focus-visible:ring-primary/20" 
+                  className={cn(
+                    "w-full rounded-2xl border-stone-100 h-12 px-4 bg-white text-sm font-bold outline-none focus-visible:ring-primary/20 transition-all",
+                    !formData.state && "text-stone-400"
+                  )}
                   required
-                />
+                  disabled={loadingLocations}
+                >
+                  <option value="">{loadingLocations ? "Cargando..." : "Seleccionar departamento"}</option>
+                  {departmentNames.map((dept) => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="city" className="text-[10px] font-bold text-stone-400 uppercase tracking-widest pl-1">Ciudad</Label>
+                <select
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => setFormData({...formData, city: e.target.value})}
+                  className={cn(
+                    "w-full rounded-2xl border-stone-100 h-12 px-4 bg-white text-sm font-bold outline-none focus-visible:ring-primary/20 transition-all",
+                    !formData.city && "text-stone-400"
+                  )}
+                  required
+                  disabled={!formData.state}
+                >
+                  <option value="">{!formData.state ? "Selecciona un departamento" : "Seleccionar ciudad"}</option>
+                  {cities.map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
               </div>
             </div>
 

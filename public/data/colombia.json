@@ -1,0 +1,167 @@
+[
+  {
+    "id": "05",
+    "name": "Antioquia",
+    "cities": ["Medellín", "Bello", "Itagüí", "Envigado", "Rionegro", "Apartadó", "Turbo", "Caucasia", "Puerto Berrío", "Segovia", "Yarumal", "Santa Fe de Antioquia", "Marinilla", "La Ceja", "Jardín", "Jericó", "San Pedro de los Milagros", "Guarne", "Caldas", "Sabaneta", "Amagá", "Andes", "Angostura", "Anzá", "Ciudad Bolívar", "Concepción", "Donmatías", "Fredonia", "Giraldo", "Gómez Plata", "La Estrella", "Montebello", "Peque", "San Jerónimo", "San Rafael", "San Roque", "Santa Bárbara", "Sopetrán", "Támesis", "Titiribí"]
+  },
+  {
+    "id": "08",
+    "name": "Atlántico",
+    "cities": ["Barranquilla", "Soledad", "Malambo", "Puerto Colombia", "Santo Tomás", "Luruaco", "Sabanalarga", "Baranoa", "Galapa", "Tubará", "Campo de la Cruz", "Candelaria", "Manatí", "Palmar de Varela", "Piojó", "Polonuevo", "Ponedera", "Repelón", "Suan", "Usiacurí", "Juan de Acosta"]
+  },
+  {
+    "id": "11",
+    "name": "Bogotá D.C.",
+    "cities": ["Bogotá"]
+  },
+  {
+    "id": "13",
+    "name": "Bolívar",
+    "cities": ["Cartagena", "Magangué", "El Carmen de Bolívar", "Turbaco", "Mompós", "San Pablo", "Arjona", "San Jacinto", "María la Baja", "Calamar", "Clemencia", "Córdoba", "El Guamo", "Hatillo de Loba", "Mahates", "Margarita", "Montecristo", "Moral", "Norosí", "Pinillos", "Regidor", "Río Viejo", "San Estanislao", "San Fernando", "Santa Catalina", "Santa Rosa", "Simití", "Soplaviento", "Talaigua Nuevo", "Tiquisio", "Turbana", "Villanueva", "Zambrano"]
+  },
+  {
+    "id": "15",
+    "name": "Boyacá",
+    "cities": ["Tunja", "Duitama", "Sogamoso", "Chiquinquirá", "Paipa", "Ramiriquí", "Miraflores", "Soatá", "Villa de Leyva", "Cómbita", "Soracá", "Oicatá", "Siachoque", "Tuta", "Santiago de Tunja", "Aquitania", "Belén", "Boavita", "Caldas", "Campohermoso", "Ciénega", "Corrales", "Covarachía", "Cubará", "El Cocuy", "El Espino", "Firavitoba", "Garagoa", "Guayatá", "Jenesano", "La Capilla", "Macanal", "Mongua", "Monguí", "Motavita", "Nobsa", "Pajarito", "Paya", "Pesca", "Ráquira", "Saboyá", "Samacá", "Santa María", "Sativanorte", "Tenza", "Tibasosa", "Tinjacá", "Toca", "Tópaga", "Tota", "Tununguá", "Umbita", "Ventaquemada", "Zetaquira"]
+  },
+  {
+    "id": "17",
+    "name": "Caldas",
+    "cities": ["Manizales", "La Dorada", "Chinchiná", "Riosucio", "Salamina", "Villamaría", "Palestina", "Neira", "Aranzazu", "Filadelfia", "Aguadas", "Anserma", "Belalcázar", "Herveo", "Marmato", "Marulanda", "Norcasia", "Pácora", "Palestina", "Pensilvania", "Risaralda", "Samana", "San José", "Supía", "Victoria", "Viterbo", "Manzanares"]
+  },
+  {
+    "id": "18",
+    "name": "Caquetá",
+    "cities": ["Florencia", "San Vicente del Caguán", "Cartagena del Chairá", "Puerto Rico", "La Montañita", "El Paujil", "Morelia", "Belén de los Andaquíes", "Albania", "Curillo", "El Doncello", "La Jagua de Ibirico", "Milán", "Puerto Milán", "San José de la Fragua", "Solano", "Solita", "Valparaíso"]
+  },
+  {
+    "id": "19",
+    "name": "Cauca",
+    "cities": ["Popayán", "Santander de Quilichao", "Puerto Tejada", "Miranda", "Patía", "Cajibío", "El Tambo", "Silvia", "Inzá", "Timbío", "Guapi", "Buenos Aires", "Toribío", "Morales", "Padilla", "Caloto", "Jambaló", "Páez", "Suárez", "Villa Rica", "Rosas", "Sotará", "La Sierra", "Puracé", "Totoró", "Almaguer", "Argelia", "Balboa", "Santa Rosa", "Sucre", "Mercaderes", "Florencia", "Caldono", "Guachené", "San Sebastián", "Piendamó", "Timbiquí", "López de Micay"]
+  },
+  {
+    "id": "20",
+    "name": "Cesar",
+    "cities": ["Valledupar", "Aguachica", "Codazzi", "La Paz", "San Diego", "El Copey", "Chiriguaná", "Jagua de Ibirico", "Pueblo Bello", "Río de Oro", "Astrea", "Becerril", "Bosconia", "Chimichagua", "Curumaní", "El Paso", "Gamarra", "González", "La Gloria", "Manaure", "Pailitas", "Pelaya", "Río de Oro", "San Alberto", "San Martín", "Tamalameque"]
+  },
+  {
+    "id": "23",
+    "name": "Córdoba",
+    "cities": ["Montería", "Cereté", "Lorica", "Tierralta", "Sahagún", "Ciénaga de Oro", "San Pelayo", "Tuchín", "Chinú", "San Antero", "Ayapel", "Buenavista", "Canalete", "Chimá", "Cotorra", "La Apartada", "Los Córdobas", "Momil", "Moñitos", "Planeta Rica", "Pueblo Nuevo", "Puerto Escondido", "Purísima", "San Andrés de Sotavento", "San Bernardo del Viento", "San Carlos", "San José de Uré", "Valencia"]
+  },
+  {
+    "id": "25",
+    "name": "Cundinamarca",
+    "cities": ["Soacha", "Facatativá", "Zipaquirá", "Girardot", "Chía", "Cajicá", "Madrid", "Sibaté", "Fusagasugá", "Mosquera", "Funza", "La Mesa", "Ubaté", "Tabio", "Tenjo", "Sopó", "Cota", "El Rosal", "Villapinzón", "Villeta", "Agua de Dios", "Albán", "Anapoima", "Anolaima", "Apulo", "Arbeláez", "Beltrán", "Bituima", "Bojacá", "Cabrera", "Cachipay", "Caqueza", "Carmen de Carupa", "Cogua", "Cucunubá", "El Colegio", "El Peñón", "Gachalá", "Gachancipá", "Gama", "Granada", "Guachetá", "Guaduas", "Guasca", "Guataquí", "Gutiérrez", "Jerusalén", "Junín", "La Calera", "La Peña", "La Vega", "Lenguazaque", "Machetá", "Manta", "Medina", "Nariño", "Nemocón", "Nilo", "Nimaima", "Nocaima", "Pacho", "Paime", "Pandi", "Paratebueno", "Pasca", "Puerto Salgar", "Pulí", "Quebradanegra", "Quetame", "Quipile", "Ricaurte", "San Antonio del Tequendama", "San Bernardo", "San Cayetano", "San Francisco", "San Juan de Rioseco", "Sasaima", "Sesquilé", "Silvania", "Simijaca", "Supatá", "Sutatausa", "Sutatenza", "Tausa", "Tena", "Tibacuy", "Tibirita", "Tocaima", "Tocancipá", "Topaipí", "Ubaque", "Une", "Venecia", "Vergara", "Vianí", "Villagómez", "Yacopí", "Zipacón"]
+  },
+  {
+    "id": "27",
+    "name": "Chocó",
+    "cities": ["Quibdó", "Istmina", "Tadó", "Condoto", "Nóvita", "San José del Palmar", "Sipí", "Bagadó", "Lloró", "Cértegui", "Alto Baudó", "Bajo Baudó", "Bojayá", "Carmen del Darién", "El Cantón de San Pablo", "El Litoral del San Juan", "Juradó", "Medio Atrato", "Medio Baudó", "Medio San Juan", "Nóvita", "Nuquí", "Río Iró", "Río Quito", "San José del Palmar", "Unguía", "Unión Panamericana"]
+  },
+  {
+    "id": "41",
+    "name": "Huila",
+    "cities": ["Neiva", "Pitalito", "La Plata", "Garzón", "Campoalegre", "Gigante", "San Agustín", "Aipe", "Villavieja", "Palermo", "Agrado", "Altamira", "Baraya", "Colombia", "Elías", "Hobo", "Íquira", "Isnos", "La Argentina", "La Jagua", "Nátaga", "Oporapa", "Paicol", "Palestina", "Rivera", "Saladoblanco", "San José de Isnos", "Santa María", "Suaza", "Tarqui", "Tello", "Teruel", "Tesalia", "Timaná", "Yaguará"]
+  },
+  {
+    "id": "44",
+    "name": "La Guajira",
+    "cities": ["Riohacha", "Maicao", "Uribia", "San Juan del Cesar", "Albania", "Hato Nuevo", "La Jagua del Pilar", "Distracción", "Fonseca", "El Molino", "Barrancas", "Dibulla", "Manaure", "Urumita", "Villanueva"]
+  },
+  {
+    "id": "47",
+    "name": "Magdalena",
+    "cities": ["Santa Marta", "Ciénaga", "Fundación", "El Banco", "Aracataca", "Plato", "Pivijay", "Cerro de San Antonio", "Guamal", "Algarrobo", "Ariguaní", "Chivolo", "El Piñón", "El Retén", "Nueva Granada", "Pedraza", "Pijiño del Carmen", "Remolino", "Salamina", "San Sebastián de Buenavista", "San Zenón", "Santa Ana", "Santa Bárbara de Pinto", "Sitionuevo", "Tenerife", "Zapayán", "Zona Bananera"]
+  },
+  {
+    "id": "50",
+    "name": "Meta",
+    "cities": ["Villavicencio", "Acacías", "Granada", "Puerto López", "San Martín", "Restrepo", "Cumaral", "Fuente de Oro", "El Dorado", "Puerto Lleras", "Barranca de Upía", "Cabuyaro", "Castilla La Nueva", "Cubarral", "El Calvario", "La Macarena", "Mapiripán", "Mesetas", "Puerto Concordia", "Puerto Gaitán", "Puerto Rico", "San Carlos de Guaroa", "San Juanito", "San Luis de Cubarral", "Uribe", "Vista Hermosa"]
+  },
+  {
+    "id": "52",
+    "name": "Nariño",
+    "cities": ["Pasto", "Tumaco", "Ipiales", "Túquerres", "La Unión", "Samaniego", "Barbacoas", "Cumbal", "El Charco", "Aldana", "Ancuya", "Arboleda", "Belén", "Buesaco", "Chachagüí", "Consaca", "Contadero", "Córdoba", "Cuaspud", "Cumbitara", "El Peñol", "El Rosario", "El Tablón", "Francisco Pizarro", "Funes", "Guachucal", "Guaitarilla", "Gualmatán", "Iles", "Imués", "La Cruz", "La Florida", "La Llanada", "La Tola", "Linares", "Los Andes", "Magüí Payán", "Mallama", "Mosquera", "Nariño", "Olaya Herrera", "Ospina", "Policarpa", "Potosí", "Providencia", "Puerres", "Pupiales", "Ricaurte", "Roberto Payán", "San Andrés de Tumaco", "San Bernardo", "San Lorenzo", "San Pablo", "San Pedro de Cartago", "Sandoná", "Santa Bárbara", "Santacruz", "Sapuyes", "Taminango", "Tangua", "Yacuanquer"]
+  },
+  {
+    "id": "54",
+    "name": "Norte de Santander",
+    "cities": ["Cúcuta", "Ocaña", "Pamplona", "Los Patios", "Villa del Rosario", "Tibú", "El Zulia", "Chinácota", "Sardinata", "Ábrego", "Arboledas", "Bochalema", "Bucarasica", "Cáchira", "Cácota", "Chitagá", "Convención", "Cucutilla", "Durania", "El Carmen", "El Tarra", "Gramalote", "Hacarí", "Herrán", "La Esperanza", "La Playa de Belén", "Labateca", "Lourdes", "Mutiscua", "Puerto Santander", "Ragonvalia", "Salazar de las Palmas", "San Calixto", "San Cayetano", "Santiago", "Silos", "Teorama", "Toledo"]
+  },
+  {
+    "id": "63",
+    "name": "Quindío",
+    "cities": ["Armenia", "Calarcá", "Quimbaya", "Montenegro", "Salento", "Buenavista", "Pijao", "Filandia", "Córdoba", "Génova", "Circasia", "La Tebaida"]
+  },
+  {
+    "id": "66",
+    "name": "Risaralda",
+    "cities": ["Pereira", "Dosquebradas", "Santa Rosa de Cabal", "La Virginia", "Quinchía", "Marsella", "Balboa", "Mistrató", "Pueblo Rico", "Belén de Umbría", "Apía", "Guática", "La Celia", "Santuario"]
+  },
+  {
+    "id": "68",
+    "name": "Santander",
+    "cities": ["Bucaramanga", "Barrancabermeja", "San Gil", "Socorro", "Piedecuesta", "Floridablanca", "Girón", "San Vicente de Chucurí", "Lebrija", "Málaga", "Barbosa", "Puente Nacional", "Simacota", "Charalá", "Aratoca", "Betulia", "Bolívar", "Cabrera", "California", "Capitanejo", "Carcasí", "Cepitá", "Cerrito", "Charta", "Chipatá", "Cimitarra", "Confines", "Contratación", "Coromoro", "Curití", "El Carmen de Chucurí", "El Guacamayo", "El Peñón", "El Playón", "Encino", "Enciso", "Florián", "Galán", "Gámbita", "Guadalupe", "Guapotá", "Guavatá", "Guepsa", "Hato", "Jesús María", "Jordán", "La Belleza", "Landázuri", "La Paz", "Matanza", "Mogotes", "Molagavita", "Ocamonte", "Oiba", "Onzaga", "Palmar", "Palmas del Socorro", "Páramo", "Pinchote", "Puente Nacional", "Rionegro", "Sabana de Torres", "San Andrés", "San Benito", "San Joaquín", "San José de Miranda", "San Miguel", "Santa Bárbara", "Santa Helena del Opón", "Sucre", "Suratá", "Tona", "Valle de San José", "Vélez", "Vetas", "Villanueva", "Zapatoca"]
+  },
+  {
+    "id": "70",
+    "name": "Sucre",
+    "cities": ["Sincelejo", "Corozal", "Tolú", "San Marcos", "Sampués", "San Onofre", "Ovejas", "Morroa", "El Roble", "Los Palmitos", "Buenavista", "Caimito", "Chalán", "Colosó", "Coveñas", "El Roble", "Galeras", "Guaranda", "La Unión", "Los Palmitos", "Majagual", "Palmito", "Puerto Arturo", "San Benito Abad", "San Juan de Betulia", "San Luis de Sincé", "San Marcos", "San Pedro", "Sucre", "Santiago de Tolú", "Tolú Viejo"]
+  },
+  {
+    "id": "73",
+    "name": "Tolima",
+    "cities": ["Ibagué", "Espinal", "Honda", "Líbano", "Mariquita", "Falan", "San Luis", "Armero", "Purificación", "Saldaña", "Alpujarra", "Alvarado", "Ambalema", "Anzoátegui", "Armero Guayabal", "Ataco", "Cajamarca", "Carmen de Apicalá", "Casabianca", "Chaparral", "Coello", "Coyaima", "Cunday", "Dolores", "El Guamo", "Fresno", "Herbeo", "Herveo", "Icononzo", "Lérida", "Melgar", "Murillo", "Natagaima", "Ortega", "Palocabildo", "Piedras", "Planadas", "Rioblanco", "Roncesvalles", "Rovira", "San Antonio", "San Luis", "Santa Isabel", "Suárez", "Valle de San Juan", "Venadillo", "Villahermosa", "Villarrica"]
+  },
+  {
+    "id": "76",
+    "name": "Valle del Cauca",
+    "cities": ["Cali", "Buenaventura", "Palmira", "Tuluá", "Cartago", "Buga", "Roldanillo", "Zarzal", "Yumbo", "Candelaria", "Jamundí", "Florida", "Pradera", "Caicedonia", "Ansermanuevo", "El Cerrito", "Ginebra", "La Unión", "Sevilla", "Toro", "Alcalá", "Andalucía", "Argelia", "Bolívar", "Bugalagrande", "Caicedonia", "Calima", "Dagua", "El Águila", "El Cairo", "El Dovio", "Guacarí", "La Cumbre", "La Victoria", "Obando", "Palmira", "Restrepo", "Riofrío", "San Pedro", "Trujillo", "Ulloa", "Versalles", "Vijes", "Yotoco"]
+  },
+  {
+    "id": "81",
+    "name": "Arauca",
+    "cities": ["Arauca", "Tame", "Saravena", "Cravo Norte", "Puerto Rondón", "Fortul", "Arauquita", "Cubará", "Panqueba"]
+  },
+  {
+    "id": "85",
+    "name": "Casanare",
+    "cities": ["Yopal", "Paz de Ariporo", "Monterrey", "Aguazul", "Tauramena", "Villanueva", "Orocué", "San Luis de Palenque", "Chámeza", "Trinidad", "Hato Corozal", "La Salina", "Maní", "Nunchía", "Pore", "Recetor", "Sabanalarga", "Sácama", "San Luis de Gaceno"]
+  },
+  {
+    "id": "86",
+    "name": "Putumayo",
+    "cities": ["Mocoa", "Valle del Guamuez", "Orito", "Puerto Asís", "Puerto Leguízamo", "Sibundoy", "San Miguel", "Colón", "Santiago", "Villagarzón", "Puerto Caicedo", "San Francisco"]
+  },
+  {
+    "id": "88",
+    "name": "San Andrés y Providencia",
+    "cities": ["San Andrés", "Providencia"]
+  },
+  {
+    "id": "91",
+    "name": "Amazonas",
+    "cities": ["Leticia", "Puerto Nariño", "El Encanto", "La Chorrera", "La Pedrera", "Puerto Santander", "Tarapacá", "La Victoria", "Mirití-Paraná"]
+  },
+  {
+    "id": "94",
+    "name": "Guainía",
+    "cities": ["Inírida", "Barranco Minas", "Mapiripana", "San Felipe", "Puerto Colombia", "La Guadalupe", "Cacahual", "Pana Pana", "Morichal Nuevo"]
+  },
+  {
+    "id": "95",
+    "name": "Guaviare",
+    "cities": ["San José del Guaviare", "Calamar", "El Retorno", "Miraflores"]
+  },
+  {
+    "id": "97",
+    "name": "Vaupés",
+    "cities": ["Mitú", "Caruru", "Taraira", "Papunahua", "Yavarate", "Pacoa", "Acaricuara", "Villa Fátima"]
+  },
+  {
+    "id": "99",
+    "name": "Vichada",
+    "cities": ["Puerto Carreño", "La Primavera", "Santa Rosalía", "Cumaribo"]
+  }
+]

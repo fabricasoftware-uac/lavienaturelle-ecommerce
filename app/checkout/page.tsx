@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/cart-context"
 import { cn, formatPrice } from "@/lib/utils"
+import { useColombiaLocations } from "@/hooks/use-colombia"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { createOrderAction, saveUserAddressAction, validateStockAction } from "./actions"
@@ -54,6 +55,8 @@ function CheckoutForm() {
   const router = useRouter()
   const supabase = createClient()
   const { cart, cartTotal, clearCart } = useStore()
+  const { departmentNames, getCities } = useColombiaLocations()
+  const [cities, setCities] = useState<string[]>([])
   const [step, setStep] = useState<CheckoutStep>("informacion")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false)
@@ -150,6 +153,19 @@ function CheckoutForm() {
     }
   }, [user])
 
+  // Sync cities when department changes
+  useEffect(() => {
+    if (formData.state) {
+      const deptCities = getCities(formData.state)
+      setCities(deptCities)
+      if (!deptCities.includes(formData.city)) {
+        setFormData((prev) => ({ ...prev, city: "" }))
+      }
+    } else {
+      setCities([])
+    }
+  }, [formData.state])
+
   const [orderSummary, setOrderSummary] = useState<any>(null)
   const [orderId, setOrderId] = useState("")
 
@@ -205,7 +221,7 @@ function CheckoutForm() {
   const shippingCost = cartTotal
   const total = cartTotal
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
@@ -778,29 +794,44 @@ function CheckoutForm() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-foreground mb-2">
-                          Ciudad
-                        </label>
-                        <Input
-                          type="text"
-                          name="city"
-                          value={formData.city}
-                          onChange={handleInputChange}
-                          placeholder="Ingresa la ciudad"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
                           Departamento
                         </label>
-                        <Input
-                          type="text"
+                        <select
                           name="state"
                           value={formData.state}
                           onChange={handleInputChange}
-                          placeholder="Ingresa el departamento"
+                          className={cn(
+                            "w-full h-11 rounded-xl border border-border bg-background px-3 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
+                            !formData.state && "text-muted-foreground"
+                          )}
                           required
-                        />
+                        >
+                          <option value="">Seleccionar departamento</option>
+                          {departmentNames.map((dept) => (
+                            <option key={dept} value={dept}>{dept}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-foreground mb-2">
+                          Ciudad
+                        </label>
+                        <select
+                          name="city"
+                          value={formData.city}
+                          onChange={handleInputChange}
+                          className={cn(
+                            "w-full h-11 rounded-xl border border-border bg-background px-3 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
+                            !formData.city && "text-muted-foreground"
+                          )}
+                          required
+                          disabled={!formData.state}
+                        >
+                          <option value="">{!formData.state ? "Selecciona un departamento" : "Seleccionar ciudad"}</option>
+                          {cities.map((city) => (
+                            <option key={city} value={city}>{city}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
