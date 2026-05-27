@@ -50,15 +50,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {/* Breadcrumb */}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-primary transition-colors">
+            <Link href="/" className="hover:text-primary transition-colors font-medium">
               Inicio
             </Link>
             <span>/</span>
-            <span className="hover:text-primary transition-colors uppercase tracking-tight font-medium">
+            <Link
+              href={`/categoria/${product.category}`}
+              className="hover:text-primary transition-colors uppercase tracking-tight font-medium"
+            >
               {product.categoryName}
-            </span>
+            </Link>
             <span>/</span>
-            <span className="text-foreground">{product.name}</span>
+            <span className="text-foreground font-medium truncate max-w-40">{product.name}</span>
           </nav>
         </div>
 
@@ -235,13 +238,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </section>
         )}
 
-        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20 flex justify-center">
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20 pt-4 flex justify-center">
           <Link
             href="/#catalogo"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all font-bold text-xs uppercase tracking-widest group"
+            className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-stone-200 transition-all group"
           >
             <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Volver al catálogo completo
+            Ver catálogo completo
           </Link>
         </section>
       </main>

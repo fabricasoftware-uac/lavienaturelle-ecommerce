@@ -73,6 +73,10 @@ function LoginForm() {
 
           <div className="bg-white border border-border p-10 rounded-[40px] shadow-sm space-y-6">
             <div className="text-center space-y-2">
+              <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-medium mb-6">
+                <ArrowLeft className="h-4 w-4" />
+                Volver a la tienda
+              </Link>
               <h1 className="font-serif text-3xl font-bold text-foreground">Iniciar Sesion</h1>
               <p className="text-muted-foreground font-medium">
                 Ingresa tus credenciales para acceder a tu cuenta
