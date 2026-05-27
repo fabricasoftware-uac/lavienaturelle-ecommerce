@@ -24,11 +24,11 @@ export function AddToCartSection({ product }: AddToCartSectionProps) {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 pt-2">
-      <div className="flex items-center border border-border rounded-xl overflow-hidden bg-white sm:w-auto w-full justify-between sm:justify-start">
+    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+      <div className="flex items-center border border-border rounded-2xl overflow-hidden bg-card sm:w-auto w-full sm:justify-start">
         <button
           onClick={() => setQuantity(Math.max(1, quantity - 1))}
-          className="p-3.5 hover:bg-secondary/50 transition-colors"
+          className="p-4 hover:bg-secondary/50 transition-colors"
           aria-label="Reducir cantidad"
         >
           <Minus className="h-5 w-5" />
@@ -36,16 +36,16 @@ export function AddToCartSection({ product }: AddToCartSectionProps) {
         <span className="w-14 text-center font-bold text-lg">{quantity}</span>
         <button
           onClick={() => setQuantity(Math.min(maxQuantity || 1, quantity + 1))}
-          className="p-3.5 hover:bg-secondary/50 transition-colors"
+          className="p-4 hover:bg-secondary/50 transition-colors"
           aria-label="Aumentar cantidad"
         >
           <Plus className="h-5 w-5" />
         </button>
       </div>
-      <Button 
-        size="lg" 
+      <Button
+        size="lg"
         disabled={maxQuantity === 0}
-        className="flex-1 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14 shadow-lg shadow-stone-200 transition-all active:scale-[0.98] gap-3"
+        className="flex-1 sm:flex-none rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14 shadow-lg shadow-stone-200 transition-all active:scale-[0.98] gap-3 w-full sm:w-auto sm:min-w-52"
         onClick={handleAddToCart}
       >
         <ShoppingCart className="h-5 w-5" />

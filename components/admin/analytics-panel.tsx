@@ -116,6 +116,7 @@ export function AnalyticsPanel() {
       const [
         ordersThisMonth,
         ordersLastMonth,
+        pendingShipmentOrders,
         productsRes,
         ordersGeoRes,
         ordersItemsRes,
@@ -131,6 +132,10 @@ export function AnalyticsPanel() {
           .gte("created_at", startLastMonth.toISOString())
           .lte("created_at", endLastMonth.toISOString())
           .not("status", "eq", "cancelled") as unknown as { data: OrderSummary[] },
+        supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .in("status", ["pending", "paid"]) as unknown as { count: number | null },
         supabase
           .from("products")
           .select("id, name, stock_quantity")
@@ -187,12 +192,12 @@ export function AnalyticsPanel() {
           color: "blue",
         },
         {
-          name: "Ticket Promedio (AOV)",
-          value: formatPrice(aov),
-          change: lastRevenue > 0 ? `${((aov - (lastRevenue / (lastMonthOrders.length || 1))) / (lastRevenue / (lastMonthOrders.length || 1)) * 100).toFixed(1)}%` : "0%",
-          trend: aov >= (lastRevenue / (lastMonthOrders.length || 1)) ? "up" : "down",
-          icon: TrendingUp,
-          color: "purple",
+          name: "Pendientes por enviar",
+          value: String(pendingShipmentOrders.count ?? 0),
+          change: (pendingShipmentOrders.count ?? 0) > 0 ? "Requiere atención" : "Sin pendientes",
+          trend: (pendingShipmentOrders.count ?? 0) > 0 ? "down" : "up",
+          icon: ShoppingBag,
+          color: (pendingShipmentOrders.count ?? 0) > 0 ? "purple" : "green",
         },
         {
           name: "Clientes Registrados",
@@ -291,8 +296,44 @@ export function AnalyticsPanel() {
     }
 
     loadData()
-    return () => { cancelled = true }
+        return () => { cancelled = true }
   }, [])
+
+  const handleExportReport = () => {
+    const now = new Date()
+    const filename = `informe-analiticas-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}.csv`
+
+    let csv = "Métrica,Valor\n"
+    kpis.forEach((kpi) => {
+      csv += `"${kpi.name}","${kpi.value}","${kpi.change}"\n`
+    })
+
+    csv += "\nTop Productos\n"
+    csv += "Producto,Unidades vendidas\n"
+    topProducts.forEach((p) => {
+      csv += `"${p.name}","${p.sales}"\n`
+    })
+
+    csv += "\nAlertas de Stock\n"
+    csv += "Producto,Stock actual,Stock mínimo\n"
+    lowStock.forEach((p) => {
+      csv += `"${p.name}","${p.current}","${p.min}"\n`
+    })
+
+    csv += "\nVentas por Ciudad\n"
+    csv += "Ciudad,Porcentaje\n"
+    geoData.forEach((g) => {
+      csv += `"${g.name}","${g.value}%" \n`
+    })
+
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-12">
@@ -302,15 +343,15 @@ export function AnalyticsPanel() {
           <h1 className="font-serif text-2xl font-semibold text-foreground tracking-tight">Análisis y Rendimiento</h1>
           <p className="text-muted-foreground mt-1 text-sm font-medium">Visualiza el crecimiento y la salud de tu negocio.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="relative">
-            <Button variant="outline" className="bg-card h-10 px-4 rounded-xl font-bold text-xs border-border flex items-center gap-2 cursor-not-allowed shadow-sm opacity-60">
+            <Button variant="outline" className="bg-card h-10 px-4 rounded-xl font-bold text-xs border-border flex items-center gap-2 cursor-not-allowed shadow-sm opacity-60 w-full sm:w-auto">
               <Calendar className="h-4 w-4 text-primary" />
               {dateRange}
               <ChevronDown className="h-4 w-4 opacity-50" />
             </Button>
           </div>
-          <Button className="bg-primary text-white h-10 px-6 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/10 transition-all hover:bg-primary/90">
+          <Button onClick={handleExportReport} className="bg-primary text-white h-10 px-6 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/10 transition-all hover:bg-primary/90 w-full sm:w-auto">
             Exportar Informe
           </Button>
         </div>

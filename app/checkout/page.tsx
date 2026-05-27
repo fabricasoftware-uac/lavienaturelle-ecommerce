@@ -825,9 +825,9 @@ function CheckoutForm() {
                             !formData.city && "text-muted-foreground"
                           )}
                           required
-                          disabled={!formData.state}
+                          disabled={!formData.state || cities.length === 0}
                         >
-                          <option value="">{!formData.state ? "Selecciona un departamento" : "Seleccionar ciudad"}</option>
+                          <option value="">{!formData.state ? "Selecciona un departamento primero" : "Seleccionar ciudad"}</option>
                           {cities.map((city) => (
                             <option key={city} value={city}>{city}</option>
                           ))}

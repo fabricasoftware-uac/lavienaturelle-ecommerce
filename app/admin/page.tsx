@@ -7,8 +7,9 @@ import {
   Package,
   Clock,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/status-badge"
 import { createClient } from "@/lib/supabase/client"
 
@@ -155,9 +156,11 @@ export default function AdminDashboardPage() {
             <h2 className="text-lg font-bold text-foreground">Pedidos Recientes</h2>
             <p className="text-xs font-medium text-muted-foreground">Últimos 5 pedidos registrados.</p>
           </div>
-          <Button variant="ghost" size="sm" className="text-primary font-bold">
-            Ver todos
-          </Button>
+          <Link href="/admin/pedidos">
+            <Button variant="ghost" size="sm" className="text-primary font-bold">
+              Ver todos
+            </Button>
+          </Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
