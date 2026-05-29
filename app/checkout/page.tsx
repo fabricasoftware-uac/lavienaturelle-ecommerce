@@ -6,7 +6,6 @@ import Image from "next/image"
 import {
   ArrowLeft,
   CreditCard,
-  Truck,
   Shield,
   Check,
   User,
@@ -541,28 +540,6 @@ function CheckoutForm() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-2">
-              <Image
-                src="/logo_header.png"
-                alt="La Vie Naturelle Logo"
-                className="h-10 w-auto object-contain"
-                height={10}
-                width={10}
-              />
-            </Link>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="hidden sm:flex items-center gap-2">
-                <Shield className="h-4 w-4 text-primary" />
-                Compra Segura
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <Link
@@ -634,30 +611,30 @@ function CheckoutForm() {
               {/* Information Step */}
               {step === "informacion" && (
                 <div className="space-y-6">
-                  <h2 className="font-serif text-xl font-semibold text-foreground">
+                  <h2 className="font-serif text-xl font-bold text-foreground">
                     Informacion de Contacto
                   </h2>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                         Correo Electronico
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                           type="email"
                           name="email"
                           value={formData.email}
                           onChange={handleInputChange}
                           placeholder="Ingresa tu correo"
-                          className="pl-10"
+                          className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                           required
                         />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                           Nombre Completo
                         </label>
                         <Input
@@ -666,12 +643,12 @@ function CheckoutForm() {
                           value={formData.firstName}
                           onChange={handleInputChange}
                           placeholder="Ingresa tu nombre y apellido"
-                          className="w-full"
+                          className="rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                           Numero de Documento
                         </label>
                         <Input
@@ -680,24 +657,24 @@ function CheckoutForm() {
                           value={formData.documentNumber}
                           onChange={handleInputChange}
                           placeholder="1234567890"
-                          className="w-full"
+                          className="rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                           required
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                         Telefono
                       </label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                           type="tel"
                           name="phone"
                           value={formData.phone}
                           onChange={handleInputChange}
                           placeholder="Ingresa tu numero de telefono"
-                          className="pl-10"
+                          className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                         />
                       </div>
                     </div>
@@ -707,24 +684,24 @@ function CheckoutForm() {
 
               {/* Shipping Step */}
               {step === "envio" && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-serif text-xl font-semibold text-foreground">
-                      Direccion de Envio
-                    </h2>
-                    {user && (
-                      <Button 
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsAddressDialogOpen(true)}
-                        className="rounded-xl border-border text-muted-foreground font-bold text-xs flex items-center gap-2"
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                        Nueva Dirección
-                      </Button>
-                    )}
-                  </div>
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-serif text-xl font-bold text-foreground">
+                        Direccion de Envio
+                      </h2>
+                      {user && (
+                        <Button 
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setIsAddressDialogOpen(true)}
+                          className="rounded-2xl border-stone-200 text-stone-600 font-bold text-xs h-9 px-4 hover:bg-stone-50"
+                        >
+                          <Plus className="h-3.5 w-3.5 mr-1.5" />
+                          Nueva Dirección
+                        </Button>
+                      )}
+                    </div>
 
                   {/* Saved Addresses List */}
                   {user && savedAddresses.length > 0 && (
@@ -759,35 +736,35 @@ function CheckoutForm() {
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                         Direccion
                       </label>
                       <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                           type="text"
                           name="address"
                           value={formData.address}
                           onChange={handleInputChange}
-                          placeholder="Ingresa tu direccion"
-                          className="pl-10"
+                          placeholder="Calle, número, apto..."
+                          className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                           required
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                         Apartamento, casa, etc. (opcional)
                       </label>
                       <div className="relative">
-                        <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Building className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                           type="text"
                           name="apartment"
                           value={formData.apartment}
                           onChange={handleInputChange}
                           placeholder="Ingresa detalles adicionales"
-                          className="pl-10"
+                          className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                         />
                       </div>
                     </div>
@@ -855,29 +832,29 @@ function CheckoutForm() {
               {/* Payment Step */}
               {step === "pago" && (
                 <div className="space-y-6">
-                  <h2 className="font-serif text-xl font-semibold text-foreground">
+                  <h2 className="font-serif text-xl font-bold text-foreground">
                     Detalles de Pago
                   </h2>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                         Numero de Tarjeta
                       </label>
                       <div className="relative">
-                        <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                           type="text"
                           name="cardNumber"
                           value={formData.cardNumber}
                           onChange={handleInputChange}
                           placeholder="Ingresa el numero de tu tarjeta"
-                          className="pl-10"
+                          className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                           required
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                         Nombre en la Tarjeta
                       </label>
                       <Input
@@ -886,12 +863,13 @@ function CheckoutForm() {
                         value={formData.cardName}
                         onChange={handleInputChange}
                         placeholder="Juan Perez"
+                        className="rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                         required
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                           Fecha de Vencimiento
                         </label>
                         <Input
@@ -900,11 +878,12 @@ function CheckoutForm() {
                           value={formData.expiry}
                           onChange={handleInputChange}
                           placeholder="MM/AA"
+                          className="rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
                           CVV
                         </label>
                         <Input
@@ -913,15 +892,16 @@ function CheckoutForm() {
                           value={formData.cvv}
                           onChange={handleInputChange}
                           placeholder="123"
+                          className="rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
                           required
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-secondary/50 rounded-lg p-4 flex items-center gap-3">
+                  <div className="bg-muted/30 rounded-2xl p-4 flex items-center gap-3 border border-border">
                     <Shield className="h-5 w-5 text-primary" />
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground font-medium">
                       Tu informacion de pago esta encriptada y segura.
                     </p>
                   </div>
@@ -938,14 +918,14 @@ function CheckoutForm() {
                       if (step === "envio") setStep("informacion")
                       if (step === "pago") setStep("envio")
                     }}
-                    className="flex-1"
+                    className="flex-1 rounded-2xl h-14 font-bold border-stone-200 text-stone-600 hover:bg-stone-50"
                   >
                     Atras
                   </Button>
                 )}
                 <Button
                   type="submit"
-                  className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                  className="flex-1 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14 shadow-lg shadow-stone-200 transition-all"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -963,8 +943,8 @@ function CheckoutForm() {
 
           {/* Right Column - Order Summary */}
           <div className="lg:pl-8 max-w-sm md:max-w-full">
-            <div className="sticky top-24 bg-card rounded-xl border border-border p-6">
-              <h2 className="font-serif text-lg font-semibold text-foreground mb-6">
+            <div className="sticky top-24 bg-white border border-border rounded-[40px] p-8 shadow-sm">
+              <h2 className="font-serif text-xl font-bold text-foreground mb-6">
                 Resumen del Pedido
               </h2>
 
@@ -972,26 +952,26 @@ function CheckoutForm() {
               <div className="space-y-4 mb-6">
                 {cart.map((item) => (
                   <div key={item.id} className="flex gap-4 rounded-lg">
-                    <div className="relative h-16 w-16 shrink-0 border  bg-muted">
+                    <div className="relative h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-muted border border-border/50">
                       <Image
                         src={item.image}
                         alt={item.name}
                         fill
                         className="object-cover"
                       />
-                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
+                      <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shadow-sm">
                         {item.quantity}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-foreground truncate">
+                      <h3 className="text-sm font-bold text-foreground truncate">
                         {item.name}
                       </h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs text-muted-foreground font-medium">
                         Cant: {item.quantity}
                       </p>
                     </div>
-                    <p className="text-sm font-medium text-foreground">
+                    <p className="text-sm font-bold text-foreground">
                       {formatPrice(item.price * item.quantity)}
                     </p>
                   </div>
@@ -1000,12 +980,12 @@ function CheckoutForm() {
 
               <div className="border-t border-border pt-4 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-foreground">{formatPrice(cartTotal)}</span>
+                  <span className="text-muted-foreground font-medium">Subtotal</span>
+                  <span className="text-foreground font-bold">{formatPrice(cartTotal)}</span>
                 </div>
                 <div className="border-t border-border pt-3 flex justify-between">
-                  <span className="font-medium text-foreground">Total</span>
-                  <span className="font-serif text-xl font-semibold text-primary">
+                  <span className="font-bold text-foreground">Total</span>
+                  <span className="font-serif text-xl font-bold text-primary">
                     {formatPrice(total)}
                   </span>
                 </div>
@@ -1013,7 +993,7 @@ function CheckoutForm() {
 
               {/* Trust Badges */}
               <div className="mt-6 pt-6 border-t border-border space-y-3">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                   <Shield className="h-4 w-4 text-primary" />
                   <span>Transaccion 100% segura</span>
                 </div>
