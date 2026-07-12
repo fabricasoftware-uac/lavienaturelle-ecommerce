@@ -1,14 +1,8 @@
-import { Suspense } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { 
   ChevronLeft, 
-  ShoppingCart, 
   Check, 
-  Minus, 
-  Plus,
-  Truck,
   Shield,
   Leaf,
   Package,
@@ -17,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { CartDrawer } from "@/components/cart-drawer"
 import { Footer } from "@/components/footer"
+import { ProductGallery } from "@/components/product-gallery"
 import { getProductBySlugOrId, getProducts } from "@/supabase/types/products"
 import { cn, formatPrice } from "@/lib/utils"
 import { ProductCard } from "@/components/product-card"
@@ -68,35 +63,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {/* Product Section */}
         <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Image Gallery - This could still be a client component for interaction */}
-            <div className="space-y-4">
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-secondary/30 border border-border/50">
-                {product.badge && (
-                  <div className="absolute top-4 left-4 z-10">
-                    <span className="px-4 py-1.5 text-sm font-medium rounded-full bg-primary text-primary-foreground shadow-lg">
-                      {product.badge}
-                    </span>
-                  </div>
-                )}
-                <Image
-                  src={images[0]}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-              
-              {images.length > 1 && (
-                <div className="flex gap-3 overflow-x-auto pb-2">
-                  {images.map((img: string, idx: number) => (
-                    <div key={idx} className="relative w-20 h-20 rounded-xl overflow-hidden border border-border shrink-0">
-                      <Image src={img} alt={product.name} fill className="object-cover" />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Image Gallery */}
+            <ProductGallery
+              images={images}
+              alt={product.name}
+              badge={product.badge}
+            />
 
             {/* Product Info */}
             <div className="space-y-6">

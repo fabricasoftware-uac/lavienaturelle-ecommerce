@@ -12,9 +12,7 @@ export default async function HomePage() {
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
         <HeroSection />
-        <div className="pt-20">
-          <ProductCatalog initialProducts={products} initialCategories={categories} />
-        </div>
+        <ProductCatalog initialProducts={products} initialCategories={categories} />
       </main>
       <Footer />
       <CartDrawer />
