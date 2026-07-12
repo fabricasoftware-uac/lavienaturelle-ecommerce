@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/supabase/types/client"
 import { slugify } from "@/lib/utils"
-import { deleteImage } from "@/lib/supabase/storage"
-import { AppProduct, Category, ProductWithDetails } from "@/lib/supabase/types/database"
+import { deleteImage } from "@/supabase/types/storage"
+import { AppProduct, Category, ProductWithDetails } from "@/supabase/types/database"
 
 export function useProducts() {
   //useMemo asegura que no recreamos la instancia de supabase en cada render innecesariamente

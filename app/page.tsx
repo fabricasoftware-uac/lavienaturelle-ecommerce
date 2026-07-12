@@ -2,7 +2,7 @@ import { HeroSection } from "@/components/hero-section"
 import { ProductCatalog } from "@/components/product-catalog"
 import { Footer } from "@/components/footer"
 import { CartDrawer } from "@/components/cart-drawer"
-import { getProducts, getCategories } from "@/lib/supabase/products"
+import { getProducts, getCategories } from "@/supabase/types/products"
 
 export default async function HomePage() {
   const products = await getProducts()

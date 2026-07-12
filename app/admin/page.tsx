@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/status-badge"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/supabase/types/client"
 
 interface DashboardStats {
   monthlyRevenue: number

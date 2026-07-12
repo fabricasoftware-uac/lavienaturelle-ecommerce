@@ -13,13 +13,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
-import { createClient } from "@/lib/supabase/client"
-import { createAddress, updateAddress } from "@/lib/supabase/addresses"
+import { createClient } from "@/supabase/types/client"
+import { createAddress, updateAddress } from "@/supabase/types/addresses"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 import { useColombiaLocations } from "@/hooks/use-colombia"
 
-import { Address } from "@/lib/supabase/types/database"
+import { Address } from "@/supabase/types/database"
 
 interface AddressDialogProps {
   open: boolean

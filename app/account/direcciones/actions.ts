@@ -1,7 +1,7 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { Address } from '@/lib/supabase/types/database'
+import { createClient } from '@/supabase/types/server'
+import { Address } from '@/supabase/types/database'
 
 export async function getUserAddressesAction(): Promise<Address[]> {
   const supabase = await createClient()

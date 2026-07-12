@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { CartDrawer } from "@/components/cart-drawer"
 import { Footer } from "@/components/footer"
-import { getProductBySlugOrId, getProducts } from "@/lib/supabase/products"
+import { getProductBySlugOrId, getProducts } from "@/supabase/types/products"
 import { cn, formatPrice } from "@/lib/utils"
 import { ProductCard } from "@/components/product-card"
 import { Sparkles } from "lucide-react"

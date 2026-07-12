@@ -9,7 +9,7 @@ import { getWhatsAppTrackingLink, getWhatsAppHelpLink } from "@/lib/whatsapp"
 import { cn } from "@/lib/utils"
 import { StatusBadge } from "@/components/status-badge"
 import { toast } from "sonner"
-import { getOrderByTracking } from "@/lib/supabase/orders"
+import { getOrderByTracking } from "@/supabase/types/orders"
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 

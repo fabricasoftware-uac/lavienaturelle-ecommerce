@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
-import { CatalogProduct } from "@/lib/supabase/types/database"
+import { CatalogProduct } from "@/supabase/types/database"
 
 export interface CartItem extends CatalogProduct { quantity: number }
 

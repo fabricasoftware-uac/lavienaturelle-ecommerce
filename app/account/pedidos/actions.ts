@@ -1,7 +1,7 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { OrderWithDetails, MappedOrder } from '@/lib/supabase/types/database'
+import { createClient } from '@/supabase/types/server'
+import { OrderWithDetails, MappedOrder } from '@/supabase/types/database'
 
 export async function getUserOrdersAction(): Promise<MappedOrder[]> {
   const supabase = await createClient()

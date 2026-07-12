@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 import { Footer } from "@/components/footer"
 import { CartDrawer } from "@/components/cart-drawer"
-import { getProducts, getCategories } from "@/lib/supabase/products"
+import { getProducts, getCategories } from "@/supabase/types/products"
 import { CategoryContent } from "./category-content"
 
 interface CategoryPageProps {

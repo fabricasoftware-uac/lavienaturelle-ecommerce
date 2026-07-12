@@ -7,7 +7,7 @@ import { ProductCard } from "@/components/product-card"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { getCategoryIcon } from "@/lib/products"
-import { CatalogProduct, Category } from "@/lib/supabase/types/database"
+import { CatalogProduct, Category } from "@/supabase/types/database"
 
 const PRODUCTS_PER_PAGE = 12
 

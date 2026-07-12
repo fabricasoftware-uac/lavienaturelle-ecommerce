@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Mail, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/supabase/types/client"
 
 export default function ForgotPasswordPage() {
   const supabase = createClient()

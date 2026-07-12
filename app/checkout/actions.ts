@@ -1,7 +1,7 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { Order } from '@/lib/supabase/types/database'
+import { createClient } from '@/supabase/types/server'
+import { Order } from '@/supabase/types/database'
 
 interface CartItem {
   id: string

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import dynamic from "next/dynamic"
-import { MappedOrder } from "@/lib/supabase/types/database"
+import { MappedOrder } from "@/supabase/types/database"
 import { OrdersSection } from "../components/OrdersSection"
 import { InfiniteScroll } from "@/components/infinite-scroll"
 

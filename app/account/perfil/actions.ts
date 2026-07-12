@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/supabase/types/server'
 
 export interface SessionUser {
   id: string

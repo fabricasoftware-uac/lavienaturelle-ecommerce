@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/supabase/types/client"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ChangePasswordPage() {

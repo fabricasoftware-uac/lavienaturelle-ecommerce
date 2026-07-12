@@ -7,7 +7,7 @@ import { Plus, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/lib/cart-context"
 import { cn, formatPrice } from "@/lib/utils"
-import { CatalogProduct } from "@/lib/supabase/types/database"
+import { CatalogProduct } from "@/supabase/types/database"
 
 interface ProductCardProps {
   product: CatalogProduct

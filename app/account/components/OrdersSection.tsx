@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { OrderCard } from "./OrderCard"
 import { Skeleton } from "@/components/ui/skeleton"
-import { MappedOrder } from "@/lib/supabase/types/database"
+import { MappedOrder } from "@/supabase/types/database"
 
 interface OrdersSectionProps {
   orders: MappedOrder[]

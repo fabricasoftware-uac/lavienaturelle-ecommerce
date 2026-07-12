@@ -4,7 +4,7 @@ import { ShoppingBag, Truck, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn, formatPrice } from "@/lib/utils"
 import { StatusBadge } from "@/components/status-badge"
-import { MappedOrder } from "@/lib/supabase/types/database"
+import { MappedOrder } from "@/supabase/types/database"
 
 interface OrderCardProps {
   order: MappedOrder

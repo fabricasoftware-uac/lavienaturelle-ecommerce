@@ -4,7 +4,7 @@ import { useState } from "react"
 import { ShoppingCart, Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/lib/cart-context"
-import type { CatalogProduct } from "@/lib/supabase/types/database"
+import type { CatalogProduct } from "@/supabase/types/database"
 
 interface AddToCartSectionProps {
   product: CatalogProduct

@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { toast } from "sonner"
-import { Address } from "@/lib/supabase/types/database"
+import { Address } from "@/supabase/types/database"
 import { AddressesSection } from "../components/AddressesSection"
 import { AddressDialog } from "@/components/address-dialog"
 import { getUserAddressesAction, createAddressAction, updateAddressAction, deleteAddressAction } from "./actions"

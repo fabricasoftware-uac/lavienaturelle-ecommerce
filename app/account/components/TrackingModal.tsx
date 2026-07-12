@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/status-badge"
 import { getWhatsAppTrackingLink } from "@/lib/whatsapp"
 import { cn } from "@/lib/utils"
-import { Order } from "@/lib/supabase/types/database"
+import { Order } from "@/supabase/types/database"
 
 export interface MappedOrder extends Partial<Order> {
   statusColor?: string

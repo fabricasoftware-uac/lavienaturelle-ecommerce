@@ -16,22 +16,24 @@ import {
   ShoppingCart,
   Lock,
   X,
-  Plus
+  Plus,
+  MessageCircle
 } from "lucide-react"
 import { AddressDialog } from "@/components/address-dialog"
-import { getUserAddresses } from "@/lib/supabase/addresses"
+import { getUserAddresses } from "@/supabase/types/addresses"
+import { getWhatsAppOrderLink } from "@/lib/whatsapp"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/cart-context"
 import { cn, formatPrice } from "@/lib/utils"
 import { useColombiaLocations } from "@/hooks/use-colombia"
 import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/supabase/types/client"
 import { createOrderAction, saveUserAddressAction, validateStockAction } from "./actions"
 import { claimGuestOrdersAction } from "../account/perfil/actions"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import { Order, OrderStatus, PaymentStatus, Address } from "@/lib/supabase/types/database"
+import { Order, OrderStatus, PaymentStatus, Address } from "@/supabase/types/database"
 
 interface UserInfo {
   id: string
@@ -41,12 +43,12 @@ interface UserInfo {
   document_number?: string | null
 }
 
-type CheckoutStep = "informacion" | "envio" | "pago" | "confirmacion"
+type CheckoutStep = "informacion" | "envio" | "finalizar" | "confirmacion"
 
 const stepLabels: Record<CheckoutStep, string> = {
   informacion: "Informacion",
   envio: "Envio",
-  pago: "Pago",
+  finalizar: "Finalizar",
   confirmacion: "Confirmacion",
 }
 
@@ -88,10 +90,6 @@ function CheckoutForm() {
     city: "",
     state: "",
     country: "Colombia",
-    cardNumber: "",
-    cardName: "",
-    expiry: "",
-    cvv: "",
   })
   
   const loadAddresses = async () => {
@@ -230,8 +228,8 @@ function CheckoutForm() {
     if (step === "informacion") {
       setStep("envio")
     } else if (step === "envio") {
-      setStep("pago")
-    } else if (step === "pago") {
+      setStep("finalizar")
+    } else if (step === "finalizar") {
       setIsSubmitting(true)
       
       const orderNumber = `LVN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
@@ -249,9 +247,9 @@ function CheckoutForm() {
         shipping_city: formData.city,
         shipping_state: formData.state,
         shipping_country: formData.country,
-        payment_method: "Tarjeta de Crédito",
-        status: 'paid' as OrderStatus,
-        payment_status: 'completed' as PaymentStatus
+        payment_method: "WhatsApp",
+        status: 'pending' as OrderStatus,
+        payment_status: 'pending' as PaymentStatus
       }
 
       try {
@@ -267,17 +265,40 @@ function CheckoutForm() {
         
         if (result.success) {
           // Store summary and order ID before clearing
-          setOrderSummary({
+          const summary = {
             items: [...cart],
             total: total,
             email: formData.email,
             name: formData.firstName,
             documentNumber: formData.documentNumber,
-            phone: formData.phone
-          })
+            phone: formData.phone,
+            address: formData.address,
+            apartment: formData.apartment,
+            city: formData.city,
+            state: formData.state,
+            country: formData.country,
+          }
+          setOrderSummary(summary)
           setOrderId(orderNumber)
-          setStep("confirmacion")
           clearCart()
+
+          // Open WhatsApp in a new tab immediately after order creation
+          const whatsappLink = getWhatsAppOrderLink({
+            orderNumber,
+            customerName: formData.firstName,
+            customerEmail: formData.email,
+            customerPhone: formData.phone || "",
+            documentNumber: formData.documentNumber,
+            shippingAddress: formData.address,
+            shippingAddress2: formData.apartment,
+            shippingCity: formData.city,
+            shippingState: formData.state,
+            items: summary.items,
+            total: summary.total,
+          })
+          window.open(whatsappLink, "_blank", "noopener,noreferrer")
+
+          setStep("confirmacion")
 
           // Save address if user is logged in
           if (user?.id) {
@@ -357,6 +378,37 @@ function CheckoutForm() {
                   <p className="text-lg font-bold">{orderId}</p>
                 </div>
               </div>
+
+              {/* WhatsApp Notification */}
+              <a
+                href={getWhatsAppOrderLink({
+                  orderNumber: orderId,
+                  customerName: orderSummary.name,
+                  customerEmail: orderSummary.email,
+                  customerPhone: orderSummary.phone || "",
+                  documentNumber: orderSummary.documentNumber,
+                  shippingAddress: orderSummary.address,
+                  shippingAddress2: orderSummary.apartment,
+                  shippingCity: orderSummary.city,
+                  shippingState: orderSummary.state,
+                  items: orderSummary.items,
+                  total: orderSummary.total,
+                })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button
+                  type="button"
+                  className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-green-200 flex items-center justify-center gap-2"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  Enviar Pedido por WhatsApp
+                </Button>
+              </a>
+              <p className="text-center text-xs text-muted-foreground mt-2">
+                Haz clic para enviarnos los detalles de tu pedido y lo gestionaremos de inmediato.
+              </p>
 
               {/* Create Account Section */}
               {!user && (
@@ -555,19 +607,19 @@ function CheckoutForm() {
           <div>
             {/* Progress Steps */}
             <div className="flex items-center gap-2 mb-8 justify-center">
-              {(["informacion", "envio", "pago"] as CheckoutStep[]).map((s, i) => (
+              {(["informacion", "envio", "finalizar"] as CheckoutStep[]).map((s, i) => (
                 <div key={s} className="flex items-center">
                   <div
                     className={cn(
                       "flex items-center justify-center h-8 w-8 rounded-full text-sm font-medium",
                       step === s
                         ? "bg-primary text-primary-foreground"
-                        : i < ["informacion", "envio", "pago"].indexOf(step)
+                        : i < ["informacion", "envio", "finalizar"].indexOf(step)
                           ? "bg-primary/20 text-primary"
                           : "bg-secondary text-muted-foreground"
                     )}
                   >
-                    {i < ["informacion", "envio", "pago"].indexOf(step) ? (
+                    {i < ["informacion", "envio", "finalizar"].indexOf(step) ? (
                       <Check className="h-4 w-4" />
                     ) : (
                       i + 1
@@ -829,81 +881,54 @@ function CheckoutForm() {
                 </div>
               )}
 
-              {/* Payment Step */}
-              {step === "pago" && (
+              {/* Finalizar Step - Review & Confirm */}
+              {step === "finalizar" && (
                 <div className="space-y-6">
                   <h2 className="font-serif text-xl font-bold text-foreground">
-                    Detalles de Pago
+                    Revisa tu pedido
                   </h2>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
-                        Numero de Tarjeta
-                      </label>
-                      <div className="relative">
-                        <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                          type="text"
-                          name="cardNumber"
-                          value={formData.cardNumber}
-                          onChange={handleInputChange}
-                          placeholder="Ingresa el numero de tu tarjeta"
-                          className="pl-12 rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
-                        Nombre en la Tarjeta
-                      </label>
-                      <Input
-                        type="text"
-                        name="cardName"
-                        value={formData.cardName}
-                        onChange={handleInputChange}
-                        placeholder="Juan Perez"
-                        className="rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
-                        required
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
+
+                  {/* Contact Summary */}
+                  <div className="bg-muted/30 rounded-2xl p-5 border border-border space-y-3">
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Contacto</h3>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
-                          Fecha de Vencimiento
-                        </label>
-                        <Input
-                          type="text"
-                          name="expiry"
-                          value={formData.expiry}
-                          onChange={handleInputChange}
-                          placeholder="MM/AA"
-                          className="rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
-                          required
-                        />
+                        <span className="text-muted-foreground block text-xs">Email</span>
+                        <span className="font-medium">{formData.email}</span>
                       </div>
                       <div>
-                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
-                          CVV
-                        </label>
-                        <Input
-                          type="text"
-                          name="cvv"
-                          value={formData.cvv}
-                          onChange={handleInputChange}
-                          placeholder="123"
-                          className="rounded-2xl border-border h-12 focus-visible:ring-primary/20 bg-muted/30"
-                          required
-                        />
+                        <span className="text-muted-foreground block text-xs">Nombre</span>
+                        <span className="font-medium">{formData.firstName}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block text-xs">Documento</span>
+                        <span className="font-medium">{formData.documentNumber}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block text-xs">Telefono</span>
+                        <span className="font-medium">{formData.phone || "—"}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-muted/30 rounded-2xl p-4 flex items-center gap-3 border border-border">
-                    <Shield className="h-5 w-5 text-primary" />
-                    <p className="text-sm text-muted-foreground font-medium">
-                      Tu informacion de pago esta encriptada y segura.
-                    </p>
+                  {/* Shipping Summary */}
+                  <div className="bg-muted/30 rounded-2xl p-5 border border-border space-y-3">
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Envio</h3>
+                    <div className="text-sm space-y-1">
+                      <p className="font-medium">{formData.address}{formData.apartment ? `, ${formData.apartment}` : ""}</p>
+                      <p className="text-muted-foreground">{formData.city}, {formData.state}, {formData.country}</p>
+                    </div>
+                  </div>
+
+                  {/* WhatsApp Notice */}
+                  <div className="bg-green-50 rounded-2xl p-5 border border-green-100 flex items-start gap-3">
+                    <MessageCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-bold text-green-800 mb-1">Pedido por WhatsApp</p>
+                      <p className="text-xs text-green-700 leading-relaxed">
+                        Al confirmar, tu pedido se registrara como pendiente. En la siguiente pantalla podras enviarnos los detalles por WhatsApp para que lo gestionemos de inmediato.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -916,7 +941,7 @@ function CheckoutForm() {
                     variant="outline"
                     onClick={() => {
                       if (step === "envio") setStep("informacion")
-                      if (step === "pago") setStep("envio")
+                      if (step === "finalizar") setStep("envio")
                     }}
                     className="flex-1 rounded-2xl h-14 font-bold border-stone-200 text-stone-600 hover:bg-stone-50"
                   >
@@ -934,7 +959,7 @@ function CheckoutForm() {
                       Procesando...
                     </div>
                   ) : (
-                    step === "pago" ? "Completar Pedido" : "Continuar"
+                    step === "finalizar" ? "Realizar Pedido" : "Continuar"
                   )}
                 </Button>
               </div>

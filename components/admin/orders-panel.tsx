@@ -53,8 +53,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { ShipmentModal } from "./shipment-modal"
-import { getOrders, updateOrder, deleteOrder } from "@/lib/supabase/orders"
-import { Order, OrderStatus, PaymentStatus } from "@/lib/supabase/types/database"
+import { getOrders, updateOrder, deleteOrder } from "@/supabase/types/orders"
+import { Order, OrderStatus, PaymentStatus } from "@/supabase/types/database"
 import { StatusBadge } from "@/components/status-badge"
 import { InfiniteScroll } from "@/components/infinite-scroll"
 import { getWhatsAppContactLink, getWhatsAppTrackingLink } from "@/lib/whatsapp"

@@ -12,7 +12,7 @@ import { ProductsTable } from "./products/products-table"
 import { ProductMobileCard } from "./products/product-mobile-card"
 import { ProductFormSheet } from "./products/product-form-sheet"
 import { InfiniteScroll } from "@/components/infinite-scroll"
-import { AppProduct } from "@/lib/supabase/types/database"
+import { AppProduct } from "@/supabase/types/database"
 
 const INITIAL_FORM_STATE: Partial<AppProduct> = {
   name: "",

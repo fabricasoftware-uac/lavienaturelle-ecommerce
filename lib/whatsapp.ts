@@ -69,3 +69,56 @@ export function getWhatsAppContactLink(
   const encodedMessage = encodeURIComponent(message);
   return `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
 }
+
+/**
+ * Generates a WhatsApp link to send a new order notification to the business.
+ * The customer clicks this to share their order details via WhatsApp.
+ */
+export function getWhatsAppOrderLink(order: {
+  orderNumber: string
+  customerName: string
+  customerEmail: string
+  customerPhone: string
+  documentNumber: string
+  shippingAddress: string
+  shippingAddress2?: string
+  shippingCity: string
+  shippingState: string
+  items: { name: string; quantity: number; price: number }[]
+  total: number
+}): string {
+  const fmt = (n: number) =>
+    "$" + n.toLocaleString("es-CO", { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+
+  const itemsText = order.items
+    .map((item) => `\u2022 ${item.name} x${item.quantity} - ${fmt(item.price * item.quantity)}`)
+    .join("\n")
+
+  const address = [
+    order.shippingAddress,
+    order.shippingAddress2,
+    `${order.shippingCity}, ${order.shippingState}`,
+  ]
+    .filter(Boolean)
+    .join(", ")
+
+  const message = [
+    `\u{1F6D2} *Nuevo Pedido - La Vie Naturelle*`,
+    ``,
+    `\u{1F4E6} *Pedido:* ${order.orderNumber}`,
+    `\u{1F464} *Cliente:* ${order.customerName}`,
+    `\u{1F4E7} *Email:* ${order.customerEmail}`,
+    `\u{1F4F1} *Tel\u00E9fono:* ${order.customerPhone}`,
+    `\u{1F194} *Documento:* ${order.documentNumber}`,
+    ``,
+    `\u{1F4CD} *Env\u00EDo:*`,
+    address,
+    ``,
+    `\u{1F6CD}\u{FE0F} *Productos:*`,
+    itemsText,
+    ``,
+    `\u{1F4B0} *Total:* ${fmt(order.total)}`,
+  ].join("\n")
+
+  return `https://wa.me/${formatWhatsAppPhone(BUSINESS_PHONE)}?text=${encodeURIComponent(message)}`
+}

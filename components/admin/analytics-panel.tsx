@@ -31,7 +31,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn, formatPrice } from "@/lib/utils"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/supabase/types/client"
 
 const COLORS = ["#10b981", "#3b82f6", "#8b5cf6", "#f59e0b", "#94a3b8"]
 

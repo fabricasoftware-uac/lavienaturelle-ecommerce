@@ -26,7 +26,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn, formatPrice } from "@/lib/utils"
 import { InfiniteScroll } from "@/components/infinite-scroll"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/supabase/types/client"
 
 interface OrderSummary {
   id: string

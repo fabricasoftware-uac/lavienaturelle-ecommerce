@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import type { Database } from '@/lib/supabase/types/database'
+import type { Database } from '@/supabase/types/database'
 
 // Routes that don't require authentication
 const publicRoutes = [

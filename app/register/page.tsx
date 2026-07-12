@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Leaf, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2, Phone, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/supabase/types/client"
 import { claimGuestOrdersAction } from "@/app/account/perfil/actions"
 import Image from "next/image"
 

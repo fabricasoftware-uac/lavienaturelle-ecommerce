@@ -1,5 +1,5 @@
 import { createClient } from "./client"
-import { Address } from "@/lib/supabase/types/database"
+import { Address, AddressInsert, AddressUpdate } from "@/supabase/types/database"
 
 export async function getUserAddresses(userId: string): Promise<Address[]> {
   const supabase = createClient()
@@ -20,7 +20,7 @@ export async function getUserAddresses(userId: string): Promise<Address[]> {
   return data || []
 }
 
-export async function createAddress(addressData: Partial<Address>) {
+export async function createAddress(addressData: AddressInsert) {
   const supabase = createClient()
   
   // If this is the first address, or is_default is true, we might want to handle default logic
@@ -46,7 +46,7 @@ export async function createAddress(addressData: Partial<Address>) {
   return { success: true, data }
 }
 
-export async function updateAddress(addressId: string, updates: Partial<Address>) {
+export async function updateAddress(addressId: string, updates: AddressUpdate) {
   const supabase = createClient()
   
   if (updates.is_default && updates.user_id) {

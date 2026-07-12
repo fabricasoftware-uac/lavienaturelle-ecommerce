@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Playfair_Display, Montserrat } from 'next/font/google'
 import { StoreProvider } from '@/lib/cart-context'
 import { Toaster } from '@/components/ui/toaster'
-import { createClient } from "@/lib/supabase/server"
+import { createClient } from "@/supabase/types/server"
 import './globals.css'
 import { Navbar } from '@/components/navbar'
 

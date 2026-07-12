@@ -3,7 +3,7 @@
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AddressCard } from "./AddressCard"
-import { Address } from "@/lib/supabase/types/database"
+import { Address } from "@/supabase/types/database"
 
 interface AddressesSectionProps {
   addresses: Address[]

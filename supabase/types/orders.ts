@@ -1,5 +1,5 @@
 import { createClient } from "./client"
-import type { Order } from "@/lib/supabase/types/database"
+import type { Order } from "@/supabase/types/database"
 
 export async function getOrders() {
   const supabase = createClient()

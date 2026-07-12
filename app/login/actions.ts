@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from "@/lib/supabase/server"
+import { createClient } from "@/supabase/types/server"
 import { claimGuestOrdersAction } from "../account/perfil/actions"
 
 const errorTranslations: Record<string, string> = {
