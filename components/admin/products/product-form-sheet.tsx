@@ -40,6 +40,7 @@ interface ProductFormSheetProps {
   title: string
   categories: Category[]
   onAddCategory: (name: string) => void
+  onDeleteCategory: (id: string) => void
   onDelete: (id: string) => void
   saving: boolean
 }
@@ -55,6 +56,7 @@ export function ProductFormSheet({
   title,
   categories,
   onAddCategory,
+  onDeleteCategory,
   onDelete,
   saving,
 }: ProductFormSheetProps) {
@@ -275,6 +277,23 @@ export function ProductFormSheet({
                               {categories.map((cat) => <option key={cat.id} value={cat.slug}>{cat.name}</option>)}
                             </select>
                             <Button type="button" onClick={() => setShowCategoryInput(true)} variant="outline" className="h-12 w-12 rounded-2xl border-border hover:bg-secondary shrink-0"><PlusCircle className="h-5 w-5 text-primary" /></Button>
+                            {data.category && (
+                              <Button 
+                                type="button" 
+                                variant="ghost" 
+                                onClick={() => {
+                                  const cat = categories.find(c => c.slug === data.category)
+                                  if (cat) {
+                                    onDeleteCategory(cat.id)
+                                    setForm({...data, category: ""})
+                                  }
+                                }}
+                                className="h-12 w-12 rounded-2xl text-red-500 hover:text-red-700 hover:bg-red-50 shrink-0"
+                                title="Eliminar categoría seleccionada"
+                              >
+                                <Trash2 className="h-5 w-5" />
+                              </Button>
+                            )}
                           </div>
                         )}
                       </div>

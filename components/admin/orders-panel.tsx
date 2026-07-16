@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   Search,
   Filter,
@@ -326,12 +326,20 @@ export function OrdersPanel() {
     window.open(whatsappLink, '_blank')
   }
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) || order.customer.name.toLowerCase().includes(searchQuery.toLowerCase())
-    if (statusFilter === "All") return matchesSearch
-    if (statusFilter === "Paid") return matchesSearch && (order.shippingStatus === "Paid" || order.paymentStatus === "Paid" || order.paymentStatus === "Completed")
-    return matchesSearch && order.shippingStatus === statusFilter
-  })
+  const filteredOrders = useMemo(() => {
+    return orders.filter(order => {
+      const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) || order.customer.name.toLowerCase().includes(searchQuery.toLowerCase())
+      if (statusFilter === "All") return matchesSearch
+      if (statusFilter === "Pending") return matchesSearch && order.shippingStatus === "Pending"
+      if (statusFilter === "Processing") return matchesSearch && order.shippingStatus === "Processing"
+      if (statusFilter === "Paid") return matchesSearch && order.paymentStatus === "Completed"
+      if (statusFilter === "Shipped") return matchesSearch && order.shippingStatus === "Shipped"
+      if (statusFilter === "Delivered") return matchesSearch && order.shippingStatus === "Delivered"
+      if (statusFilter === "Cancelled") return matchesSearch && order.shippingStatus === "Cancelled"
+      if (statusFilter === "Refunded") return matchesSearch && order.shippingStatus === "Refunded"
+      return matchesSearch
+    })
+  }, [orders, searchQuery, statusFilter])
 
   // Reset display count when filters change
   useEffect(() => { setDisplayCount(STEP) }, [searchQuery, statusFilter])
@@ -380,12 +388,16 @@ export function OrdersPanel() {
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setDisplayCount(STEP) }}
-            className="bg-secondary/30 rounded-lg px-3 py-1.5 text-xs font-medium border-none h-9 outline-none"
+            className="bg-secondary/30 rounded-lg px-3 py-1.5 text-xs font-medium border-none h-9 outline-none cursor-pointer"
           >
             <option value="All">Todos</option>
+            <option value="Pending">Pendiente</option>
+            <option value="Processing">Procesando</option>
             <option value="Paid">Pagado</option>
             <option value="Shipped">Enviado</option>
             <option value="Delivered">Entregado</option>
+            <option value="Cancelled">Cancelado</option>
+            <option value="Refunded">Reembolsado</option>
           </select>
         </div>
       </div>

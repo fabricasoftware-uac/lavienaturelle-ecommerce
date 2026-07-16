@@ -39,6 +39,7 @@ export function ProductsPanel() {
     saveProduct,
     createProduct,
     addCategory,
+    deleteCategory,
     deleteProduct,
   } = useProducts()
 
@@ -100,6 +101,17 @@ export function ProductsPanel() {
     if (res.success) {
       // Sincronizamos con el slug para mantener consistencia con el resto del flujo
       setForm((prev) => ({ ...prev, category: res.data?.slug }))
+    }
+  }
+
+  const handleDeleteCategory = async (id: string) => {
+    const cat = categories.find(c => c.id === id)
+    if (!window.confirm(`¿Eliminar la categoría "${cat?.name}"? Los productos que la usen quedarán sin categoría.`)) return
+    const res = await deleteCategory(id)
+    if (res.success) {
+      toast.success("Categoría eliminada")
+    } else {
+      toast.error("Error al eliminar categoría")
     }
   }
 
@@ -228,6 +240,7 @@ export function ProductsPanel() {
         title="Detalle del Producto"
         categories={categories}
         onAddCategory={handleAddCategory}
+        onDeleteCategory={handleDeleteCategory}
         onDelete={handleDelete}
         saving={saving}
       />
@@ -244,6 +257,7 @@ export function ProductsPanel() {
         title="Nuevo Producto"
         categories={categories}
         onAddCategory={handleAddCategory}
+        onDeleteCategory={handleDeleteCategory}
         onDelete={() => {}} 
         saving={saving}
       />

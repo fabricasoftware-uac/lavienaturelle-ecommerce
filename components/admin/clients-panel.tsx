@@ -54,6 +54,8 @@ export function ClientsPanel() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [dateSort, setDateSort] = useState("desc")
+  const [orderFilter, setOrderFilter] = useState<"all" | "with" | "without">("all")
+  const [roleFilter, setRoleFilter] = useState<"all" | "customer" | "admin">("all")
   const [displayCount, setDisplayCount] = useState(20)
   const STEP = 10
 
@@ -168,22 +170,27 @@ export function ClientsPanel() {
     setSaving(false)
   }
 
-  const filteredClients = clients
-    .filter(c => {
-      const q = searchQuery.toLowerCase()
-      return (
-        c.full_name.toLowerCase().includes(q) ||
-        c.email.toLowerCase().includes(q) ||
-        c.id.toLowerCase().includes(q)
-      )
-    })
-    .sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime()
-      const dateB = new Date(b.created_at).getTime()
-      return dateSort === "desc" ? dateB - dateA : dateA - dateB
-    })
-
-  useEffect(() => { setDisplayCount(STEP) }, [searchQuery, dateSort])
+  const filteredClients = useMemo(() => {
+    return clients
+      .filter(c => {
+        const q = searchQuery.toLowerCase()
+        const matchesSearch = (
+          c.full_name.toLowerCase().includes(q) ||
+          c.email.toLowerCase().includes(q) ||
+          c.id.toLowerCase().includes(q)
+        )
+        if (!matchesSearch) return false
+        if (orderFilter === "with") return c.totalOrders > 0
+        if (orderFilter === "without") return c.totalOrders === 0
+        if (roleFilter !== "all") return c.role === roleFilter
+        return true
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.created_at).getTime()
+        const dateB = new Date(b.created_at).getTime()
+        return dateSort === "desc" ? dateB - dateA : dateA - dateB
+      })
+  }, [clients, searchQuery, dateSort, orderFilter, roleFilter])
 
   const visibleClients = filteredClients.slice(0, displayCount)
   const hasMore = displayCount < filteredClients.length
@@ -220,10 +227,28 @@ export function ClientsPanel() {
               className="pl-10 bg-secondary/30 border-none h-11 rounded-xl text-sm font-medium"
             />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <select
+              value={orderFilter}
+              onChange={(e) => { setOrderFilter(e.target.value as any); setDisplayCount(STEP) }}
+              className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50"
+            >
+              <option value="all">Todos</option>
+              <option value="with">Con pedidos</option>
+              <option value="without">Sin pedidos</option>
+            </select>
+            <select
+              value={roleFilter}
+              onChange={(e) => { setRoleFilter(e.target.value as any); setDisplayCount(STEP) }}
+              className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50"
+            >
+              <option value="all">Todos los roles</option>
+              <option value="customer">Cliente</option>
+              <option value="admin">Admin</option>
+            </select>
             <select
               value={dateSort}
-              onChange={(e) => setDateSort(e.target.value)}
+              onChange={(e) => { setDateSort(e.target.value); setDisplayCount(STEP) }}
               className="bg-secondary/30 rounded-xl px-4 py-1.5 text-xs font-semibold focus:outline-none border-none cursor-pointer h-11 transition-colors hover:bg-secondary/50"
             >
               <option value="desc">Más recientes</option>

@@ -233,6 +233,25 @@ export function useProducts() {
     }
   }
 
+  const deleteCategory = async (id: string) => {
+    setError(null)
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id)
+
+      if (error) throw error
+
+      setCategories(prev => prev.filter(c => c.id !== id))
+      return { success: true }
+    } catch (err: any) {
+      console.error("Error deleting category:", err)
+      setError(err.message || "Error al eliminar categoría")
+      return { success: false, error: err }
+    }
+  }
+
   const deleteProduct = async (id: string) => {
     setSaving(true)
     setError(null)
@@ -264,6 +283,7 @@ export function useProducts() {
     saveProduct,
     createProduct,
     addCategory,
+    deleteCategory,
     deleteProduct,
     refresh: fetchData
   }
