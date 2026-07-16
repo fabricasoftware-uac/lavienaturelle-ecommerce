@@ -118,6 +118,8 @@ export function getWhatsAppOrderLink(order: {
     itemsText,
     ``,
     `\u{1F4B0} *Total:* ${fmt(order.total)}`,
+    ``,
+    `\u{1F4AC} *Pendiente:* Contactar al cliente para confirmar pago y envio.`,
   ].join("\n")
 
   return `https://wa.me/${formatWhatsAppPhone(BUSINESS_PHONE)}?text=${encodeURIComponent(message)}`

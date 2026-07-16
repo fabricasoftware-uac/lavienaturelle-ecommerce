@@ -29,7 +29,7 @@ import { cn, formatPrice } from "@/lib/utils"
 import { useColombiaLocations } from "@/hooks/use-colombia"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/supabase/types/client"
-import { createOrderAction, saveUserAddressAction, validateStockAction } from "./actions"
+import { createOrderAction, saveUserAddressAction } from "./actions"
 import { claimGuestOrdersAction } from "../account/perfil/actions"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
@@ -253,14 +253,6 @@ function CheckoutForm() {
       }
 
       try {
-        // Validate stock before creating the order
-        const stockCheck = await validateStockAction(cart)
-        if (!stockCheck.valid) {
-          toast.error(stockCheck.error || "Stock insuficiente")
-          setIsSubmitting(false)
-          return
-        }
-
         const result = await createOrderAction(orderData, cart)
         
         if (result.success) {
@@ -365,7 +357,7 @@ function CheckoutForm() {
                   ¡Pedido Recibido!
                 </h1>
                 <p className="text-stone-100 font-medium max-w-sm mx-auto text-sm leading-relaxed">
-                  Gracias por confiar en La Vie Naturelle. Tu pedido ya está en camino a ser procesado.
+                  Tu pedido fue registrado con exito. En breve nos pondremos en contacto via WhatsApp para confirmar el pago y coordinar la entrega.
                 </p>
               </div>
             </div>
@@ -407,7 +399,7 @@ function CheckoutForm() {
                 </Button>
               </a>
               <p className="text-center text-xs text-muted-foreground mt-2">
-                Haz clic para enviarnos los detalles de tu pedido y lo gestionaremos de inmediato.
+                Al hacer clic se abrira un chat con los detalles de tu pedido listos para enviar. Por ahi coordinaremos el pago y la entrega.
               </p>
 
               {/* Create Account Section */}
@@ -892,21 +884,21 @@ function CheckoutForm() {
                   <div className="bg-muted/30 rounded-2xl p-5 border border-border space-y-3">
                     <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Contacto</h3>
                     <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div>
+                      <div className="col-span-2">
                         <span className="text-muted-foreground block text-xs">Email</span>
-                        <span className="font-medium">{formData.email}</span>
+                        <span className="font-medium break-words">{formData.email}</span>
                       </div>
                       <div>
                         <span className="text-muted-foreground block text-xs">Nombre</span>
-                        <span className="font-medium">{formData.firstName}</span>
+                        <span className="font-medium break-words">{formData.firstName}</span>
                       </div>
                       <div>
                         <span className="text-muted-foreground block text-xs">Documento</span>
-                        <span className="font-medium">{formData.documentNumber}</span>
+                        <span className="font-medium break-words">{formData.documentNumber}</span>
                       </div>
                       <div>
                         <span className="text-muted-foreground block text-xs">Telefono</span>
-                        <span className="font-medium">{formData.phone || "—"}</span>
+                        <span className="font-medium break-words">{formData.phone || "—"}</span>
                       </div>
                     </div>
                   </div>
@@ -925,9 +917,9 @@ function CheckoutForm() {
                     <MessageCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-bold text-green-800 mb-1">Pedido por WhatsApp</p>
-                      <p className="text-xs text-green-700 leading-relaxed">
-                        Al confirmar, tu pedido se registrara como pendiente. En la siguiente pantalla podras enviarnos los detalles por WhatsApp para que lo gestionemos de inmediato.
-                      </p>
+                        <p className="text-xs text-green-700 leading-relaxed">
+                          Al confirmar, tu pedido quedara registrado y te llevaremos a WhatsApp para coordinar el pago y envio directamente con nosotros. No se realizara ningun cobro en linea.
+                        </p>
                     </div>
                   </div>
                 </div>
