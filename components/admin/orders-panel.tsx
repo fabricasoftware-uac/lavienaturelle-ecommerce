@@ -53,17 +53,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { ShipmentModal } from "./shipment-modal"
-import { getOrders, updateOrder, deleteOrder } from "@/supabase/types/orders"
+import { updateOrder, deleteOrder } from "@/supabase/types/orders"
 import { Order, OrderStatus, PaymentStatus } from "@/supabase/types/database"
 import { StatusBadge } from "@/components/status-badge"
 import { InfiniteScroll } from "@/components/infinite-scroll"
 import { getWhatsAppContactLink, getWhatsAppTrackingLink } from "@/lib/whatsapp"
-
-// INITIAL_ORDERS removed - using Supabase data
+import { useRealtimeOrders } from "@/hooks/use-realtime-orders"
 
 export function OrdersPanel() {
-  const [orders, setOrders] = useState<any[]>([]) // Keeping any[] for the mapped UI structure but could define a UIOther interface
-  const [loading, setLoading] = useState(true)
+  const { orders, loading, refetch } = useRealtimeOrders()
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("All")
   const [displayCount, setDisplayCount] = useState(20)
@@ -81,58 +79,6 @@ export function OrdersPanel() {
   const [orderToDelete, setOrderToDelete] = useState<{ id: string, realId: string } | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
-  useEffect(() => {
-    let cancelled = false
-
-    async function loadOrders() {
-      setLoading(true)
-      try {
-        const data = await getOrders()
-        if (cancelled) return
-
-        // Map Supabase data to UI structure
-        const mappedOrders = data.map((o: any) => ({
-          id: o.order_number || o.id,
-          realId: o.id,
-          customer: {
-            name: o.full_name ?? "Sin nombre",
-            email: o.email ?? "",
-            phone: o.phone || "No especificado",
-            documentNumber: o.document_number || "No especificado",
-            address: `${o.shipping_address_line1 ?? ""}${o.shipping_address_line2 ? ', ' + o.shipping_address_line2 : ''}, ${o.shipping_city ?? ""}, ${o.shipping_state ?? ""}`,
-            addressLine1: o.shipping_address_line1 ?? "",
-            addressLine2: o.shipping_address_line2 || "",
-            city: o.shipping_city ?? "",
-            state: o.shipping_state ?? "",
-          },
-          date: o.created_at,
-          shippingStatus: (o.status ?? "pending").charAt(0).toUpperCase() + (o.status ?? "pending").slice(1),
-          paymentStatus: (o.payment_status ?? "pending").charAt(0).toUpperCase() + (o.payment_status ?? "pending").slice(1),
-          total: Number(o.total_amount ?? 0),
-          items: (o.order_items ?? []).map((item: any) => ({
-            id: item.product_id,
-            name: item.product_name_snapshot,
-            price: Number(item.unit_price),
-            quantity: item.quantity
-          })),
-          history: [
-            { status: "Pedido Realizado", date: o.created_at }
-          ]
-        }))
-
-        setOrders(mappedOrders)
-      } catch (err) {
-        console.error("Error loading orders:", err)
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-
-    loadOrders()
-
-    return () => { cancelled = true }
-  }, [])
-
   const handleOpenShipmentModal = (order: any) => {
     setShipmentModalOrder(order)
     setIsShipmentModalOpen(true)
@@ -148,20 +94,7 @@ export function OrdersPanel() {
     })
 
     if (res.success) {
-      setOrders(prev => prev.map(order => 
-        order.realId === shipmentModalOrder.realId 
-          ? { 
-              ...order, 
-              shippingStatus: "Shipped" as const,
-              carrier,
-              trackingId,
-              history: [
-                { status: "Shipped", date: new Date().toISOString() },
-                ...order.history
-              ]
-            } 
-          : order
-      ))
+      refetch()
 
       toast.success("Pedido actualizado", {
         description: `El pedido ${shipmentModalOrder.id} ha sido marcado como enviado.`
@@ -193,18 +126,7 @@ export function OrdersPanel() {
     })
 
     if (res.success) {
-      setOrders(prev => prev.map(o =>
-        o.realId === order.realId
-          ? {
-              ...o,
-              shippingStatus: "Delivered" as const,
-              history: [
-                { status: "Delivered", date: new Date().toISOString() },
-                ...o.history,
-              ],
-            }
-          : o
-      ))
+      refetch()
 
       toast.success("Pedido actualizado", {
         description: `El pedido ${order.id} ha sido marcado como entregado.`,
@@ -251,29 +173,7 @@ export function OrdersPanel() {
     })
 
     if (res.success) {
-      const fullAddress = `${editForm.customerAddress}${editForm.customerAddress2 ? ', ' + editForm.customerAddress2 : ''}, ${editForm.customerCity}, ${editForm.customerState}`
-      
-      setOrders(prev => prev.map(order => 
-        order.realId === selectedOrder.realId 
-          ? { 
-              ...order, 
-              customer: { 
-                ...order.customer, 
-                name: editForm.customerName, 
-                email: editForm.customerEmail, 
-                phone: editForm.customerPhone, 
-                documentNumber: editForm.customerDocument,
-                address: fullAddress,
-                addressLine1: editForm.customerAddress,
-                addressLine2: editForm.customerAddress2,
-                city: editForm.customerCity,
-                state: editForm.customerState
-              },
-              shippingStatus: editForm.shippingStatus,
-              paymentStatus: editForm.paymentStatus,
-            } 
-          : order
-      ))
+      refetch()
       toast.success("Pedido guardado", {
         description: "La información del pedido ha sido actualizada correctamente."
       })
@@ -296,7 +196,7 @@ export function OrdersPanel() {
 
     const res = await deleteOrder(orderToDelete.realId)
     if (res.success) {
-      setOrders(prev => prev.filter(order => order.realId !== orderToDelete.realId))
+      refetch()
       toast.success("Pedido eliminado", {
         description: `El pedido ${orderToDelete.id} ha sido borrado.`
       })
