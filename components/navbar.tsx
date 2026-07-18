@@ -8,6 +8,7 @@ import { useStore } from "@/lib/cart-context"
 import Image from "next/image"
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -31,6 +32,7 @@ export function Navbar({ role }: { role: string | null }) {
   const router = useRouter()
   const { cartCount, setIsCartOpen } = useStore()
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Admin and Account layouts have their own navigation
   if (pathname.startsWith('/admin') || pathname.startsWith('/account')) {
@@ -113,9 +115,13 @@ export function Navbar({ role }: { role: string | null }) {
         <div className="flex h-20 items-center justify-between">
           {/* Mobile Menu (Left) */}
           <div className="flex sm:hidden">
-            <Sheet>
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   <Menu className="h-6 w-6" />
                   <span className="sr-only">Menú</span>
                 </Button>
@@ -136,6 +142,7 @@ export function Navbar({ role }: { role: string | null }) {
                 <div className="flex flex-col gap-6 p-6">
                   <Link
                     href="/consulta-pedido"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center gap-3 text-lg font-medium text-foreground hover:text-primary transition-colors"
                   >
                     <Truck className="h-5 w-5 text-stone-500" />
@@ -148,13 +155,17 @@ export function Navbar({ role }: { role: string | null }) {
                     <div className="flex flex-col gap-4">
                       <Link
                         href="/account"
+                        onClick={() => setIsMobileMenuOpen(false)}
                         className="flex items-center gap-3 text-lg font-medium text-foreground hover:text-primary transition-colors"
                       >
                         <User className="h-5 w-5 text-stone-500" />
                         Mi Cuenta
                       </Link>
                       <button
-                        onClick={() => setShowLogoutDialog(true)}
+                        onClick={() => {
+                          setIsMobileMenuOpen(false)
+                          setShowLogoutDialog(true)
+                        }}
                         className="flex items-center gap-3 text-lg font-medium text-destructive hover:opacity-80 transition-opacity text-left"
                       >
                         <LogOut className="h-5 w-5" />
@@ -164,6 +175,7 @@ export function Navbar({ role }: { role: string | null }) {
                   ) : (
                     <Link
                       href="/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
                       className="flex items-center gap-3 text-lg font-medium text-foreground hover:text-primary transition-colors"
                     >
                       <User className="h-5 w-5 text-stone-500" />

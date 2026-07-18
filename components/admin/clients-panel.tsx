@@ -375,7 +375,7 @@ export function ClientsPanel() {
 
       {/* Client Detail Sheet */}
       <Sheet open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <SheetContent className="sm:max-w-2xl p-0 flex flex-col h-full border-l border-border bg-background shadow-2xl">
+        <SheetContent className="sm:max-w-2xl w-full p-0 flex flex-col h-full border-l border-border bg-background shadow-2xl">
           {selectedClient && (
             <div className="flex flex-col h-full overflow-hidden">
               {/* Header */}

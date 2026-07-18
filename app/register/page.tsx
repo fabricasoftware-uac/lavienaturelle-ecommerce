@@ -58,7 +58,7 @@ function RegisterForm() {
       await claimGuestOrdersAction()
       setIsSuccess(true)
       setTimeout(() => {
-        router.push("/")
+        router.push("/login")
       }, 1000)
     } else {
       setError(signUpError.message)
@@ -77,7 +77,7 @@ function RegisterForm() {
           </div>
           <h1 className="font-serif text-3xl font-semibold text-foreground">Cuenta creada con exito!</h1>
           <p className="text-muted-foreground">
-            Bienvenido a La Vie Naturelle, {name}. Te estamos redirigiendo a la tienda...
+            Bienvenido a La Vie Naturelle, {name}. Para continuar, inicia sesion...
           </p>
           <div className="flex justify-center">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -118,16 +118,6 @@ function RegisterForm() {
             <ArrowLeft className="h-4 w-4" />
             Volver a la tienda
           </Link>
-
-          <div className="lg:hidden flex items-center gap-2 mb-8 text-primary">
-            <Image
-                src="/logo_header.png"
-                alt="La Vie Naturelle Logo"
-                className="h-12 w-auto object-contain"
-                height={50}
-                width={50}
-            />
-          </div>
 
           <div className="bg-white border border-border p-10 rounded-[40px] shadow-sm space-y-6">
             <div className="text-center space-y-2">

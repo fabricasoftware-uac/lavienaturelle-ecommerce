@@ -35,7 +35,7 @@ export default async function RootLayout({
   const role = data?.claims.app_metadata?.role || null
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${montserrat.variable} font-sans antialiased`} suppressHydrationWarning>
+      <body className={`${montserrat.variable} font-sans antialiased smooth-scroll`} suppressHydrationWarning>
         <StoreProvider>
           <Navbar role={role} />
           {children}

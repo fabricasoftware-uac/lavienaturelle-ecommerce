@@ -128,7 +128,7 @@ export function ProductFormSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetContent className="sm:max-w-2xl p-0 flex flex-col h-full border-l border-border bg-background shadow-2xl">
+      <SheetContent className="sm:max-w-2xl w-full p-0 flex flex-col h-full border-l border-border bg-background shadow-2xl">
         <div className="flex flex-col h-full overflow-hidden">
           {/* Header */}
           <div className="px-5 sm:px-8 pt-8 sm:pt-10 pb-6 border-b border-border bg-card/50 backdrop-blur-md z-30 shrink-0">

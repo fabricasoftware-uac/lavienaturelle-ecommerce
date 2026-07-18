@@ -387,7 +387,7 @@ export function OrdersPanel() {
 
       {/* Sidebar de Detalles (Fixed Scroll) */}
       <Sheet open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <SheetContent className="sm:max-w-xl p-0 flex flex-col h-full border-l border-border bg-background">
+        <SheetContent className="sm:max-w-xl w-full p-0 flex flex-col h-full border-l border-border bg-background">
           {selectedOrder && editForm && (
             <>
               {/* Header Fijo */}

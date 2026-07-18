@@ -35,7 +35,7 @@ export function HeroSection() {
               sostenible del territorio.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link href="#catalogo">
+              <Link href="/#catalogo">
                 <Button
                   size="lg"
                   className="rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14 px-10 shadow-lg shadow-stone-200 transition-all active:scale-[0.98]"
