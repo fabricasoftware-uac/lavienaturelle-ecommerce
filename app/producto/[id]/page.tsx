@@ -41,7 +41,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="min-h-screen bg-background">
       <CartDrawer />
-      <main className="pt-20">
+      <main className="pt-5">
         {/* Breadcrumb */}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -154,7 +154,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         {/* Benefits & Instructions */}
         {(product.details.ingredients || product.details.usage || (product.details.benefits && product.details.benefits.length > 0)) && (
-          <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+          <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
             <div className="grid md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 {product.details.ingredients && (

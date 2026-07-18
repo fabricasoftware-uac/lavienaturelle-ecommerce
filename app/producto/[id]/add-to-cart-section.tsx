@@ -25,7 +25,7 @@ export function AddToCartSection({ product }: AddToCartSectionProps) {
 
   return (
     <div className="flex flex-col sm:flex-row gap-3 pt-2">
-      <div className="flex items-center border border-border rounded-2xl overflow-hidden bg-card sm:w-auto w-full sm:justify-start">
+      <div className="flex items-center border border-border rounded-2xl overflow-hidden bg-card sm:w-auto w-full justify-center sm:justify-start">
         <button
           onClick={() => setQuantity(Math.max(1, quantity - 1))}
           className="p-4 hover:bg-secondary/50 transition-colors"
@@ -45,7 +45,7 @@ export function AddToCartSection({ product }: AddToCartSectionProps) {
       <Button
         size="lg"
         disabled={maxQuantity === 0}
-        className="flex-1 sm:flex-none rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14 shadow-lg shadow-stone-200 transition-all active:scale-[0.98] gap-3 w-full sm:w-auto sm:min-w-52"
+        className="h-14 "
         onClick={handleAddToCart}
       >
         <ShoppingCart className="h-5 w-5" />
