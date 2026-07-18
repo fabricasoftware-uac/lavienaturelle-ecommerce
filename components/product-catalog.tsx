@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 import { CatalogProduct, Category } from "@/supabase/types/database"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useRealtimeProducts } from "@/hooks/use-realtime-products"
 
 const PRODUCTS_PER_PAGE = 8
 
@@ -17,17 +18,16 @@ interface ProductCatalogProps {
 }
 
 export function ProductCatalog({ initialProducts, initialCategories }: ProductCatalogProps) {
-  const displayProducts = initialProducts
-  const displayCategories = initialCategories
+  const { products, categories } = useRealtimeProducts(initialProducts, initialCategories)
 
   const [activeCategory, setActiveCategory] = useState<string | "all">("all")
   const [currentPage, setCurrentPage] = useState(1)
 
   const filteredProducts = useMemo(() => {
     return activeCategory === "all"
-      ? displayProducts
-      : displayProducts.filter((p) => p.category === activeCategory)
-  }, [activeCategory, displayProducts])
+      ? products
+      : products.filter((p) => p.category === activeCategory)
+  }, [activeCategory, products])
 
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
   const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE
@@ -61,7 +61,7 @@ export function ProductCatalog({ initialProducts, initialCategories }: ProductCa
   }
 
   const activeCategoryName = activeCategory !== "all"
-    ? displayCategories.find(c => c.slug === activeCategory)?.name
+    ? categories.find(c => c.slug === activeCategory)?.name
     : null
 
   return (
@@ -96,7 +96,7 @@ export function ProductCatalog({ initialProducts, initialCategories }: ProductCa
         {/* Filters + Results inline bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4 pb-5 border-b border-border/40">
           <div className="flex flex-wrap items-center justify-center gap-2">
-            {[{ slug: "all", name: "Todos" }, ...displayCategories].map((cat) => {
+            {[{ slug: "all", name: "Todos" }, ...categories].map((cat) => {
               const isActive = cat.slug === "all" ? activeCategory === "all" : activeCategory === cat.slug
               const isRealCategory = cat.slug !== "all"
               const Icon = isRealCategory ? getCategoryIcon(cat.slug) : null
