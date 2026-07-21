@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react"
+import { Lock, Eye, EyeOff, Loader2, ShieldCheck, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createClient } from "@/supabase/types/client"
@@ -13,11 +13,25 @@ export default function ChangePasswordPage() {
   const supabase = createClient()
   const { toast } = useToast()
 
+  const [sessionReady, setSessionReady] = useState(false)
+  const [sessionError, setSessionError] = useState(false)
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+
+  useEffect(() => {
+    async function initSession() {
+      const { data, error } = await supabase.auth.getSession()
+      if (error || !data.session) {
+        setSessionError(true)
+      } else {
+        setSessionReady(true)
+      }
+    }
+    initSession()
+  }, [supabase])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,68 +78,93 @@ export default function ChangePasswordPage() {
         </div>
 
         <div className="bg-white border border-stone-100 p-10 rounded-[40px] shadow-sm space-y-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="p-4 rounded-2xl bg-red-50 text-red-600 text-sm font-bold border border-red-100">
-                {error}
+          {sessionError ? (
+            <div className="text-center space-y-6">
+              <div className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-red-50 text-red-600 border border-red-100">
+                <AlertCircle className="h-5 w-5 shrink-0" />
+                <p className="text-sm font-bold text-left">
+                  El enlace de recuperación no es válido o ha expirado.
+                  <br />
+                  <span className="font-normal text-red-500 text-xs">
+                    Solicita un nuevo enlace desde la página de inicio de sesión.
+                  </span>
+                </p>
               </div>
-            )}
-
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
-                Nueva Contraseña
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 pr-12 rounded-2xl border-stone-100 h-14 focus-visible:ring-primary/20 bg-stone-50/30"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-300 hover:text-stone-600 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
+              <Button
+                className="w-full rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14"
+                onClick={() => router.push("/forgot-password")}
+              >
+                Solicitar nuevo enlace
+              </Button>
             </div>
-
-            <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
-                Confirmar Contraseña
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300" />
-                <Input
-                  id="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="pl-12 rounded-2xl border-stone-100 h-14 focus-visible:ring-primary/20 bg-stone-50/30"
-                  required
-                />
-              </div>
+          ) : !sessionReady ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-stone-300" />
             </div>
-
-            <Button
-              type="submit"
-              className="w-full rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14 shadow-lg shadow-stone-200 transition-all flex items-center justify-center gap-2"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                "Restablecer contraseña"
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="p-4 rounded-2xl bg-red-50 text-red-600 text-sm font-bold border border-red-100">
+                  {error}
+                </div>
               )}
-            </Button>
-          </form>
+
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
+                  Nueva Contraseña
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-12 pr-12 rounded-2xl border-stone-100 h-14 focus-visible:ring-primary/20 bg-stone-50/30"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-300 hover:text-stone-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="confirmPassword" className="text-xs font-bold text-stone-400 uppercase tracking-widest pl-1">
+                  Confirmar Contraseña
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-300" />
+                  <Input
+                    id="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="pl-12 rounded-2xl border-stone-100 h-14 focus-visible:ring-primary/20 bg-stone-50/30"
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold h-14 shadow-lg shadow-stone-200 transition-all flex items-center justify-center gap-2"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  "Restablecer contraseña"
+                )}
+              </Button>
+            </form>
+          )}
         </div>
       </div>
     </div>
