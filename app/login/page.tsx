@@ -134,7 +134,7 @@ function LoginForm() {
               </div>
 
               <div className="flex items-center justify-between pt-2">
-                <Link href="/forgot-password" className="text-xs font-bold text-primary hover:underline">
+                <Link href="/recuperar-contrasena" className="text-xs font-bold text-primary hover:underline">
                   Olvidaste tu contrasena?
                 </Link>
               </div>

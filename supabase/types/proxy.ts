@@ -3,9 +3,12 @@ import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from '@/supabase/types/database'
 
 // Routes that don't require authentication
+const authCallbackRoutes = ['/cambiar-contrasena']
+
 const publicRoutes = [
   '/login',
   '/register',
+  '/recuperar-contrasena',
   '/forgot-password',
   '/auth',
   '/consulta-pedido',
@@ -53,6 +56,21 @@ export async function updateSession(request: NextRequest) {
 
   // Allow public routes, root, and static assets without auth
   if (isPublic || isRoot || isStatic) {
+    return supabaseResponse
+  }
+
+  // Allow auth callback routes (recovery session may not exist yet server-side)
+  const isAuthCallback = authCallbackRoutes.some((route) => pathname.startsWith(route))
+  if (isAuthCallback) {
+    return supabaseResponse
+  }
+
+  // Detect Supabase auth redirect with query params (PKCE flow)
+  const hasAuthParams =
+    request.nextUrl.searchParams.has('code') ||
+    request.nextUrl.searchParams.has('token_hash') ||
+    request.nextUrl.searchParams.has('token')
+  if (hasAuthParams) {
     return supabaseResponse
   }
 

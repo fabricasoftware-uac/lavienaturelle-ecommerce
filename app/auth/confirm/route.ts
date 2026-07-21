@@ -1,0 +1,27 @@
+import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/supabase/types/server"
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const token_hash = searchParams.get("token_hash")
+  const type = searchParams.get("type")
+  const next = searchParams.get("next") || "/"
+
+  if (!token_hash || !type) {
+    return NextResponse.redirect(new URL("/login", request.url))
+  }
+
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.verifyOtp({
+    type: type as "recovery" | "signup" | "invite" | "magiclink" | "email_change",
+    token_hash,
+  })
+
+  if (error) {
+    console.error("Error verifying OTP:", error.message)
+    return NextResponse.redirect(new URL("/login", request.url))
+  }
+
+  return NextResponse.redirect(new URL(next, request.url))
+}
