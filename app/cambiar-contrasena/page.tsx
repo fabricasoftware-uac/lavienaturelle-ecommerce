@@ -22,6 +22,10 @@ export default function CambiarContrasenaPage() {
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) setIsRecovery(true)
+    })
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
