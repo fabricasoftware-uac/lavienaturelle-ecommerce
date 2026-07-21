@@ -26,12 +26,6 @@ export default function CambiarContrasenaPage() {
       if (data.session) setIsRecovery(true)
     })
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data, error }) => {
-    console.log("🔍 Session:", data.session)
-    console.log("❌ Error:", error)
-  })
-}, [])
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
@@ -42,6 +36,13 @@ export default function CambiarContrasenaPage() {
 
     return () => subscription.unsubscribe()
   }, [supabase])
+
+  useEffect(() => {
+  supabase.auth.getSession().then(({ data, error }) => {
+    console.log("🔍 Session:", data.session)
+    console.log("❌ Error:", error)
+  })
+}, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
