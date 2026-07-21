@@ -5,10 +5,9 @@ import Link from "next/link"
 import { Mail, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { createClient } from "@/supabase/types/client"
+import { sendPasswordResetEmail } from "./actions"
 
 export default function ForgotPasswordPage() {
-  const supabase = createClient()
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSent, setIsSent] = useState(false)
@@ -19,14 +18,12 @@ export default function ForgotPasswordPage() {
     setError("")
     setIsLoading(true)
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/change-password`,
-    })
+    const result = await sendPasswordResetEmail(email)
 
-    if (!error) {
+    if (result.success) {
       setIsSent(true)
     } else {
-      setError(error.message || "No se pudo enviar el correo de recuperación")
+      setError(result.error || "No se pudo enviar el correo de recuperación")
     }
     setIsLoading(false)
   }
