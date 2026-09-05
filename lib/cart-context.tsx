@@ -1,12 +1,13 @@
 "use client"
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import { CatalogProduct } from "@/supabase/types/database"
+import { getItemUnitPrice } from "@/lib/utils"
 
 export interface CartItem extends CatalogProduct { quantity: number }
 
 interface StoreContextType {
   cart: CartItem[]
-  addToCart: (product: CatalogProduct) => void
+  addToCart: (product: CatalogProduct, quantity?: number) => void
   removeFromCart: (productId: string) => void
   updateQuantity: (productId: string, quantity: number) => void
   clearCart: () => void
@@ -35,17 +36,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (hydrated) localStorage.setItem("lavie-cart", JSON.stringify(cart))
   }, [cart, hydrated])
 
-  const addToCart = useCallback((product: CatalogProduct) => {
+  const addToCart = useCallback((product: CatalogProduct, quantity: number = 1) => {
+    const qtyToAdd = Math.max(1, quantity)
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id)
       if (existing) {
         return prev.map(item =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, ...product, quantity: item.quantity + qtyToAdd }
             : item
         )
       }
-      return [...prev, { ...product, quantity: 1 }]
+      return [...prev, { ...product, quantity: qtyToAdd }]
     })
     setIsCartOpen(true)
   }, [])
@@ -68,7 +70,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => setCart([]), [])
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const cartTotal = cart.reduce(
+    (sum, item) => sum + getItemUnitPrice(item, item.quantity) * item.quantity,
+    0
+  )
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
 
   return (

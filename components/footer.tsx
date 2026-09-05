@@ -50,27 +50,39 @@ export function Footer() {
               Contacto y Ubicación
             </h3>
             <ul className="space-y-6">
-              <li className="flex items-center gap-4 group cursor-pointer">
-                <div className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Mail className="h-5 w-5 text-primary" />
-                </div>
-                <span className="text-sm font-medium text-background/90 group-hover:text-primary transition-colors">
-                  lavienaturel.info@gmail.com
-                </span>
+              <li>
+                <a
+                  href="mailto:lavienaturelle.info@gmail.com"
+                  className="flex items-center gap-4 group cursor-pointer transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Mail className="h-5 w-5 text-primary" />
+                  </div>
+                  <span className="text-sm font-medium text-background/90 group-hover:text-primary transition-colors">
+                    lavienaturelle.info@gmail.com
+                  </span>
+                </a>
               </li>
-              <li className="flex items-center gap-4 group cursor-pointer">
-                <div className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Phone className="h-5 w-5 text-primary" />
-                </div>
-                <span className="text-sm font-medium text-background/90 group-hover:text-primary transition-colors">
-                  +57 3246763231
-                </span>
+              <li>
+                <a
+                  href="https://wa.me/573246763231"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 group cursor-pointer transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Phone className="h-5 w-5 text-primary" />
+                  </div>
+                  <span className="text-sm font-medium text-background/90 group-hover:text-primary transition-colors">
+                    +57 324 676 3231
+                  </span>
+                </a>
               </li>
-              <li className="flex items-start gap-4 group cursor-pointer">
-                <div className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors shrink-0">
+              <li className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center shrink-0">
                   <MapPin className="h-5 w-5 text-primary" />
                 </div>
-                  <span className="text-background/50 font-light">Popayan, Cauca. Colombia</span>
+                <span className="text-background/50 font-light pt-2">Popayan, Cauca. Colombia</span>
               </li>
             </ul>
           </div>

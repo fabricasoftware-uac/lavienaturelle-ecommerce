@@ -210,7 +210,7 @@ export function OrderInvoice({ order }: OrderInvoiceProps) {
             Gracias por elegir La Vie Naturelle. Este documento es un comprobante de compra válido.
           </Text>
           <Text style={[styles.footerText, { marginTop: 4 }]}>
-            lavienaturelle.com | Soporte: contacto@lavienaturelle.com
+            lavienaturelle.com | Soporte: lavienaturelle.info@gmail.com
           </Text>
         </View>
       </Page>

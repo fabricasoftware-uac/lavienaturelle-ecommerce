@@ -25,7 +25,7 @@ import { getWhatsAppOrderLink } from "@/lib/whatsapp"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/cart-context"
-import { cn, formatPrice } from "@/lib/utils"
+import { cn, formatPrice, getItemUnitPrice, getWholesalePrice } from "@/lib/utils"
 import { useColombiaLocations } from "@/hooks/use-colombia"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/supabase/types/client"
@@ -253,12 +253,17 @@ function CheckoutForm() {
       }
 
       try {
-        const result = await createOrderAction(orderData, cart)
+        const itemsWithEffectivePrice = cart.map((item) => ({
+          ...item,
+          price: getItemUnitPrice(item, item.quantity),
+        }))
+
+        const result = await createOrderAction(orderData, itemsWithEffectivePrice)
         
         if (result.success) {
           // Store summary and order ID before clearing
           const summary = {
-            items: [...cart],
+            items: [...itemsWithEffectivePrice],
             total: total,
             email: formData.email,
             name: formData.firstName,
@@ -967,32 +972,43 @@ function CheckoutForm() {
 
               {/* Cart Items */}
               <div className="space-y-4 mb-6">
-                {cart.map((item) => (
-                  <div key={item.id} className="flex gap-4 rounded-lg">
-                    <div className="relative h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-muted border border-border/50">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                      />
-                      <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shadow-sm">
-                        {item.quantity}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-bold text-foreground truncate">
-                        {item.name}
-                      </h3>
-                      <p className="text-xs text-muted-foreground font-medium">
-                        Cant: {item.quantity}
+                {cart.map((item) => {
+                  const isWholesale = item.quantity >= 12
+                  const unitPrice = getItemUnitPrice(item, item.quantity)
+                  return (
+                    <div key={item.id} className="flex gap-4 rounded-lg">
+                      <div className="relative h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-muted border border-border/50">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                        />
+                        <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shadow-sm">
+                          {item.quantity}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-bold text-foreground truncate">
+                          {item.name}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                          <p className="text-xs text-muted-foreground font-medium">
+                            Cant: {item.quantity}
+                          </p>
+                          {isWholesale && (
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                              Al por mayor
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-sm font-bold text-foreground">
+                        {formatPrice(unitPrice * item.quantity)}
                       </p>
                     </div>
-                    <p className="text-sm font-bold text-foreground">
-                      {formatPrice(item.price * item.quantity)}
-                    </p>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
               <div className="border-t border-border pt-4 space-y-3">

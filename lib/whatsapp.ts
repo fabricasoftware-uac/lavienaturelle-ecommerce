@@ -91,7 +91,10 @@ export function getWhatsAppOrderLink(order: {
     "$" + n.toLocaleString("es-CO", { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
   const itemsText = order.items
-    .map((item) => `\u2022 ${item.name} x${item.quantity} - ${fmt(item.price * item.quantity)}`)
+    .map((item) => {
+      const wholesaleTag = item.quantity >= 12 ? " (Precio al por mayor)" : ""
+      return `\u2022 ${item.name} x${item.quantity}${wholesaleTag} - ${fmt(item.price * item.quantity)}`
+    })
     .join("\n")
 
   const address = [

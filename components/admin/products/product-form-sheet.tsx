@@ -241,9 +241,9 @@ export function ProductFormSheet({
                       <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Nombre Comercial</label>
                       <Input placeholder="Ej: Jabón de Romero" value={data.name} onChange={(e) => setForm({...data, name: e.target.value})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Precio ($)</label>
+                        <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Precio Detal ($)</label>
                         <Input 
                           type="text" 
                           placeholder="0"
@@ -256,10 +256,22 @@ export function ProductFormSheet({
                         />
                       </div>
                       <div className="space-y-2">
+                        <label className="text-[10px] font-black text-primary uppercase ml-1">Precio Mayorista (12+ uds)</label>
+                        <Input 
+                          type="text" 
+                          placeholder="Auto (-20%)"
+                          value={data.wholesalePrice ? Number(data.wholesalePrice).toLocaleString('es-CO') : ''} 
+                          onChange={(e) => {
+                            const rawValue = e.target.value.replace(/\D/g, '')
+                            setForm({...data, wholesalePrice: rawValue ? Number(rawValue) : null})
+                          }} 
+                          className="h-12 bg-primary/5 rounded-2xl border border-primary/20 font-bold text-sm" 
+                        />
+                      </div>
+                      <div className="space-y-2">
                          <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Stock</label>
                          <Input type="number" min={0} value={data.stock} onChange={(e) => setForm({...data, stock: Math.max(0, Number(e.target.value))})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
                        </div>
-
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Categoría</label>
@@ -313,16 +325,22 @@ export function ProductFormSheet({
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="p-5 rounded-3xl bg-secondary/10 border border-border/40">
-                    <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Precio</p>
+                    <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Precio Detal</p>
                     <p className="text-sm font-black text-foreground">{formatPrice(data.price || 0)}</p>
+                  </div>
+                  <div className="p-5 rounded-3xl bg-primary/5 border border-primary/20">
+                    <p className="text-[10px] text-primary font-black uppercase mb-1">Precio Mayorista (12+)</p>
+                    <p className="text-sm font-black text-primary">
+                      {formatPrice(data.wholesalePrice || Math.round(((data.price || 0) * 0.8) / 100) * 100)}
+                    </p>
                   </div>
                   <div className="p-5 rounded-3xl bg-secondary/10 border border-border/40">
                     <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Stock</p>
                     <p className="text-sm font-black text-foreground">{data.stock} unidades</p>
                   </div>
-                  <div className="p-6 rounded-3xl bg-secondary/10 border border-border/40 sm:col-span-2">
+                  <div className="p-6 rounded-3xl bg-secondary/10 border border-border/40 sm:col-span-3">
                     <p className="text-[10px] text-muted-foreground font-black uppercase mb-1">Descripción</p>
                     <p className="text-sm font-medium leading-relaxed italic text-foreground/80">{data.description}</p>
                   </div>

@@ -70,7 +70,12 @@ export function ProductsTable({ products, loading, onOpenDetail }: ProductsTable
                     <span className="text-xs font-semibold text-muted-foreground/80">{p.category}</span>
                   </td>
                   <td className="px-6 py-5">
-                    <span className="text-sm font-bold text-foreground tabular-nums">{formatPrice(p.price || 0)}</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-foreground tabular-nums">{formatPrice(p.price || 0)}</span>
+                      <span className="text-[10px] font-semibold text-primary">
+                        Mayor: {formatPrice(p.wholesalePrice || Math.round(((p.price || 0) * 0.8) / 100) * 100)}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-6 py-5">
                     <span className="text-sm font-bold text-foreground tabular-nums">{p.stock}</span>
