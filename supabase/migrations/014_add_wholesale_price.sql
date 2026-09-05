@@ -2,10 +2,11 @@
 -- MIGRATION 014: Add Wholesale Price support (>= 12 units)
 -- ====================================================================
 
--- 1. Add wholesale_price column to products table
+-- 1. Add wholesale_price and wholesale_min_quantity columns to products table
 ALTER TABLE products ADD COLUMN IF NOT EXISTS wholesale_price DECIMAL(12,2);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS wholesale_min_quantity INT DEFAULT 12;
 
--- 2. Update create_order_with_items RPC to apply wholesale pricing when quantity >= 12
+-- 2. Update create_order_with_items RPC to apply wholesale pricing when quantity >= wholesale_min_quantity
 CREATE OR REPLACE FUNCTION public.create_order_with_items(p_order JSONB, p_items JSONB)
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -22,6 +23,7 @@ DECLARE
     v_db_price NUMERIC(12,2);
     v_db_sale_price NUMERIC(12,2);
     v_db_wholesale_price NUMERIC(12,2);
+    v_db_wholesale_min_qty INT;
     v_effective_price NUMERIC(12,2);
     v_calculated_total NUMERIC(12,2) := 0;
 BEGIN
@@ -60,8 +62,8 @@ BEGIN
         v_quantity := (v_item->>'quantity')::INT;
 
         -- Read stock AND prices from DB with row lock
-        SELECT stock_quantity, price, sale_price, wholesale_price
-        INTO v_stock, v_db_price, v_db_sale_price, v_db_wholesale_price
+        SELECT stock_quantity, price, sale_price, wholesale_price, COALESCE(wholesale_min_quantity, 12)
+        INTO v_stock, v_db_price, v_db_sale_price, v_db_wholesale_price, v_db_wholesale_min_qty
         FROM products
         WHERE id = v_product_id
         FOR UPDATE;
@@ -76,17 +78,12 @@ BEGIN
         END IF;
 
         -- Price determination:
-        -- If quantity >= 12, use wholesale_price if available, otherwise default to 20% discount (or sale_price)
-        IF v_quantity >= 12 THEN
-            IF v_db_wholesale_price IS NOT NULL AND v_db_wholesale_price > 0 THEN
-                v_effective_price := v_db_wholesale_price;
-            ELSIF v_db_sale_price IS NOT NULL AND v_db_sale_price > 0 THEN
-                v_effective_price := v_db_sale_price;
-            ELSE
-                v_effective_price := ROUND(v_db_price * 0.8, -2);
-            END IF;
+        -- Only apply wholesale price if manually configured (> 0) and quantity >= wholesale_min_quantity.
+        -- Otherwise apply standard price (sale_price or price).
+        IF v_quantity >= v_db_wholesale_min_qty AND v_db_wholesale_price IS NOT NULL AND v_db_wholesale_price > 0 THEN
+            v_effective_price := v_db_wholesale_price;
         ELSE
-            -- Detal (1-11 units)
+            -- Detal (less than min qty, or products without wholesale price)
             v_effective_price := COALESCE(v_db_sale_price, v_db_price);
         END IF;
 

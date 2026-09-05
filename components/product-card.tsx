@@ -25,7 +25,7 @@ const badgeStyles: Record<string, string> = {
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addToCart } = useStore()
   const router = useRouter()
-  const wholesalePrice = getWholesalePrice(product.price, product.wholesalePrice)
+  const wholesalePrice = getWholesalePrice(product.wholesalePrice)
 
   const handleViewProduct = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -136,20 +136,30 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
         {/* Price + Add */}
         <div className="flex items-end justify-between mt-auto pt-2.5 border-t border-border/30 gap-2">
-          <div className="flex flex-col min-w-0">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-tight">Detal:</span>
-              <span className="font-serif text-base font-bold text-foreground leading-none">
+          {wholesalePrice ? (
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-tight">Detal:</span>
+                <span className="font-serif text-base font-bold text-foreground leading-none">
+                  {formatPrice(product.price)}
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1.5 mt-1.5">
+                <span className="text-[9px] font-bold text-primary uppercase tracking-tight">
+                  Mayor ({product.wholesaleMinQuantity || 12}+):
+                </span>
+                <span className="font-serif text-xs font-bold text-primary leading-none">
+                  {formatPrice(wholesalePrice)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              <span className="font-serif text-xl font-bold text-primary leading-none">
                 {formatPrice(product.price)}
               </span>
             </div>
-            <div className="flex items-baseline gap-1.5 mt-1.5">
-              <span className="text-[9px] font-bold text-primary uppercase tracking-tight">Mayor (12+):</span>
-              <span className="font-serif text-xs font-bold text-primary leading-none">
-                {formatPrice(wholesalePrice)}
-              </span>
-            </div>
-          </div>
+          )}
           <button
             onClick={() => product.inStock && addToCart(product)}
             disabled={!product.inStock}

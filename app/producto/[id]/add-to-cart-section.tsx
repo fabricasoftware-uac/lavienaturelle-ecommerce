@@ -4,7 +4,7 @@ import { useState } from "react"
 import { ShoppingCart, Minus, Plus, Sparkles, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/lib/cart-context"
-import { formatPrice, getWholesalePrice, getItemUnitPrice } from "@/lib/utils"
+import { formatPrice, getWholesalePrice, getItemUnitPrice, getWholesaleMinQuantity } from "@/lib/utils"
 import type { CatalogProduct } from "@/supabase/types/database"
 
 interface AddToCartSectionProps {
@@ -16,8 +16,9 @@ export function AddToCartSection({ product }: AddToCartSectionProps) {
   const [quantity, setQuantity] = useState(1)
 
   const maxQuantity = product.stockQuantity || 0
-  const isWholesale = quantity >= 12
-  const wholesalePrice = getWholesalePrice(product.price, product.wholesalePrice)
+  const wholesalePrice = getWholesalePrice(product.wholesalePrice)
+  const minWholesaleQty = getWholesaleMinQuantity(product.wholesaleMinQuantity)
+  const isWholesale = quantity >= minWholesaleQty && Boolean(wholesalePrice)
   const unitPrice = getItemUnitPrice(product, quantity)
   const subtotal = unitPrice * quantity
 
@@ -28,14 +29,14 @@ export function AddToCartSection({ product }: AddToCartSectionProps) {
   }
 
   const handleSetWholesaleQty = () => {
-    if (maxQuantity < 12) return
-    setQuantity(12)
+    if (maxQuantity < minWholesaleQty || !wholesalePrice) return
+    setQuantity(minWholesaleQty)
   }
 
   return (
     <div className="space-y-4 pt-2">
       {/* Wholesale Banner / Guidance */}
-      {maxQuantity >= 12 && (
+      {wholesalePrice && maxQuantity >= minWholesaleQty && (
         <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-primary/5 border border-primary/15 text-xs">
           {isWholesale ? (
             <div className="flex items-center gap-2 text-primary font-bold">
@@ -46,17 +47,17 @@ export function AddToCartSection({ product }: AddToCartSectionProps) {
             <div className="flex items-center gap-2 text-muted-foreground font-medium">
               <Tag className="h-4 w-4 shrink-0 text-primary" />
               <span>
-                Lleva <strong>{12 - quantity} {12 - quantity === 1 ? 'unidad más' : 'unidades más'}</strong> para activar precio mayorista ({formatPrice(wholesalePrice)}/ud).
+                Lleva <strong>{minWholesaleQty - quantity} {minWholesaleQty - quantity === 1 ? 'unidad más' : 'unidades más'}</strong> para activar precio mayorista ({formatPrice(wholesalePrice)}/ud).
               </span>
             </div>
           )}
-          {!isWholesale && maxQuantity >= 12 && (
+          {!isWholesale && maxQuantity >= minWholesaleQty && (
             <button
               type="button"
               onClick={handleSetWholesaleQty}
               className="text-[11px] font-bold text-primary underline hover:text-primary/80 shrink-0 cursor-pointer"
             >
-              Pedir 12 uds
+              Pedir {minWholesaleQty} uds
             </button>
           )}
         </div>

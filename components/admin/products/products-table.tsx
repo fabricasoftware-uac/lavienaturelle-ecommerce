@@ -72,9 +72,15 @@ export function ProductsTable({ products, loading, onOpenDetail }: ProductsTable
                   <td className="px-6 py-5">
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-foreground tabular-nums">{formatPrice(p.price || 0)}</span>
-                      <span className="text-[10px] font-semibold text-primary">
-                        Mayor: {formatPrice(p.wholesalePrice || Math.round(((p.price || 0) * 0.8) / 100) * 100)}
-                      </span>
+                      {p.wholesalePrice ? (
+                        <span className="text-[10px] font-semibold text-primary">
+                          Mayor: {formatPrice(p.wholesalePrice)} ({p.wholesaleMinQuantity || 12}+ uds)
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-medium text-muted-foreground/60">
+                          Sin mayorista
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-5">

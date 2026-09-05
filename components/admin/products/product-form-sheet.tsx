@@ -241,7 +241,7 @@ export function ProductFormSheet({
                       <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Nombre Comercial</label>
                       <Input placeholder="Ej: Jabón de Romero" value={data.name} onChange={(e) => setForm({...data, name: e.target.value})} className="h-12 bg-secondary/20 rounded-2xl border-none font-bold text-sm" />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">Precio Detal ($)</label>
                         <Input 
@@ -256,14 +256,28 @@ export function ProductFormSheet({
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-black text-primary uppercase ml-1">Precio Mayorista (12+ uds)</label>
+                        <label className="text-[10px] font-black text-primary uppercase ml-1">Precio Mayorista ($)</label>
                         <Input 
                           type="text" 
-                          placeholder="Auto (-20%)"
+                          placeholder="Opcional (manual)"
                           value={data.wholesalePrice ? Number(data.wholesalePrice).toLocaleString('es-CO') : ''} 
                           onChange={(e) => {
                             const rawValue = e.target.value.replace(/\D/g, '')
                             setForm({...data, wholesalePrice: rawValue ? Number(rawValue) : null})
+                          }} 
+                          className="h-12 bg-primary/5 rounded-2xl border border-primary/20 font-bold text-sm" 
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-primary uppercase ml-1">Mín. Mayorista (uds)</label>
+                        <Input 
+                          type="number" 
+                          min={1}
+                          placeholder="12"
+                          value={data.wholesaleMinQuantity ?? 12} 
+                          onChange={(e) => {
+                            const val = Math.max(1, Number(e.target.value) || 12)
+                            setForm({...data, wholesaleMinQuantity: val})
                           }} 
                           className="h-12 bg-primary/5 rounded-2xl border border-primary/20 font-bold text-sm" 
                         />
@@ -331,9 +345,11 @@ export function ProductFormSheet({
                     <p className="text-sm font-black text-foreground">{formatPrice(data.price || 0)}</p>
                   </div>
                   <div className="p-5 rounded-3xl bg-primary/5 border border-primary/20">
-                    <p className="text-[10px] text-primary font-black uppercase mb-1">Precio Mayorista (12+)</p>
+                    <p className="text-[10px] text-primary font-black uppercase mb-1">
+                      Precio Mayorista ({data.wholesaleMinQuantity || 12}+ uds)
+                    </p>
                     <p className="text-sm font-black text-primary">
-                      {formatPrice(data.wholesalePrice || Math.round(((data.price || 0) * 0.8) / 100) * 100)}
+                      {data.wholesalePrice ? formatPrice(data.wholesalePrice) : "No configurado"}
                     </p>
                   </div>
                   <div className="p-5 rounded-3xl bg-secondary/10 border border-border/40">

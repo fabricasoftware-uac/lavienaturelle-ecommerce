@@ -973,7 +973,7 @@ function CheckoutForm() {
               {/* Cart Items */}
               <div className="space-y-4 mb-6">
                 {cart.map((item) => {
-                  const isWholesale = item.quantity >= 12
+                  const isWholesale = item.quantity >= (item.wholesaleMinQuantity || 12) && Boolean(item.wholesalePrice && Number(item.wholesalePrice) > 0)
                   const unitPrice = getItemUnitPrice(item, item.quantity)
                   return (
                     <div key={item.id} className="flex gap-4 rounded-lg">

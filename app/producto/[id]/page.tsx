@@ -82,40 +82,52 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 {product.name}
               </h1>
 
-              {/* Pricing Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-secondary/30 border border-border">
-                {/* Detal */}
-                <div className="p-3.5 rounded-xl bg-card border border-border/60 shadow-xs">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                      Precio al Detal
-                    </span>
-                    <span className="text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                      1 a 11 uds
-                    </span>
+              {/* Pricing */}
+              {product.wholesalePrice && Number(product.wholesalePrice) > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-secondary/30 border border-border">
+                  {/* Detal */}
+                  <div className="p-3.5 rounded-xl bg-card border border-border/60 shadow-xs">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                        Precio al Detal
+                      </span>
+                      <span className="text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                        {(product.wholesaleMinQuantity || 12) > 2
+                          ? `1 a ${(product.wholesaleMinQuantity || 12) - 1} uds`
+                          : "1 ud"}
+                      </span>
+                    </div>
+                    <p className="font-serif text-2xl font-bold text-foreground">
+                      {formatPrice(product.price)}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Precio unitario estándar</p>
                   </div>
-                  <p className="font-serif text-2xl font-bold text-foreground">
-                    {formatPrice(product.price)}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Precio unitario estándar</p>
-                </div>
 
-                {/* Por Mayor */}
-                <div className="p-3.5 rounded-xl bg-primary/5 border border-primary/20 shadow-xs relative overflow-hidden">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[11px] font-bold text-primary uppercase tracking-wider">
-                      Precio al Por Mayor
-                    </span>
-                    <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                      12+ uds
-                    </span>
+                  {/* Por Mayor */}
+                  <div className="p-3.5 rounded-xl bg-primary/5 border border-primary/20 shadow-xs relative overflow-hidden">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[11px] font-bold text-primary uppercase tracking-wider">
+                        Precio al Por Mayor
+                      </span>
+                      <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                        {product.wholesaleMinQuantity || 12}+ uds
+                      </span>
+                    </div>
+                    <p className="font-serif text-2xl font-bold text-primary">
+                      {formatPrice(product.wholesalePrice)}
+                    </p>
+                    <p className="text-[11px] text-primary/80 font-medium mt-0.5">
+                      A partir de {product.wholesaleMinQuantity || 12} unidades
+                    </p>
                   </div>
-                  <p className="font-serif text-2xl font-bold text-primary">
-                    {formatPrice(getWholesalePrice(product.price, product.wholesalePrice))}
-                  </p>
-                  <p className="text-[11px] text-primary/80 font-medium mt-0.5">A partir de 12 unidades</p>
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-baseline gap-3 py-1">
+                  <span className="font-serif text-3xl sm:text-4xl font-bold text-primary">
+                    {formatPrice(product.price)}
+                  </span>
+                </div>
+              )}
 
               {/* Stock Status */}
               <div>

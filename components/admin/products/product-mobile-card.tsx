@@ -37,9 +37,11 @@ export function ProductMobileCard({ product, onOpenDetail }: ProductMobileCardPr
             <span className="text-xs font-semibold text-muted-foreground/80">{product.category}</span>
             <span className="h-1 w-1 rounded-full bg-border" />
             <span className="text-sm font-black text-foreground">{formatPrice(product.price || 0)}</span>
-            <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-              Mayor: {formatPrice(product.wholesalePrice || Math.round(((product.price || 0) * 0.8) / 100) * 100)}
-            </span>
+            {product.wholesalePrice && Number(product.wholesalePrice) > 0 && (
+              <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                Mayor: {formatPrice(product.wholesalePrice)} ({product.wholesaleMinQuantity || 12}+ uds)
+              </span>
+            )}
           </div>
         </div>
       </div>

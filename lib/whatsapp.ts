@@ -84,7 +84,13 @@ export function getWhatsAppOrderLink(order: {
   shippingAddress2?: string
   shippingCity: string
   shippingState: string
-  items: { name: string; quantity: number; price: number }[]
+  items: {
+    name: string
+    quantity: number
+    price: number
+    wholesalePrice?: number | null
+    wholesaleMinQuantity?: number | null
+  }[]
   total: number
 }): string {
   const fmt = (n: number) =>
@@ -92,7 +98,11 @@ export function getWhatsAppOrderLink(order: {
 
   const itemsText = order.items
     .map((item) => {
-      const wholesaleTag = item.quantity >= 12 ? " (Precio al por mayor)" : ""
+      const minQty = item.wholesaleMinQuantity && item.wholesaleMinQuantity > 0 ? item.wholesaleMinQuantity : 12
+      const wholesaleTag =
+        item.quantity >= minQty && item.wholesalePrice && Number(item.wholesalePrice) > 0
+          ? " (Precio al por mayor)"
+          : ""
       return `\u2022 ${item.name} x${item.quantity}${wholesaleTag} - ${fmt(item.price * item.quantity)}`
     })
     .join("\n")

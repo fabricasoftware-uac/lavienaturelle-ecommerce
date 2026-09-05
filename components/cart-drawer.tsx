@@ -5,7 +5,7 @@ import Image from "next/image"
 import { X, Plus, Minus, ShoppingBag, AlertTriangle, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/lib/cart-context"
-import { cn, formatPrice, getItemUnitPrice, getWholesalePrice } from "@/lib/utils"
+import { cn, formatPrice, getItemUnitPrice, getWholesalePrice, getWholesaleMinQuantity } from "@/lib/utils"
 
 export function CartDrawer() {
   const { cart, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, cartTotal } = useStore()
@@ -26,27 +26,28 @@ export function CartDrawer() {
       {/* Drawer */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-full max-w-md bg-card shadow-2xl z-50 transform transition-transform duration-300 ease-out flex flex-col",
+          "fixed top-0 right-0 h-full w-full sm:w-[420px] bg-card z-50 shadow-2xl transition-transform duration-300 flex flex-col",
           isCartOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+        <div className="flex items-center justify-between p-6 border-b border-border">
           <div className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5 text-primary" />
-            <h2 className="font-serif text-lg font-semibold text-foreground">Tu Carrito</h2>
+            <h2 className="font-serif text-lg font-bold text-foreground">Tu Carrito</h2>
+            <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-bold">
+              {cart.reduce((sum, item) => sum + item.quantity, 0)}
+            </span>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={() => setIsCartOpen(false)}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground transition-colors p-1"
           >
             <X className="h-5 w-5" />
-          </Button>
+          </button>
         </div>
 
-        {/* Cart Items */}
+        {/* Items */}
         <div className="flex-1 overflow-y-auto p-6">
           {cart.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
@@ -60,9 +61,11 @@ export function CartDrawer() {
                 const stock = item.stockQuantity ?? Infinity
                 const isLow = stock > 0 && stock <= 5
                 const isOut = stock <= 0
-                const isWholesale = item.quantity >= 12
+                const wholesalePrice = getWholesalePrice(item.wholesalePrice)
+                const minQty = getWholesaleMinQuantity(item.wholesaleMinQuantity)
+                const hasWholesalePrice = Boolean(wholesalePrice)
+                const isWholesale = item.quantity >= minQty && hasWholesalePrice
                 const unitPrice = getItemUnitPrice(item, item.quantity)
-                const wholesalePrice = getWholesalePrice(item.price, item.wholesalePrice)
                 const itemTotal = unitPrice * item.quantity
 
                 return (
@@ -94,16 +97,18 @@ export function CartDrawer() {
                         </div>
 
                         {/* Wholesale Indicator / Suggestion */}
-                        {isWholesale ? (
-                          <div className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                            <Sparkles className="h-3 w-3" />
-                            Precio por mayor aplicado (12+ uds)
-                          </div>
-                        ) : stock >= 12 ? (
-                          <p className="text-[10px] text-muted-foreground mt-1">
-                            Lleva {12 - item.quantity} más para precio mayorista ({formatPrice(wholesalePrice)}/ud)
-                          </p>
-                        ) : null}
+                        {hasWholesalePrice && (
+                          isWholesale ? (
+                            <div className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                              <Sparkles className="h-3 w-3" />
+                              Precio por mayor aplicado ({minQty}+ uds)
+                            </div>
+                          ) : stock >= minQty ? (
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              Lleva {minQty - item.quantity} más para precio mayorista ({formatPrice(wholesalePrice!)}/ud)
+                            </p>
+                          ) : null
+                        )}
 
                         {isLow && (
                           <p className="text-xs text-amber-600 font-medium mt-1 flex items-center gap-1">

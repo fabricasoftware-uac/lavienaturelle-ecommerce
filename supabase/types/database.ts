@@ -167,6 +167,7 @@ export interface Database {
           price: number
           sale_price: number | null
           wholesale_price?: number | null
+          wholesale_min_quantity?: number | null
           sku: string | null
           stock_quantity: number
           is_featured: boolean
@@ -192,6 +193,7 @@ export interface Database {
           price?: number
           sale_price?: string | null
           wholesale_price?: number | null
+          wholesale_min_quantity?: number | null
           sku?: string | null
           stock_quantity?: number
           is_featured?: boolean
@@ -217,6 +219,7 @@ export interface Database {
           price?: number
           sale_price?: string | null
           wholesale_price?: number | null
+          wholesale_min_quantity?: number | null
           sku?: string | null
           stock_quantity?: number
           is_featured?: boolean
@@ -650,6 +653,7 @@ export interface CatalogProduct {
   name: string
   price: number
   wholesalePrice?: number | null
+  wholesaleMinQuantity?: number | null
   category: string
   categoryName: string
   image: string
@@ -678,6 +682,7 @@ export interface AppProduct {
   categoryId: string
   price: number
   wholesalePrice?: number | null
+  wholesaleMinQuantity?: number | null
   stock: number
   stockStatus: "In Stock" | "Low Stock" | "Out of Stock"
   status: "Active" | "Draft" | "Out of Stock"

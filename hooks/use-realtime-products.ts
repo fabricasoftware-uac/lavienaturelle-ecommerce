@@ -31,6 +31,7 @@ export function useRealtimeProducts(
       name: p.name,
       price: Number(p.price),
       wholesalePrice: p.wholesale_price ? Number(p.wholesale_price) : null,
+      wholesaleMinQuantity: p.wholesale_min_quantity ? Number(p.wholesale_min_quantity) : 12,
       category: p.categories?.slug || "otros",
       categoryName: p.categories?.name || "Otros",
       image: p.product_multimedia?.[0]?.url || "/logo-script.png",

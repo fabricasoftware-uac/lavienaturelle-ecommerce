@@ -27,26 +27,40 @@ export function formatPrice(price: number | string) {
 }
 
 /**
- * Returns the wholesale price for a product.
- * If not explicitly configured, defaults to 20% discount rounded to nearest hundred.
+ * Returns the wholesale price for a product if manually configured.
+ * Returns null if no wholesale price has been set.
  */
-export function getWholesalePrice(price: number, wholesalePrice?: number | null): number {
-  if (wholesalePrice && wholesalePrice > 0) {
+export function getWholesalePrice(wholesalePrice?: number | null): number | null {
+  if (wholesalePrice && Number(wholesalePrice) > 0) {
     return Number(wholesalePrice)
   }
-  return Math.round((price * 0.8) / 100) * 100
+  return null
+}
+
+/**
+ * Returns the minimum quantity required to activate wholesale price.
+ * Defaults to 12 if not specified.
+ */
+export function getWholesaleMinQuantity(wholesaleMinQuantity?: number | null): number {
+  if (wholesaleMinQuantity && Number(wholesaleMinQuantity) > 0) {
+    return Math.floor(Number(wholesaleMinQuantity))
+  }
+  return 12
 }
 
 /**
  * Returns the effective unit price for a given quantity.
- * Wholesale price applies for 12 or more units.
+ * Wholesale price applies only when the purchase quantity meets or exceeds
+ * the product's configured wholesaleMinQuantity (default 12) AND
+ * a wholesale price has been manually configured for the product.
  */
 export function getItemUnitPrice(
-  item: { price: number; wholesalePrice?: number | null },
+  item: { price: number; wholesalePrice?: number | null; wholesaleMinQuantity?: number | null },
   quantity: number
 ): number {
-  if (quantity >= 12) {
-    return getWholesalePrice(item.price, item.wholesalePrice)
+  const minQty = getWholesaleMinQuantity(item.wholesaleMinQuantity)
+  if (quantity >= minQty && item.wholesalePrice && Number(item.wholesalePrice) > 0) {
+    return Number(item.wholesalePrice)
   }
   return item.price
 }
